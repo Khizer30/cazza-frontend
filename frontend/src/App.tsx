@@ -1,9 +1,11 @@
 import { SignIn } from "./pages/auth/SignIn";
+import { SignUp } from "./pages/auth/SignUp";
 
 const App = () => {
   return (
     <>
-      <SignIn></SignIn>
+      {/* <SignIn></SignIn> */}
+      <SignUp></SignUp>
     </>
   );
 };
