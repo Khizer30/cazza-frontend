@@ -1,5 +1,11 @@
+import { SignIn } from "./pages/auth/SignIn";
+
 const App = () => {
-  return <div className="bg-amber-600">App setup</div>;
+  return (
+    <>
+      <SignIn></SignIn>
+    </>
+  );
 };
 
 export default App;
