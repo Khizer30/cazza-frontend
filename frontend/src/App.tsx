@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-const App = () => {
-  return <div className="bg-amber-600">App setup</div>;
-=======
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ResetPassword } from "./pages/auth/ResetPassword";
 import { SetNewPassword } from "./pages/auth/SetNewPassword";
@@ -33,7 +29,6 @@ const App = () => {
       </ThemeProvider>
     </>
   );
->>>>>>> Stashed changes
-};
+}
 
 export default App;
