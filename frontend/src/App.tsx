@@ -8,6 +8,9 @@ import { LandingPage } from "./pages/landingPage/LandingPage";
 import { ThemeProvider } from "./components/theme-provider";
 import { ClientLayout } from "./layouts/ClientLayout";
 import { ClientDashboard } from "./pages/ClientDashboard/ClientDashboard";
+import { ClientPlatforms } from "./pages/ClientDashboard/ClientPlatforms";
+import { AIChat } from "./pages/ClientDashboard/AIChat";
+import { Channels } from "./pages/ClientDashboard/Channels";
 
 const App = () => {
   return (
@@ -15,20 +18,23 @@ const App = () => {
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <BrowserRouter>
           <Routes>
+            <Route path="*" element={<NotFound />} />
             <Route index element={<LandingPage />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/set-new-password" element={<SetNewPassword />} />
-            <Route path="*" element={<NotFound />} />
             <Route path="/client" element={<ClientLayout />}>
-              <Route index element={<ClientDashboard />} />
+              <Route index path="dashboard" element={<ClientDashboard />} />
+              <Route path="platforms" element={<ClientPlatforms />} />
+              <Route path="channels" element={<Channels />} />
+              <Route path="ask-cazza" element={<AIChat />} />
             </Route>
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
     </>
   );
-}
+};
 
 export default App;

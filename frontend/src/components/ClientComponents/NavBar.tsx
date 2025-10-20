@@ -10,7 +10,7 @@ interface ClientSidebarProps {
 }
 export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
   return (
-    <div className="w-16 lg:w-16 bg-card/50 border-r border-border/50 mt-4 flex flex-col bg-white">
+    <div className="w-16 lg:w-16 border-r border-border/50 mt-4 flex flex-col bg-white">
       <ScrollArea className="flex-1">
         <div className="p-2 lg:p-3 space-y-2">
           {/* Ask Cazza - Primary Focus */}
@@ -26,7 +26,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
               }`}
               asChild
             >
-              <Link to="/client/chat" onClick={onNavigate}>
+              <Link to="/client/ask-cazza" onClick={onNavigate}>
                 <Bot className="w-5 h-5" />
               </Link>
             </Button>

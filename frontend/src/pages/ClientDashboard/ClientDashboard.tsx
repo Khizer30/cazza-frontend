@@ -1,4 +1,4 @@
-// import { PlatformRevenueChart } from "@/components/ClientComponents/PlatformRevenueChart";
+import { PlatformRevenueChart } from "@/components/ClientComponents/PlatformRevenueChart";
 import { ProfitLossStatement } from "@/components/ClientComponents/ProfitLossStatement";
 import {
   Card,
@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { tempRevenueData, totalRevenue } from "@/constants/ClientDashboard";
 import {
   BarChart3,
   Calendar,
@@ -25,19 +26,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const tempRevenueData = [
-  { month: "Sep", revenue: 4280, expenses: 2450 },
-  { month: "Oct", revenue: 5340, expenses: 3120 },
-  { month: "Nov", revenue: 5920, expenses: 3680 },
-  { month: "Dec", revenue: 6240, expenses: 3950 },
-  { month: "Jan", revenue: 6875, expenses: 4200 },
-  { month: "Feb", revenue: 7691, expenses: 4180 },
-];
-const totalRevenue = 2016.5;
+
 
 export const ClientDashboard = () => {
   return (
-    <div className="flex-1 space-y-6 p-4">
+    <div className="flex-1 space-y-3 p-4">
       {/* Date Range Selector */}
       <Card className="hover:shadow-none hover:transform-none">
         <CardHeader>
@@ -77,7 +70,7 @@ export const ClientDashboard = () => {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs defaultValue="overview" className="space-y-1">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -255,7 +248,7 @@ export const ClientDashboard = () => {
         </TabsContent>
 
         <TabsContent value="revenue" className="space-y-6">
-          {/* <PlatformRevenueChart /> */}
+          <PlatformRevenueChart />
         </TabsContent>
 
         <TabsContent value="profit-loss" className="space-y-6">
