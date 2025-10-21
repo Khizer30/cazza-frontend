@@ -1,5 +1,4 @@
-
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { BarChart3, Bot, HashIcon, ShoppingCart } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
@@ -9,6 +8,8 @@ interface ClientSidebarProps {
   onNavigate?: () => void;
 }
 export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
+  const location = useLocation();
+
   return (
     <div className="w-16 lg:w-16 border-r border-border/50 mt-4 flex flex-col bg-white">
       <ScrollArea className="flex-1">
@@ -19,8 +20,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
               variant="ghost"
               size="icon"
               className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
-                location.pathname === "/client/chat" ||
-                location.pathname === "/client/ai-chat"
+                location.pathname === "/client/ask-cazza"
                   ? "bg-primary text-primary-foreground shadow-lg"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}
