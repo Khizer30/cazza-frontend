@@ -11,6 +11,9 @@ import { ClientDashboard } from "./pages/ClientDashboard/ClientDashboard";
 import { ClientPlatforms } from "./pages/ClientDashboard/ClientPlatforms";
 import { AIChat } from "./pages/ClientDashboard/AIChat";
 import { Channels } from "./pages/ClientDashboard/Channels";
+import { BillingSettings } from "./pages/Settings/BillingSettings";
+import { SupportSettings } from "./pages/Settings/SupportSettings";
+import { AccountSettings } from "./pages/Settings/AccountSettings";
 
 const App = () => {
   return (
@@ -29,6 +32,9 @@ const App = () => {
               <Route path="platforms" element={<ClientPlatforms />} />
               <Route path="channels" element={<Channels />} />
               <Route path="ask-cazza" element={<AIChat />} />
+              <Route path="billing" element={<BillingSettings />} />
+              <Route path="support" element={<SupportSettings />} />
+              <Route path="settings" element={<AccountSettings />} />
             </Route>
           </Routes>
         </BrowserRouter>
