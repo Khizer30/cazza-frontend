@@ -28,7 +28,7 @@ export const SupportSettings = () => {
 
   const handleSubmitTicket = () => {};
   return (
-    <div className="max-w-6xl space-y-6 m-4">
+    <div className="max-w-6xl space-y-6 mx-auto my-4">
       {/* Create Support Ticket */}
       <Card>
         <CardHeader>

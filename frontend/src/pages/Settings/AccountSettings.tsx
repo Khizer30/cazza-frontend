@@ -32,8 +32,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Camera, Loader2, Trash2, Upload } from "lucide-react";
 import React, { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const AccountSettings = () => {
+  const navigate = useNavigate();
   // Role can be derived from user context / auth in real implementation.
   // Defaulting to 'client' for now. Change to 'accountant' to view accountant UI.
   const [role] = useState<"client" | "accountant">("client");
@@ -149,7 +151,7 @@ export const AccountSettings = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl space-y-6 m-4">
+    <div className="max-w-4xl space-y-6 mx-auto my-4">
       {/* Profile Picture Section */}
       <Card>
         <CardHeader>
@@ -159,7 +161,7 @@ export const AccountSettings = () => {
               <Button
                 variant="outline"
                 onClick={() => {
-                  window.location.href = "/client/chat";
+                  navigate("/client/dashboard");
                 }}
                 className="gap-2 "
               >

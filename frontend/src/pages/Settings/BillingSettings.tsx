@@ -91,7 +91,7 @@ export const BillingSettings = () => {
     window.open("mailto:sales@example.com?subject=Book%20a%20demo", "_blank");
   };
   return (
-    <div className="max-w-6xl space-y-6 m-4">
+    <div className="max-w-6xl space-y-6 mx-auto my-4">
       {/* Current Plan */}
       {subscription && (
         <Card>

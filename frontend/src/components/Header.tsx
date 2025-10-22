@@ -46,7 +46,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
         <div
           className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-          //   onClick={() => navigate(getHomePath())}
+          onClick={() => navigate("/client/dashboard")}
         >
           {/* <Logo size="md" /> */}
           <img
@@ -60,20 +60,6 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             className="w-[120px] block dark:hidden"
           />
         </div>
-
-        {/* Organization Label - Always show
-        {currentOrgName && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Welcome to</span>
-            <Badge
-              variant="outline"
-              className="text-sm border-primary/50 px-3 py-1.5"
-            >
-              <Building2 className="w-4 h-4 mr-2" />
-              {currentOrgName}
-            </Badge>
-          </div>
-        )} */}
       </div>
 
       {/* Right side elements */}
@@ -106,7 +92,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               <Avatar className="h-10 w-10">
                 <AvatarImage src={"avatarUrl"} alt="User avatar" />
                 <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                  {/* {getUserInitials()} */}
+                  S
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -119,7 +105,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
           >
             <DropdownMenuItem
               className="cursor-pointer"
-              //   onClick={() => handleSettingsClick("account")}
+              onClick={() => navigate("/client/settings")}
             >
               <Settings className="mr-2 h-4 w-4" />
               Account Settings
@@ -127,7 +113,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
             <DropdownMenuItem
               className="cursor-pointer"
-              //   onClick={() => handleSettingsClick("billing")}
+              onClick={() => navigate("/client/billing")}
             >
               <CreditCard className="mr-2 h-4 w-4" />
               Billing
@@ -135,7 +121,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
             <DropdownMenuItem
               className="cursor-pointer"
-              //   onClick={() => handleSettingsClick("support")}
+              onClick={() => navigate("/client/support")}
             >
               <HelpCircle className="mr-2 h-4 w-4" />
               Support
@@ -143,7 +129,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
             <DropdownMenuItem
               className="cursor-pointer"
-              //   onClick={() => handleSettingsClick("teams")}
+              onClick={() => navigate("teams")}
             >
               <Users className="mr-2 h-4 w-4" />
               Teams

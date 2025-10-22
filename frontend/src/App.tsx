@@ -14,6 +14,7 @@ import { Channels } from "./pages/ClientDashboard/Channels";
 import { BillingSettings } from "./pages/Settings/BillingSettings";
 import { SupportSettings } from "./pages/Settings/SupportSettings";
 import { AccountSettings } from "./pages/Settings/AccountSettings";
+import { TeamSettings } from "./pages/Settings/TeamSettings";
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
               <Route path="billing" element={<BillingSettings />} />
               <Route path="support" element={<SupportSettings />} />
               <Route path="settings" element={<AccountSettings />} />
+              <Route path="teams" element={<TeamSettings />} />
             </Route>
           </Routes>
         </BrowserRouter>
