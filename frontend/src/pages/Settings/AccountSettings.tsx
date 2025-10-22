@@ -69,8 +69,8 @@ export const AccountSettings = () => {
   };
 
   const [formData, setFormData] = useState<AccountFormData>({
-    firstName: "",
-    lastName: "",
+    firstName: "Shahzaib",
+    lastName: "Farooq",
     email: "",
     firmName: "",
     marketplaces: [],
@@ -191,9 +191,8 @@ export const AccountSettings = () => {
             <Avatar className="h-24 w-24">
               <AvatarImage src={avatarUrl ?? undefined} alt="Profile" />
               <AvatarFallback className="text-2xl">
-                {/* {formData.firstName.charAt(0)}
-                {formData.lastName.charAt(0)} */}
-                p
+                {formData.firstName.charAt(0)}
+                {formData.lastName.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div className="flex gap-2">

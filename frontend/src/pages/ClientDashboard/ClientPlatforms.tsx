@@ -117,6 +117,9 @@ export const ClientPlatforms = () => {
             <p className="text-sm text-muted-foreground">Connected</p>
           </div>
           <div className="text-center">
+            <div className="text-2xl font-bold text-primary">
+              {/* {connectedPlatforms.length} */}0
+            </div>
             <p className="text-sm text-muted-foreground">Monthly Revenue</p>
           </div>
           <div className="text-center">
