@@ -10,12 +10,41 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-
-import { AlertCircle, Eye, EyeOff, Mail } from "lucide-react";
-import React from "react";
+import { AlertCircle, Eye, EyeOff, Mail, User, Lock } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const SignUp = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordMatchError, setPasswordMatchError] = useState<string | null>(
+    null
+  );
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setEmailError(null);
+
+    try {
+      // Add your signup logic here
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
@@ -25,18 +54,18 @@ export const SignUp = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* {error && !emailError && (
+          {error && emailError && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
-          )} */}
+          )}
 
           <div className="grid grid-cols-1 gap-3">
             <Button
               variant="outline"
               //   onClick={() => handleOAuthSignIn("google")}
-              //   disabled={loading}
+              disabled={loading}
               className="w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -63,7 +92,7 @@ export const SignUp = () => {
             <Button
               variant="outline"
               //   onClick={() => handleOAuthSignIn("azure")}
-              //   disabled={loading}
+              disabled={loading}
               className="w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -76,33 +105,20 @@ export const SignUp = () => {
             </Button>
           </div>
 
-          {/* {!invitationToken && (
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator className="w-full" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or
-                </span>
-              </div>
-            </div>
-          )} */}
-
-          <form onSubmit={undefined} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <div className="relative">
-                {/* <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" /> */}
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   id="name"
                   type="text"
                   placeholder="Enter your full name"
-                  //   value={name}
-                  //   onChange={(e) => setName(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="pl-10"
                   required
-                  //   disabled={loading}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -115,46 +131,46 @@ export const SignUp = () => {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  //   value={email}
-                  //   onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
                   required
-                  //   disabled={loading || !!invitationDetails}
+                  disabled={loading}
                 />
               </div>
-              {/* {emailError && (
+              {emailError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{emailError}</AlertDescription>
                 </Alert>
-              )} */}
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                {/* <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" /> */}
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   id="password"
-                  //   type={showPassword ? "text" : "password"}
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  //   value={password}
-                  //   onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10"
                   required
-                  //   disabled={loading}
+                  disabled={loading}
                 />
                 <button
                   type="button"
-                  //   onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  //   disabled={loading}
+                  disabled={loading}
                 >
-                  {/* {showPassword ? (
+                  {showPassword ? (
                     <EyeOff className="h-4 w-4" />
                   ) : (
                     <Eye className="h-4 w-4" />
-                  )} */}
+                  )}
                 </button>
               </div>
             </div>
@@ -162,53 +178,53 @@ export const SignUp = () => {
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <div className="relative">
-                {/* <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" /> */}
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   id="confirmPassword"
-                  //   type={showConfirmPassword ? "text" : "password"}
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  //   value={confirmPassword}
+                  value={confirmPassword}
                   onChange={(e) => {
-                    // setConfirmPassword(e.target.value);
-                    // setPasswordMatchError(null);
+                    setConfirmPassword(e.target.value);
+                    setPasswordMatchError(null);
                   }}
                   className="pl-10 pr-10"
                   required
-                  //   disabled={loading}
+                  disabled={loading}
                 />
                 <button
                   type="button"
-                  //   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  //   disabled={loading}
+                  disabled={loading}
                 >
-                  {/* {showConfirmPassword ? (
+                  {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4" />
                   ) : (
                     <Eye className="h-4 w-4" />
-                  )} */}
+                  )}
                 </button>
               </div>
-              {/* {passwordMatchError && (
+              {passwordMatchError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{passwordMatchError}</AlertDescription>
                 </Alert>
-              )} */}
+              )}
             </div>
 
             <div className="flex items-start space-x-2">
               <Checkbox
                 id="terms"
-                // checked={acceptedTerms}
-                // onCheckedChange={(checked) =>
-                //   setAcceptedTerms(checked as boolean)
-                // }
+                checked={acceptedTerms}
+                onCheckedChange={(checked) =>
+                  setAcceptedTerms(checked as boolean)
+                }
                 required
               />
               <Label
                 htmlFor="terms"
-                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-wrap"
               >
                 By signing up, you agree to our{" "}
                 <a
@@ -232,9 +248,9 @@ export const SignUp = () => {
             <Button
               type="submit"
               className="w-full"
-              //   disabled={loading || !acceptedTerms}
+              disabled={loading || !acceptedTerms}
             >
-              {/* {loading ? "Creating account..." : "Create account"} */}
+              {loading ? "Creating account..." : "Create account"}
             </Button>
           </form>
 
@@ -243,9 +259,9 @@ export const SignUp = () => {
               Already have an account?{" "}
               <button
                 type="button"
-                // onClick={() => navigate("/auth/signin")}
+                onClick={() => navigate("/signin")}
                 className="text-primary hover:underline font-medium"
-                // disabled={loading}
+                disabled={loading}
               >
                 Sign in
               </button>

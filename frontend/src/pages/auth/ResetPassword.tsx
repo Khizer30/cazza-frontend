@@ -11,8 +11,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { AlertCircle, Mail, ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const ResetPassword = () => {
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
@@ -26,14 +46,14 @@ export const ResetPassword = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* {error && (
+          {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
-          )} */}
+          )}
 
-          <form onSubmit={undefined} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -42,10 +62,10 @@ export const ResetPassword = () => {
                   id="email"
                   type="email"
                   placeholder="Enter your email address"
-                  //   value={email}
-                  //   onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                  //   disabled={loading}
+                  disabled={loading}
                   className="pl-9"
                 />
               </div>
@@ -59,9 +79,9 @@ export const ResetPassword = () => {
           <div className="text-center">
             <Button
               variant="ghost"
-              //   onClick={() => navigate('/auth')}
+              onClick={() => navigate("/signin")}
               className="text-sm text-muted-foreground hover:text-foreground"
-              //   disabled={loading}
+              disabled={loading}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to sign in
