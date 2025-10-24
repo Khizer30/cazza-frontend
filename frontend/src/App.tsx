@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ResetPassword } from "./pages/auth/ResetPassword";
+import { SetNewPassword } from "./pages/auth/SetNewPassword";
+import { SignIn } from "./pages/auth/SignIn";
+import { SignUp } from "./pages/auth/SignUp";
+import NotFound from "./pages/NotFound";
+import { LandingPage } from "./pages/landingPage/LandingPage";
+import { ThemeProvider } from "./components/theme-provider";
+import { ClientLayout } from "./layouts/ClientLayout";
+import { ClientDashboard } from "./pages/ClientDashboard/ClientDashboard";
+import { ClientPlatforms } from "./pages/ClientDashboard/ClientPlatforms";
+import { AIChat } from "./pages/ClientDashboard/AIChat";
+import { Channels } from "./pages/ClientDashboard/Channels";
+import { BillingSettings } from "./pages/Settings/BillingSettings";
+import { SupportSettings } from "./pages/Settings/SupportSettings";
+import { AccountSettings } from "./pages/Settings/AccountSettings";
+import { TeamSettings } from "./pages/Settings/TeamSettings";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <BrowserRouter>
+          <Routes>
+            <Route path="*" element={<NotFound />} />
+            <Route index element={<LandingPage />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/set-new-password" element={<SetNewPassword />} />
+            <Route path="/client" element={<ClientLayout />}>
+              <Route index path="dashboard" element={<ClientDashboard />} />
+              <Route path="platforms" element={<ClientPlatforms />} />
+              <Route path="channels" element={<Channels />} />
+              <Route path="ask-cazza" element={<AIChat />} />
+              <Route path="billing" element={<BillingSettings />} />
+              <Route path="support" element={<SupportSettings />} />
+              <Route path="settings" element={<AccountSettings />} />
+              <Route path="teams" element={<TeamSettings />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
