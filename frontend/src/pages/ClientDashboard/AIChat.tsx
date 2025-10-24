@@ -1,10 +1,7 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatLayout } from "@/layouts/ChatLayout";
-import { FormattedMessage } from "@/utils/FormattedMessage";
-import { BrainCircuit, Forward, Send, Sparkles, User } from "lucide-react";
+import {  Forward, Send,  } from "lucide-react";
 import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import ZZLogo from "@/assets/imgs/ZZ logo.png";
@@ -17,8 +14,8 @@ const suggestedPrompts = [
 export const AIChat = () => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<
+  // const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [messages, ] = useState<
     Array<{
       id: string;
       type: "user" | "assistant";
@@ -28,20 +25,20 @@ export const AIChat = () => {
       isNew?: boolean;
     }>
   >([]);
-  const [chatHistory, setChatHistory] = useState<
-    Array<{
-      id: string;
-      title: string;
-      timestamp: string;
-    }>
-  >([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [forwardDialog, setForwardDialog] = useState<{
-    open: boolean;
-    messageContent: string;
-    messageId: string;
-  }>({ open: false, messageContent: "", messageId: "" });
+  // const [chatHistory, setChatHistory] = useState<
+  //   Array<{
+  //     id: string;
+  //     title: string;
+  //     timestamp: string;
+  //   }>
+  // >([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [userId, setUserId] = useState<string | null>(null);
+  // const [forwardDialog, setForwardDialog] = useState<{
+  //   open: boolean;
+  //   messageContent: string;
+  //   messageId: string;
+  // }>({ open: false, messageContent: "", messageId: "" });
   return (
     <ChatLayout>
       <div className="h-full flex flex-col bg-background">

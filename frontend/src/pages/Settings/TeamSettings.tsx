@@ -79,7 +79,6 @@ export const TeamSettings = () => {
   const [invitations] = useState<any[]>([]);
 
   const canManageTeam = true;
-  const isOrgOwner = true;
 
   // Empty placeholder handlers per request
   const handleInvite = useCallback(() => {

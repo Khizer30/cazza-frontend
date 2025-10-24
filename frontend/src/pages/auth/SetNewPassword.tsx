@@ -18,8 +18,8 @@ export const SetNewPassword = () => {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, ] = useState(false);
+  const [error, ] = useState<string | null>(null);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
@@ -49,7 +49,7 @@ export const SetNewPassword = () => {
                   id="newPassword"
                   type={showNewPassword ? "text" : "password"}
                   placeholder="Enter new password"
-                  //   value={newPassword}
+                    value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   disabled={loading}
@@ -79,7 +79,7 @@ export const SetNewPassword = () => {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm new password"
-                  //   value={confirmPassword}
+                    value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   disabled={loading}

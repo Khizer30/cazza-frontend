@@ -5,10 +5,10 @@ import { Button } from "../ui/button";
 import { ExternalLink, Loader2 } from "lucide-react";
 
 export const ShopifyConnectionForm = ({
-  onSubmit,
+  // onSubmit,
   isLoading,
   onClose,
-  onConnectionSuccess,
+  // onConnectionSuccess,
 }: {
   onSubmit: (data: any) => void;
   isLoading: boolean;
@@ -16,7 +16,7 @@ export const ShopifyConnectionForm = ({
   onConnectionSuccess?: () => void;
 }) => {
   const [shopUrl, setShopUrl] = useState("");
-  const [isConnecting, setIsConnecting] = useState(false);
+  const [isConnecting, ] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

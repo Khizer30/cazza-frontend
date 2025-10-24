@@ -30,6 +30,9 @@ export const SignIn = () => {
     setEmailError(null);
 
     try {
+      if (email === "test@gmail.com" && password === "test@1234") {
+        navigate("/client/dashboard");
+      }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
     } finally {

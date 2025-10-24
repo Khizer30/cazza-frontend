@@ -45,11 +45,11 @@ interface MonthlyRevenue {
 }
 
 export const PlatformRevenueChart = () => {
-  const [platformRevenue, setPlatformRevenue] =
+  const [platformRevenue, ] =
     useState<PlatformRevenue[]>(platformDummy);
-  const [monthlyRevenue, setMonthlyRevenue] =
+  const [monthlyRevenue, ] =
     useState<MonthlyRevenue[]>(MonthlyRevenueDummy);
-  const [loading, setLoading] = useState(false);
+  const [loading, ] = useState(false);
   const [chartView, setChartView] = useState<"revenue" | "profit" | "expenses">(
     "revenue"
   );

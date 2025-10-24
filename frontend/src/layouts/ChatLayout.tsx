@@ -34,14 +34,14 @@ export function ChatLayout({
   chatHistory = [],
   onNewChat,
   onSelectChat,
-  onDeleteChat,
-  onRenameChat,
+  // onDeleteChat,
+  // onRenameChat,
   currentChatId,
   isSidebarOpen = false,
   onToggleSidebar,
 }: ChatLayoutProps) {
-  const [isEditing, setIsEditing] = useState<string | null>(null);
-  const [editTitle, setEditTitle] = useState("");
+  // const [isEditing, setIsEditing] = useState<string | null>(null);
+  // const [editTitle, setEditTitle] = useState("");
   const [internalSidebarOpen, setInternalSidebarOpen] = useState(() => {
     // Initialize based on screen size
     if (typeof window !== "undefined") {
@@ -70,23 +70,23 @@ export function ChatLayout({
   const handleToggleSidebar =
     onToggleSidebar || (() => setInternalSidebarOpen(!internalSidebarOpen));
 
-  const handleEditStart = (chat: ChatHistoryItem) => {
-    setIsEditing(chat.id);
-    setEditTitle(chat.title);
-  };
+  // const handleEditStart = (chat: ChatHistoryItem) => {
+  //   setIsEditing(chat.id);
+  //   setEditTitle(chat.title);
+  // };
 
-  const handleEditSave = () => {
-    if (editTitle.trim() && onRenameChat && isEditing) {
-      onRenameChat(isEditing, editTitle.trim());
-    }
-    setIsEditing(null);
-    setEditTitle("");
-  };
+  // const handleEditSave = () => {
+  //   if (editTitle.trim() && onRenameChat && isEditing) {
+  //     onRenameChat(isEditing, editTitle.trim());
+  //   }
+  //   setIsEditing(null);
+  //   setEditTitle("");
+  // };
 
-  const handleEditCancel = () => {
-    setIsEditing(null);
-    setEditTitle("");
-  };
+  // const handleEditCancel = () => {
+  //   setIsEditing(null);
+  //   setEditTitle("");
+  // };
 
   return (
     <div className="flex h-full bg-background">
