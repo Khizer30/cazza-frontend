@@ -15,6 +15,7 @@ import { BillingSettings } from "./pages/Settings/BillingSettings";
 import { SupportSettings } from "./pages/Settings/SupportSettings";
 import { AccountSettings } from "./pages/Settings/AccountSettings";
 import { TeamSettings } from "./pages/Settings/TeamSettings";
+import { Onboarding } from "./pages/auth/OnBoarding";
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/set-new-password" element={<SetNewPassword />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/client" element={<ClientLayout />}>
               <Route index path="dashboard" element={<ClientDashboard />} />
               <Route path="platforms" element={<ClientPlatforms />} />
