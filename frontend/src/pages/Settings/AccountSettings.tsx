@@ -39,7 +39,6 @@ export const AccountSettings = () => {
   // Role can be derived from user context / auth in real implementation.
   // Defaulting to 'client' for now. Change to 'accountant' to view accountant UI.
   const [role] = useState<"client" | "accountant">("client");
-  const isAccountant = role === "accountant";
   const isClient = role === "client";
 
   // Avatar upload state
@@ -281,87 +280,13 @@ export const AccountSettings = () => {
       {/* Business/Firm Information */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            {isAccountant
-              ? "Tell us about your firm"
-              : "Tell us about your business"}
-          </CardTitle>
+          <CardTitle>{"Tell us about your business"}</CardTitle>
           <CardDescription>
-            {isAccountant
-              ? "Help us set up your accounting firm profile"
-              : "Help us understand your business structure"}
+            {"Help us understand your business structure"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isAccountant ? (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="firmName">Firm Name</Label>
-                <Input
-                  id="firmName"
-                  value={formData.firmName}
-                  onChange={(e) => updateFormData("firmName", e.target.value)}
-                  placeholder="Your accounting firm name"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="clientCount">Client Count</Label>
-                  <Select
-                    value={formData.clientCount}
-                    onValueChange={(value) =>
-                      updateFormData("clientCount", value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select client count" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1-5">1-5 clients</SelectItem>
-                      <SelectItem value="6-20">6-20 clients</SelectItem>
-                      <SelectItem value="21-50">21-50 clients</SelectItem>
-                      <SelectItem value="51-100">51-100 clients</SelectItem>
-                      <SelectItem value="100+">100+ clients</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="staffCount">Staff Count</Label>
-                  <Select
-                    value={formData.staffCount}
-                    onValueChange={(value) =>
-                      updateFormData("staffCount", value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select staff count" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Just me</SelectItem>
-                      <SelectItem value="2-5">2-5 staff members</SelectItem>
-                      <SelectItem value="6-10">6-10 staff members</SelectItem>
-                      <SelectItem value="11-25">11-25 staff members</SelectItem>
-                      <SelectItem value="25+">25+ staff members</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="allowClientInvites"
-                  //   checked={formData.allowClientInvites}
-                  //   onCheckedChange={(checked) =>
-                  //     updateFormData("allowClientInvites", checked)
-                  //   }
-                />
-                <Label htmlFor="allowClientInvites">
-                  Allow client invitations through the platform
-                </Label>
-              </div>
-            </>
-          ) : (
+          {
             <>
               <div className="space-y-2">
                 <Label htmlFor="businessName">Business Name</Label>
@@ -381,7 +306,7 @@ export const AccountSettings = () => {
                   value={formData.entityType}
                   onValueChange={(value) => updateFormData("entityType", value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select entity type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -407,7 +332,7 @@ export const AccountSettings = () => {
                     updateFormData("revenueBand", value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select revenue band" />
                   </SelectTrigger>
                   <SelectContent>
@@ -423,7 +348,7 @@ export const AccountSettings = () => {
                 </Select>
               </div>
             </>
-          )}
+          }
         </CardContent>
       </Card>
 

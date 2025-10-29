@@ -59,7 +59,7 @@ export const SupportSettings = () => {
                   setTicketForm({ ...ticketForm, priority: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -80,7 +80,7 @@ export const SupportSettings = () => {
                 setTicketForm({ ...ticketForm, category: value })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
