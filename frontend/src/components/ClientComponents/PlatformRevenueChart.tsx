@@ -45,11 +45,9 @@ interface MonthlyRevenue {
 }
 
 export const PlatformRevenueChart = () => {
-  const [platformRevenue, ] =
-    useState<PlatformRevenue[]>(platformDummy);
-  const [monthlyRevenue, ] =
-    useState<MonthlyRevenue[]>(MonthlyRevenueDummy);
-  const [loading, ] = useState(false);
+  const [platformRevenue] = useState<PlatformRevenue[]>(platformDummy);
+  const [monthlyRevenue] = useState<MonthlyRevenue[]>(MonthlyRevenueDummy);
+  const [loading] = useState(false);
   const [chartView, setChartView] = useState<"revenue" | "profit" | "expenses">(
     "revenue"
   );
@@ -285,18 +283,15 @@ export const PlatformRevenueChart = () => {
                     <stop offset="95%" stopColor="#FFB3B3" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
                   dataKey="month"
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="var(--muted-foreground)"
                   fontSize={12}
                 />
                 <YAxis
                   tickFormatter={(value) => `£${value.toLocaleString()}`}
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="var(--muted-foreground)"
                   fontSize={12}
                 />
                 <Tooltip

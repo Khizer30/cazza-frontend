@@ -1,5 +1,7 @@
+import { DateRangePicker } from "@/components/ClientComponents/DateRangePicker";
 import { PlatformRevenueChart } from "@/components/ClientComponents/PlatformRevenueChart";
 import { ProfitLossStatement } from "@/components/ClientComponents/ProfitLossStatement";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,8 +16,10 @@ import {
   Calendar,
   DollarSign,
   PieChart,
+  RefreshCw,
   TrendingUp,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -25,10 +29,24 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-
-
+import type { DateRange } from "react-day-picker";
 export const ClientDashboard = () => {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  useEffect(() => {
+    const today = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
+    setDateRange({ from: sixMonthsAgo, to: today });
+  }, []);
+
+  const handleReset = () => {
+    const today = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
+    setDateRange({ from: sixMonthsAgo, to: today });
+  };
+
   return (
     <div className="flex-1 space-y-3 p-4">
       {/* Date Range Selector */}
@@ -43,7 +61,7 @@ export const ClientDashboard = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-4 flex-wrap">
             <DateRangePicker
               dateRange={dateRange}
               onDateRangeChange={setDateRange}
@@ -66,12 +84,12 @@ export const ClientDashboard = () => {
                 {dateRange.to?.toLocaleDateString()}
               </p>
             </div>
-          )} */}
+          )}
         </CardContent>
       </Card>
 
       <Tabs defaultValue="overview" className="space-y-1">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 bg-card">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Overview
@@ -113,7 +131,7 @@ export const ClientDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card >
+            <Card>
               <CardContent className="px-6 py-2">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
@@ -161,7 +179,7 @@ export const ClientDashboard = () => {
           </div>
 
           {/* Revenue Chart - Midday Style */}
-          <Card >
+          <Card>
             <CardHeader>
               <CardTitle>Revenue vs Expenses Overview</CardTitle>
               <CardDescription>Monthly financial performance</CardDescription>
@@ -205,12 +223,12 @@ export const ClientDashboard = () => {
                   />
                   <XAxis
                     dataKey="month"
-                    stroke="hsl(var(--muted-foreground))"
+                    stroke="var(--muted-foreground)"
                     fontSize={12}
                   />
                   <YAxis
                     tickFormatter={(value) => `£${value.toLocaleString()}`}
-                    stroke="hsl(var(--muted-foreground))"
+                    stroke="var(--muted-foreground)"
                     fontSize={12}
                   />
                   <Tooltip
