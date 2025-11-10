@@ -62,15 +62,13 @@ export const AIChat = () => {
     }, 800); // slight delay for realism
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") handleSendMessage();
-  };
+  
 
   return (
     <ChatLayout>
       <div className="h-[92vh] flex flex-col bg-background">
         {/* Header - fixed at top */}
-        <div className="flex-shrink-0 p-4 border-b border-border bg-white">
+        <div className="flex-shrink-0 p-4 border-b border-border bg-card">
           <h1 className="text-lg font-semibold">Ask Cazza</h1>
         </div>
 
@@ -89,7 +87,7 @@ export const AIChat = () => {
                     className={`relative max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
                       message.type === "user"
                         ? "bg-primary text-primary-foreground"
-                        : "bg-white border border-border shadow-sm text-foreground"
+                        : "bg-card border border-border shadow-sm text-foreground"
                     }`}
                   >
                     {message.type === "assistant" ? (
@@ -143,7 +141,7 @@ export const AIChat = () => {
         </div>
 
         {/* Input area fixed at bottom */}
-        <div className="flex-shrink-0 p-4 border-t border-border bg-white">
+        <div className="flex-shrink-0 p-4 border-t border-border bg-background">
           <div className="flex items-center gap-2">
             <Input
               value={input}
@@ -155,7 +153,7 @@ export const AIChat = () => {
             <Button
               onClick={handleSendMessage}
               disabled={!input.trim()}
-              className="px-3 py-2 rounded-lg bg-primary text-white"
+              className="px-3 py-2 rounded-lg bg-primary text-secondary"
             >
               <Send className="w-4 h-4" />
             </Button>
