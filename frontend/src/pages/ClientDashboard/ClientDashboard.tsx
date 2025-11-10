@@ -26,8 +26,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
-
 export const ClientDashboard = () => {
   return (
     <div className="flex-1 space-y-3 p-4">
@@ -71,7 +69,7 @@ export const ClientDashboard = () => {
       </Card>
 
       <Tabs defaultValue="overview" className="space-y-1">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 bg-card">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Overview
@@ -113,7 +111,7 @@ export const ClientDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card >
+            <Card>
               <CardContent className="px-6 py-2">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
@@ -161,7 +159,7 @@ export const ClientDashboard = () => {
           </div>
 
           {/* Revenue Chart - Midday Style */}
-          <Card >
+          <Card>
             <CardHeader>
               <CardTitle>Revenue vs Expenses Overview</CardTitle>
               <CardDescription>Monthly financial performance</CardDescription>
@@ -205,12 +203,12 @@ export const ClientDashboard = () => {
                   />
                   <XAxis
                     dataKey="month"
-                    stroke="hsl(var(--muted-foreground))"
+                    stroke="var(--muted-foreground)"
                     fontSize={12}
                   />
                   <YAxis
                     tickFormatter={(value) => `£${value.toLocaleString()}`}
-                    stroke="hsl(var(--muted-foreground))"
+                    stroke="var(--muted-foreground)"
                     fontSize={12}
                   />
                   <Tooltip
