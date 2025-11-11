@@ -10,7 +10,7 @@ export const ClientLayout = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
   return (
-    <div className="min-h-screen flex flex-col bg-[#F6F7F9]">
+    <div className="min-h-screen flex flex-col bg-sidebar-accent">
       <Header onToggleSidebar={toggleSidebar} />
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop Sidebar - Always visible on large screens */}

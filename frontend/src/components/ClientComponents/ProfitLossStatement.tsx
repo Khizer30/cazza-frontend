@@ -227,12 +227,12 @@ export const ProfitLossStatement = () => {
               />
               <XAxis
                 dataKey="month"
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
                 fontSize={12}
               />
               <YAxis
                 tickFormatter={(value) => `£${value.toLocaleString()}`}
-                stroke="hsl(var(--muted-foreground))"
+                stroke="var(--muted-foreground)"
                 fontSize={12}
               />
               <Tooltip

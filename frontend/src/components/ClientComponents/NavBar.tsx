@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
-import { BarChart3, Bot, HashIcon, ShoppingCart } from "lucide-react";
+import { BarChart3, Bot, ShoppingCart } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { Logo } from "@/assets/svgs/Logo";
 
@@ -11,7 +11,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
   const location = useLocation();
 
   return (
-    <div className="w-16 lg:w-16 border-r border-border/50 mt-4 flex flex-col bg-white">
+    <div className="w-16 lg:w-16 border-r border-border/50 mt-4 flex flex-col bg-card">
       <ScrollArea className="flex-1">
         <div className="p-2 lg:p-3 space-y-2">
           {/* Ask Cazza - Primary Focus */}
@@ -40,7 +40,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           {/* Channels */}
-          <div className="relative group">
+          {/* <div className="relative group">
             <Button
               variant="ghost"
               size="icon"
@@ -54,14 +54,14 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
               <Link to="/client/channels" onClick={onNavigate}>
                 <HashIcon className="w-5 h-5" />
               </Link>
-            </Button>
+            </Button> */}
 
-            {/* Hover Tooltip */}
-            <div className="absolute left-12 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 pointer-events-none whitespace-nowrap z-50">
+          {/* Hover Tooltip */}
+          {/* <div className="absolute left-12 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 pointer-events-none whitespace-nowrap z-50">
               Channels
               <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
             </div>
-          </div>
+          </div> */}
 
           {/* Insights */}
           <div className="relative group">
