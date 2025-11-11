@@ -5,7 +5,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -109,12 +108,7 @@ export const LandingPage = () => {
               >
                 Integrations
               </a>
-              <a
-                href="#testimonials"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Testimonials
-              </a>
+
               <a
                 href="#pricing"
                 className="text-foreground hover:text-primary transition-colors"
@@ -127,6 +121,12 @@ export const LandingPage = () => {
               >
                 FAQ
               </a>
+              <Link
+                to="/amazon-sellers"
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                For Amazon Sellers
+              </Link>
             </div>
 
             <div className="flex items-center gap-4">
@@ -161,20 +161,20 @@ export const LandingPage = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-8 animate-fade-in-up">
-              <Badge
+              {/* <Badge
                 variant="secondary"
                 className="bg-accent/20 text-accent-foreground border-accent/30"
               >
                 Free for Social Commerce Accountants clients
-              </Badge>
+              </Badge> */}
 
               <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-tight">
                 Instant Answers From Your Numbers
               </h1>
 
               <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
-                Ask anything about Amazon, TikTok, Shopify & Xero. Get clear
-                answers in seconds instead of waiting days for your accountant.
+                Connect your Amazon, TikTok Shop, Shopify & Xero accounts
+                securely — and get instant financial insights powered by OpenAI.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -198,7 +198,10 @@ export const LandingPage = () => {
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                    <Star
+                      key={i}
+                      className="w-4 h-4 fill-amber-400 text-accent "
+                    />
                   ))}
                 </div>
                 <span>Rated "Game-changer for 7-figure eCom sellers"</span>
@@ -413,9 +416,9 @@ export const LandingPage = () => {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Amazon */}
-              <Card className="border-2 hover:border-accent/40 transition-colors">
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in group">
                 <CardContent className="p-6 space-y-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center gap-3">
                     <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
                       <FontAwesomeIcon icon={faAmazon} />
                     </div>
@@ -423,12 +426,12 @@ export const LandingPage = () => {
                       Amazon
                     </h3>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     Cazza securely connects to Amazon’s Selling Partner API to
                     retrieve authorised seller data (orders, settlements, fees,
                     and performance metrics).
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     We use this data exclusively to generate analytics for the
                     account owner — never for resale or cross-account
                     benchmarking.
@@ -437,9 +440,9 @@ export const LandingPage = () => {
               </Card>
 
               {/* TikTok Shop */}
-              <Card className="border-2 hover:border-accent/40 transition-colors">
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in group">
                 <CardContent className="p-6 space-y-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center gap-3">
                     <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
                       <FontAwesomeIcon icon={faTiktok} />
                     </div>
@@ -447,11 +450,11 @@ export const LandingPage = () => {
                       TikTok Shop
                     </h3>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     We connect through TikTok Shop’s official API to display
                     sales, refunds, and payout data.
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     Cazza complies with TikTok’s Data Security and Partner
                     Integration policies.
                   </p>
@@ -459,9 +462,9 @@ export const LandingPage = () => {
               </Card>
 
               {/* Shopify */}
-              <Card className="border-2 hover:border-accent/40 transition-colors">
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in group">
                 <CardContent className="p-6 space-y-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center gap-3">
                     <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
                       <FontAwesomeIcon icon={faShopify} />
                     </div>
@@ -469,11 +472,11 @@ export const LandingPage = () => {
                       Shopify
                     </h3>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     Cazza uses Shopify’s OAuth process to sync sales, orders,
                     and refunds.
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     We never alter or push data back into Shopify — insights
                     only.
                   </p>
@@ -481,9 +484,9 @@ export const LandingPage = () => {
               </Card>
 
               {/* Xero */}
-              <Card className="border-2 hover:border-accent/40 transition-colors">
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in group">
                 <CardContent className="p-6 space-y-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center gap-3">
                     <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
                       <FontAwesomeIcon icon={faMixer} />
                     </div>
@@ -491,11 +494,11 @@ export const LandingPage = () => {
                       Xero
                     </h3>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     Cazza connects via Xero’s official partner integration to
                     show live accounting data and automate reconciliation.
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     Your credentials are encrypted and stored using bank-level
                     security standards.
                   </p>
@@ -520,6 +523,10 @@ export const LandingPage = () => {
               <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
                 See it in action
               </h2>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+                Cazza connects securely to major platforms so you can view
+                trusted sales, payout and accounting data in one place.
+              </p>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8 items-center">
@@ -895,9 +902,16 @@ export const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div className="space-y-4">
-              <Logo size="lg" className="text-background" />
+              <Logo size="lg" invert={true} className="text-background" />
               <p className="text-sm text-background/70">
-                Instant answers from your numbers.
+                Cazza is developed by Social Commerce Accountants Ltd, a
+                UK-registered company
+                <br /> (Company No. 13802919).
+              </p>
+              <p className="text-sm text-background/70">
+                Unit D2, Office 2, The Maltings, Station Road, Sawbridgeworth,
+                Hertfordshire, CM21 9JX.
+                <br /> support@cazza.ai
               </p>
             </div>
 
@@ -905,72 +919,65 @@ export const LandingPage = () => {
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-background/70">
                 <li>
-                  <Link
-                    to="#"
+                  <a
+                    href="#problem"
+                    className="hover:text-background transition-colors"
+                  >
+                    Problem
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="#solution"
+                    className="hover:text-background transition-colors"
+                  >
+                    Solution
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#platforms"
                     className="hover:text-background transition-colors"
                   >
                     Integrations
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link
-                    to="#"
+                  <a
+                    href="#pricing"
                     className="hover:text-background transition-colors"
                   >
-                    Security
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="#"
-                    className="hover:text-background transition-colors"
-                  >
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="#"
-                    className="hover:text-background transition-colors"
-                  >
-                    API Docs
-                  </Link>
+                    Pricing
+                  </a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
+              <h4 className="font-semibold mb-4">Data Protection & Security</h4>
               <ul className="space-y-2 text-sm text-background/70">
                 <li>
                   <Link
-                    to="#"
+                    to="/data-protection"
                     className="hover:text-background transition-colors"
                   >
-                    Help Center
+                    Data Protection
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="#"
+                    to="/amazon-sellers"
                     className="hover:text-background transition-colors"
                   >
-                    Contact Us
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="#"
-                    className="hover:text-background transition-colors"
-                  >
-                    Status
+                    For Amazon Sellers
                   </Link>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
+              <h4 className="font-semibold mb-4">Terms & Conditions</h4>
               <ul className="space-y-2 text-sm text-background/70">
                 <li>
                   <Link

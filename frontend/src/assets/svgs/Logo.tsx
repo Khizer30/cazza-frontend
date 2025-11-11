@@ -5,6 +5,7 @@ import logoBlack from "@/assets/imgs/logoBlack.png";
 interface LogoProps {
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
+  invert?: boolean;
 }
 
 const sizeConfig = {
@@ -14,7 +15,7 @@ const sizeConfig = {
   xl: "w-[200px]",
 };
 
-export const Logo = ({ className, size = "md"}: LogoProps) => {
+export const Logo = ({ className, size = "md", invert }: LogoProps) => {
   const sizeClass = sizeConfig[size];
 
   return (
@@ -22,12 +23,18 @@ export const Logo = ({ className, size = "md"}: LogoProps) => {
       <img
         src={logoWhite}
         alt="Cazza"
-        className={cn(sizeClass, `hidden dark:block` )}
+        className={cn(
+          sizeClass,
+          `${invert ? "block dark:hidden" : "hidden dark:block"}`
+        )}
       />
       <img
         src={logoBlack}
         alt="Cazza"
-        className={cn(sizeClass, "block dark:hidden")}
+        className={cn(
+          sizeClass,
+          `${invert ? "hidden dark:block" : "block dark:hidden"}`
+        )}
       />
     </div>
   );
