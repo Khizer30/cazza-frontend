@@ -22,7 +22,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faAmazon,
+  faTiktok,
+  faShopify,
+  faMixer,
+} from "@fortawesome/free-brands-svg-icons";
 export const LandingPage = () => {
   const navigate = useNavigate();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -96,6 +102,12 @@ export const LandingPage = () => {
                 className="text-foreground hover:text-primary transition-colors"
               >
                 Solution
+              </a>
+              <a
+                href="#platforms"
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Integrations
               </a>
               <a
                 href="#testimonials"
@@ -385,7 +397,121 @@ export const LandingPage = () => {
           </div>
         </div>
       </section>
+      {/* Partner Integrations / Compliance Hub Section */}
+      <section id="platforms" className="py-20 bg-muted/10">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto space-y-8">
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
+                Our Partner Integrations
+              </h2>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+                Cazza connects securely to major platforms so you can view
+                trusted sales, payout and accounting data in one place.
+              </p>
+            </div>
 
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Amazon */}
+              <Card className="border-2 hover:border-accent/40 transition-colors">
+                <CardContent className="p-6 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
+                      <FontAwesomeIcon icon={faAmazon} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Amazon
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Cazza securely connects to Amazon’s Selling Partner API to
+                    retrieve authorised seller data (orders, settlements, fees,
+                    and performance metrics).
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    We use this data exclusively to generate analytics for the
+                    account owner — never for resale or cross-account
+                    benchmarking.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* TikTok Shop */}
+              <Card className="border-2 hover:border-accent/40 transition-colors">
+                <CardContent className="p-6 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
+                      <FontAwesomeIcon icon={faTiktok} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      TikTok Shop
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    We connect through TikTok Shop’s official API to display
+                    sales, refunds, and payout data.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Cazza complies with TikTok’s Data Security and Partner
+                    Integration policies.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Shopify */}
+              <Card className="border-2 hover:border-accent/40 transition-colors">
+                <CardContent className="p-6 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
+                      <FontAwesomeIcon icon={faShopify} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Shopify
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Cazza uses Shopify’s OAuth process to sync sales, orders,
+                    and refunds.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    We never alter or push data back into Shopify — insights
+                    only.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Xero */}
+              <Card className="border-2 hover:border-accent/40 transition-colors">
+                <CardContent className="p-6 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
+                      <FontAwesomeIcon icon={faMixer} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Xero
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Cazza connects via Xero’s official partner integration to
+                    show live accounting data and automate reconciliation.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Your credentials are encrypted and stored using bank-level
+                    security standards.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="text-center">
+              <p className="text-xs sm:text-base text-muted-foreground max-w-2xl mx-auto">
+                Cazza is independently developed by Social Commerce Accountants
+                Ltd, a UK-registered accounting firm.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Demo Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
