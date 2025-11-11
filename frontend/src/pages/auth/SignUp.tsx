@@ -88,21 +88,6 @@ export const SignUp = () => {
               </svg>
               Continue with Google
             </Button>
-
-            <Button
-              variant="outline"
-              //   onClick={() => handleOAuthSignIn("azure")}
-              disabled={loading}
-              className="w-full"
-            >
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M11.4 24H0L8.87 0h6.54zM21.45 0H12L23.16 24H24z"
-                />
-              </svg>
-              Continue with Microsoft
-            </Button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
