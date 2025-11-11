@@ -46,7 +46,7 @@ const App = () => {
             <Route path="/set-new-password" element={<SetNewPassword />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/client" element={<ClientLayout />}>
-              <Route index path="dashboard" element={<ClientDashboard />} />
+              <Route index element={<ClientDashboard />} />
               <Route path="platforms" element={<ClientPlatforms />} />
               <Route path="channels" element={<Channels />} />
               <Route path="ask-cazza" element={<AIChat />} />
