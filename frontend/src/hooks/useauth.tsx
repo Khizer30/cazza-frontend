@@ -7,6 +7,7 @@ import {
 } from "@/services/authService";
 import type {
   FORGOTPASSWORD_PAYLOAD,
+  LOGIN_PAYLOAD,
   SETNEWPASSWORD_PAYLOAD,
   SIGNUP_PAYLOAD,
 } from "@/types/auth";
@@ -15,7 +16,7 @@ import { AxiosError } from "axios";
 
 export const useauth = () => {
   const { showToast } = useToast();
-  const signIn = async (paylaod: SIGNUP_PAYLOAD) => {
+  const signIn = async (paylaod:LOGIN_PAYLOAD ) => {
     try {
       const res = await signInService(paylaod);
       if (res) {

@@ -10,34 +10,34 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useauth } from "@/hooks/useauth";
 import { AlertCircle, Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useForm } from "react-hook-form";
+import { logInSchema, type LoginData } from "@/validators/auth-validator";
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { LOGIN_PAYLOAD } from "@/types/auth";
 export const SignIn = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isLoading },
+  } = useForm<LoginData>({
+    resolver: zodResolver(logInSchema),
+    mode: "onBlur",
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [emailError, setEmailError] = useState<string | null>(null);
+  const { signIn } = useauth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setEmailError(null);
-
-    try {
-      if (email === "test@gmail.com" && password === "test@1234") {
-        navigate("/client/dashboard");
-      }
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = (data: LOGIN_PAYLOAD) => {
+    const paylaod = { ...data, email: data.email.toLowerCase() };
+    signIn(paylaod);
   };
 
   return (
@@ -53,18 +53,11 @@ export const SignIn = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {error && !emailError && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
           <div className="grid grid-cols-1 gap-3">
             <Button
               variant="outline"
               // onClick={() => handleOAuthSignIn("google")}
-              disabled={loading}
+
               className="w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -100,7 +93,7 @@ export const SignIn = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -109,17 +102,14 @@ export const SignIn = () => {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...register("email")}
                   className="pl-10"
-                  required
-                  disabled={loading}
                 />
               </div>
-              {emailError && (
+              {errors.email && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{emailError}</AlertDescription>
+                  <AlertDescription>{errors.email.message}</AlertDescription>
                 </Alert>
               )}
             </div>
@@ -132,17 +122,12 @@ export const SignIn = () => {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10"
-                  required
-                  disabled={loading}
+                  {...register("password")}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  disabled={loading}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -153,8 +138,8 @@ export const SignIn = () => {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign in"}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 
@@ -163,7 +148,7 @@ export const SignIn = () => {
               type="button"
               onClick={() => navigate("/reset-password")}
               className="text-sm text-muted-foreground hover:text-primary underline"
-              disabled={loading}
+              disabled={isLoading}
             >
               Forgot your password?
             </button>
@@ -174,7 +159,7 @@ export const SignIn = () => {
                 type="button"
                 onClick={() => navigate("/signup")}
                 className="text-primary hover:underline font-medium"
-                disabled={loading}
+                disabled={isLoading}
               >
                 Sign up
               </button>
