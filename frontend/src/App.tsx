@@ -22,10 +22,11 @@ import { PrivacyPolicy } from "./pages/auth/Term and Conditions/PrivacyPolicy";
 import { TermsAndConditions } from "./pages/auth/Term and Conditions/TermsAndConditions";
 import { CookiePolicy } from "./pages/auth/Term and Conditions/CookiePolicy";
 import { Disclaimer } from "./pages/auth/Term and Conditions/Disclaimer";
+import { ToastProvider } from "@radix-ui/react-toast";
 
 const App = () => {
   return (
-    <>
+    <ToastProvider>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <BrowserRouter>
           <Routes>
@@ -58,7 +59,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
-    </>
+    </ToastProvider>
   );
 };
 
