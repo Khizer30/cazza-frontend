@@ -1,10 +1,9 @@
 export const END_POINT={
 auth:{
     login:"/auth/signin",
-    signup:"",
-    forgotPassword:"",
-    otpVerification:"",
-    resetPassword:""
+    signup:"/auth/signup",
+    forgotPassword:"/auth/forgot-password",
+    setNewPassowrd:"/auth/reset-password"
 },
 user:{
     profile:""
