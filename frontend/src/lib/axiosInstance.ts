@@ -25,8 +25,12 @@ axiosInstance.interceptors.response.use(
   (response) => response, // Just return the response if successful
   async (error) => {
     if (error.response && error.response.status === 403) {
-      localStorage.clear();
-      window.location.href = "/login";
+      // Don't redirect for auth endpoints - let components handle the error
+      const isAuthEndpoint = error.config?.url?.includes('/auth/');
+      if (!isAuthEndpoint) {
+        localStorage.clear();
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

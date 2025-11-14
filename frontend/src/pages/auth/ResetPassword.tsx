@@ -34,8 +34,14 @@ export const ResetPassword = () => {
     },
   });
 
-  const onSubmit = (data: ResetPasswordData) => {
-    forgotPassword(data);
+  const onSubmit = async (data: ResetPasswordData) => {
+    try {
+      await forgotPassword(data);
+      // Stay on the reset password page after showing success message
+    } catch (err) {
+      // Error is already handled in the useauth hook
+      console.error("Forgot password error:", err);
+    }
   };
   return (
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -79,7 +85,7 @@ export const ResetPassword = () => {
           <div className="text-center">
             <Button
               variant="ghost"
-              onClick={() => navigate("/signin")}
+              onClick={() => navigate("/login")}
               className="text-sm text-muted-foreground hover:text-foreground"
               disabled={isLoading}
             >

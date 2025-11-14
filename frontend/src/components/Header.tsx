@@ -10,7 +10,7 @@ import {
   Sun,
   Users,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import logoWhite from "@/assets/imgs/logoWhite.png";
 import logoBlack from "@/assets/imgs/logoBlack.png";
 import {
@@ -22,12 +22,26 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useTheme } from "./theme-provider";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import { useauth } from "@/hooks/useauth";
 interface HeaderProps {
   onToggleSidebar?: () => void;
 }
 export const Header = ({ onToggleSidebar }: HeaderProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme, setTheme } = useTheme();
+  const { logout } = useauth();
   return (
     <header className="h-16 bg-card border-b border-border/50 flex items-center justify-between px-6">
       {/* Logo and Welcome Message */}
@@ -156,14 +170,35 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
 
-            {/* Sign Out */}
-            <DropdownMenuItem
-              className="cursor-pointer text-red-600"
-              //   onClick={signOut}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </DropdownMenuItem>
+            {/* Sign Out with Confirmation Dialog */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem
+                  className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You will need to sign in again to access your account.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={logout}
+                    className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                  >
+                    Sign Out
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

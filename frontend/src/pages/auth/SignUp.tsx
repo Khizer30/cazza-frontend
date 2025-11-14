@@ -1,4 +1,3 @@
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,36 +9,57 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Eye, EyeOff, Mail, User, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, User, Lock } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signUpSchema } from "@/validators/auth-validator";
+import type { SignUpData } from "@/validators/auth-validator";
+import { useauth } from "@/hooks/useauth";
 
 export const SignUp = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [emailError, setEmailError] = useState<string | null>(null);
+  const { signUp } = useauth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordMatchError, setPasswordMatchError] = useState<string | null>(
-    null
-  );
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    control,
+  } = useForm<SignUpData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      invitationId: "",
+      acceptedTerms: false,
+    },
+  });
+
+  const acceptedTerms = watch("acceptedTerms");
+
+  const onSubmit = async (data: SignUpData) => {
     setLoading(true);
-    setError(null);
-    setEmailError(null);
-
     try {
-      // Add your signup logic here
+      const { confirmPassword, acceptedTerms, invitationId, ...signupPayload } = data;
+      // Only include invitationId if it has a value
+      const payload = invitationId && invitationId.trim() 
+        ? { ...signupPayload, invitationId: invitationId.trim() }
+        : signupPayload;
+      await signUp(payload);
+      // Optionally navigate to login or show success message
+      // navigate("/login");
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      // Error is already handled in the useauth hook
+      console.error("Signup error:", err);
     } finally {
       setLoading(false);
     }
@@ -54,13 +74,6 @@ export const SignUp = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {error && emailError && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
           <div className="grid grid-cols-1 gap-3">
             <Button
               variant="outline"
@@ -90,22 +103,41 @@ export const SignUp = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="firstName">First Name</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  id="name"
+                  id="firstName"
                   type="text"
-                  placeholder="Enter your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your first name"
+                  {...register("firstName")}
                   className="pl-10"
-                  required
                   disabled={loading}
                 />
               </div>
+              {errors.firstName && (
+                <p className="text-sm text-destructive">{errors.firstName.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="Enter your last name"
+                  {...register("lastName")}
+                  className="pl-10"
+                  disabled={loading}
+                />
+              </div>
+              {errors.lastName && (
+                <p className="text-sm text-destructive">{errors.lastName.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -116,18 +148,13 @@ export const SignUp = () => {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...register("email")}
                   className="pl-10"
-                  required
                   disabled={loading}
                 />
               </div>
-              {emailError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{emailError}</AlertDescription>
-                </Alert>
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
               )}
             </div>
 
@@ -139,10 +166,8 @@ export const SignUp = () => {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register("password")}
                   className="pl-10 pr-10"
-                  required
                   disabled={loading}
                 />
                 <button
@@ -158,6 +183,9 @@ export const SignUp = () => {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -168,13 +196,8 @@ export const SignUp = () => {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setPasswordMatchError(null);
-                  }}
+                  {...register("confirmPassword")}
                   className="pl-10 pr-10"
-                  required
                   disabled={loading}
                 />
                 <button
@@ -190,22 +213,23 @@ export const SignUp = () => {
                   )}
                 </button>
               </div>
-              {passwordMatchError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{passwordMatchError}</AlertDescription>
-                </Alert>
+              {errors.confirmPassword && (
+                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
               )}
             </div>
 
             <div className="flex items-start space-x-2">
-              <Checkbox
-                id="terms"
-                checked={acceptedTerms}
-                onCheckedChange={(checked) =>
-                  setAcceptedTerms(checked as boolean)
-                }
-                required
+              <Controller
+                name="acceptedTerms"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    id="terms"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={loading}
+                  />
+                )}
               />
               <Label
                 htmlFor="terms"
@@ -229,6 +253,9 @@ export const SignUp = () => {
                 </a>
               </Label>
             </div>
+            {errors.acceptedTerms && (
+              <p className="text-sm text-destructive">{errors.acceptedTerms.message}</p>
+            )}
 
             <Button
               type="submit"
@@ -244,7 +271,7 @@ export const SignUp = () => {
               Already have an account?{" "}
               <button
                 type="button"
-                onClick={() => navigate("/signin")}
+                onClick={() => navigate("/login")}
                 className="text-primary hover:underline font-medium"
                 disabled={loading}
               >

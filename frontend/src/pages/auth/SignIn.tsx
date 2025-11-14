@@ -32,12 +32,28 @@ export const SignIn = () => {
     },
   });
   const navigate = useNavigate();
-  const { signIn } = useauth();
+  const { signIn, getGoogleAuthUrl } = useauth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = (data: LOGIN_PAYLOAD) => {
+  const handleGoogleSignIn = async () => {
+    try {
+      await getGoogleAuthUrl();
+    } catch (err) {
+      // Error is already handled in the useauth hook
+      console.error("Google sign in error:", err);
+    }
+  };
+
+  const onSubmit = async (data: LOGIN_PAYLOAD) => {
     const paylaod = { ...data, email: data.email.toLowerCase() };
-    signIn(paylaod);
+    try {
+      await signIn(paylaod);
+      // Navigate to dashboard/client after successful login
+      navigate("/client");
+    } catch (err) {
+      // Error is already handled in the useauth hook
+      console.error("Sign in error:", err);
+    }
   };
 
   return (
@@ -56,8 +72,8 @@ export const SignIn = () => {
           <div className="grid grid-cols-1 gap-3">
             <Button
               variant="outline"
-              // onClick={() => handleOAuthSignIn("google")}
-
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
               className="w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -123,6 +139,7 @@ export const SignIn = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   {...register("password")}
+                  className="pl-10 pr-10"
                 />
                 <button
                   type="button"
