@@ -130,7 +130,7 @@ export const LandingPage = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              <Button variant="outline" onClick={() => navigate("/signin")}>
+              <Button variant="outline" onClick={() => navigate("/login")}>
                 Sign In
               </Button>
               <Button
@@ -743,7 +743,7 @@ export const LandingPage = () => {
                   </div>
 
                   <Button
-                    onClick={() => navigate("/signin")}
+                    onClick={() => navigate("/login")}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     Start free trial →
@@ -811,7 +811,7 @@ export const LandingPage = () => {
                     </div>
                   </div>
                   <Button
-                    onClick={() => navigate("/signin")}
+                    onClick={() => navigate("/login")}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     Book a call →
