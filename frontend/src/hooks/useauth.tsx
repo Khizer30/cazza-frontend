@@ -25,7 +25,7 @@ export const useauth = () => {
       if (res && res.success) {
         // Handle new response structure with data object
         if (res.data) {
-          const { accessToken, refreshToken, user } = res.data;
+          const { accessToken, refreshToken } = res.data;
           
           // Store tokens
           if (accessToken) {
@@ -151,13 +151,12 @@ export const useauth = () => {
     try {
       // Send the OAuth authorization code as 'token' field (as per API spec)
       // Note: OAuth codes are single-use and expire quickly (usually 1-10 minutes)
-      console.log(code)
-      const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
+            const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
       const res = await googleCallbackService(payload);
       if (res && res.success) {
         // Handle response similar to regular login
         if (res.data) {
-          const { accessToken, refreshToken, user } = res.data;
+          const { accessToken, refreshToken } = res.data;
           
           // Store tokens
           if (accessToken) {
@@ -167,11 +166,7 @@ export const useauth = () => {
             setRefreshToken(refreshToken);
           }
           
-          // Store user data
-          if (user) {
-            setUser(JSON.stringify(user));
-          }
-        }
+    }
         
         showToast(res.message || "Successfully signed in with Google", "success");
         return res;
@@ -193,8 +188,9 @@ export const useauth = () => {
       } else {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
-      throw error;
+      return null;
     }
+    
   };
 
   const logout = () => {

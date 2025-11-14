@@ -55,7 +55,7 @@ export const GoogleCallback = () => {
     };
 
     processCallback();
-  }, [searchParams, handleGoogleCallback, navigate]);
+  }, []);
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
