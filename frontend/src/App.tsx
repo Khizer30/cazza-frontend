@@ -3,6 +3,7 @@ import { ResetPassword } from "./pages/auth/ResetPassword";
 import { SetNewPassword } from "./pages/auth/SetNewPassword";
 import { SignIn } from "./pages/auth/SignIn";
 import { SignUp } from "./pages/auth/SignUp";
+import { GoogleCallback } from "./pages/auth/GoogleCallback";
 import { DataProtection } from "./pages/auth/Term and Conditions/DataProtection";
 import NotFound from "./pages/NotFound";
 import { LandingPage } from "./pages/landingPage/LandingPage";
@@ -22,31 +23,40 @@ import { PrivacyPolicy } from "./pages/auth/Term and Conditions/PrivacyPolicy";
 import { TermsAndConditions } from "./pages/auth/Term and Conditions/TermsAndConditions";
 import { CookiePolicy } from "./pages/auth/Term and Conditions/CookiePolicy";
 import { Disclaimer } from "./pages/auth/Term and Conditions/Disclaimer";
+import { ToastProvider } from "./components/ToastProvider";
+import  PrivateRoute  from "./routes/PrivateRoute";
+import PublicRoute  from "./routes/PublicRoute";
 
 const App = () => {
   return (
-    <>
+    <ToastProvider>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <BrowserRouter>
           <Routes>
+             {/* Public routes that redirect if authenticated */}
+            <Route element={<PublicRoute/>}>
+              <Route index element={<LandingPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/cookie-policy" element={<CookiePolicy />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
+              <Route path="/data-protection" element={<DataProtection />} />
+              <Route path="/amazon-sellers" element={<AmazonSellers />} />
             <Route path="*" element={<NotFound />} />
-            <Route index element={<LandingPage />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route
-              path="/terms-and-conditions"
-              element={<TermsAndConditions />}
-            />
-            <Route path="/cookie-policy" element={<CookiePolicy />} />
-            <Route path="/disclaimer" element={<Disclaimer />} />
-            <Route path="/data-protection" element={<DataProtection />} />
-            <Route path="/amazon-sellers" element={<AmazonSellers />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/set-new-password" element={<SetNewPassword />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/client" element={<ClientLayout />}>
-              <Route index element={<ClientDashboard />} />
+            <Route  path="/login"element={<SignIn /> }/>
+            <Route path="/signup" element={<SignUp />}/>
+            <Route path="/reset-password"element={<ResetPassword />}/>
+            <Route path="/set-new-password" element={<SetNewPassword />}/>
+            <Route path="/auth/google/callback" element={<GoogleCallback />}/>  
+            <Route path="/onboarding" element={<Onboarding />}/>
+            </Route>
+                
+               
+            
+            {/* Private routes that require authentication */}
+            <Route element={<PrivateRoute/>}>
+            <Route path="/client" element={<ClientLayout />} >
+             <Route index element={<ClientDashboard />} /></Route>
               <Route path="platforms" element={<ClientPlatforms />} />
               <Route path="channels" element={<Channels />} />
               <Route path="ask-cazza" element={<AIChat />} />
@@ -55,10 +65,13 @@ const App = () => {
               <Route path="settings" element={<AccountSettings />} />
               <Route path="teams" element={<TeamSettings />} />
             </Route>
+            
+        
+           
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
-    </>
+    </ToastProvider>
   );
 };
 
