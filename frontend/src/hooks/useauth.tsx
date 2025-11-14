@@ -14,7 +14,7 @@ import type {
   SETNEWPASSWORD_PAYLOAD,
   SIGNUP_PAYLOAD,
 } from "@/types/auth";
-import { setToken, setRefreshToken, setUser, removeToken } from "@/utils/localStorage";
+import { setToken, setRefreshToken,  removeToken } from "@/utils/localStorage";
 import { AxiosError } from "axios";
 
 export const useauth = () => {
