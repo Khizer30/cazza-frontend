@@ -49,17 +49,16 @@ export const SignIn = () => {
     const paylaod = { ...data, email: data.email.toLowerCase() };
     try {
       await signIn(paylaod);
-      // Wait a bit for the store to update with user data
-      setTimeout(() => {
-        const currentUser = useUserStore.getState().user;
-        if (currentUser && !currentUser.businessProfile) {
-          // Redirect to onboarding if business profile is missing
-          navigate("/onboarding");
-        } else {
-          // Navigate to dashboard/client after successful login
-          navigate("/client");
-        }
-      }, 100);
+      // After signIn, user profile is fetched and stored
+      // Check the user from store to determine redirect
+      const currentUser = useUserStore.getState().user;
+      if (currentUser && !currentUser.businessProfile) {
+        // Redirect to onboarding if business profile is missing
+        navigate("/onboarding");
+      } else {
+        // Navigate to dashboard/client after successful login
+        navigate("/client");
+      }
     } catch (err) {
       // Error is already handled in the useauth hook
       console.error("Sign in error:", err);

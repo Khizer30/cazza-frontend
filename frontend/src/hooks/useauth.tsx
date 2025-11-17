@@ -53,12 +53,13 @@ export const useauth = () => {
             setRefreshToken(refreshToken);
           }
           
-          // Set user in store if provided
-          if (user) {
+          // Always fetch fresh user profile to ensure we have the latest data
+          // This ensures we check businessProfile status correctly
+          const userData = await fetchUserProfile();
+          
+          // If fetchUserProfile returns null, try to use user from response as fallback
+          if (!userData && user) {
             setUser(user);
-          } else {
-            // Fetch user profile if not provided in response
-            await fetchUserProfile();
           }
         } else {
           // Legacy support for old response format
@@ -194,12 +195,13 @@ export const useauth = () => {
             setRefreshToken(refreshToken);
           }
           
-          // Set user in store if provided
-          if (user) {
+          // Always fetch fresh user profile to ensure we have the latest data
+          // This ensures we check businessProfile status correctly
+          const userData = await fetchUserProfile();
+          
+          // If fetchUserProfile returns null, try to use user from response as fallback
+          if (!userData && user) {
             setUser(user);
-          } else {
-            // Fetch user profile if not provided in response
-            await fetchUserProfile();
           }
         }
         
