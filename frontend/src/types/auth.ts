@@ -3,6 +3,19 @@ export interface LOGIN_PAYLOAD{
     password:string;
 }
 
+export interface BusinessProfile {
+  id?: string;
+  businessName: string;
+  businessEntityType: string;
+  annualRevenueBand: string;
+  marketplaces: string[];
+  tools: string[];
+  useXero: boolean;
+  useMultipleCurrencies: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface User {
   id: string;
   firstName: string;
@@ -19,6 +32,7 @@ export interface User {
   planId: string | null;
   planExpiry: string | null;
   ownerId: string | null;
+  businessProfile: BusinessProfile | null;
 }
 
 export interface LOGIN_RESPONSE {
@@ -80,5 +94,182 @@ export interface GOOGLE_CALLBACK_RESPONSE {
     accessToken: string;
     refreshToken: string;
     user: User;
+  };
+}
+
+export interface ONBOARDING_PAYLOAD {
+  businessName: string;
+  businessEntityType: string;
+  annualRevenueBand: string;
+  marketplaces: string[];
+  tools: string[];
+  useXero: boolean;
+  useMultipleCurrencies: boolean;
+}
+
+export interface ONBOARDING_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    businessProfile: BusinessProfile;
+  };
+}
+
+export interface USER_PROFILE_RESPONSE {
+  success: boolean;
+  message: string;
+  data: User;
+}
+
+export interface UPDATE_USER_PAYLOAD {
+  firstName?: string;
+  lastName?: string;
+  profileImage?: File | null;
+  role?: string;
+}
+
+export interface UPDATE_USER_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: User;
+}
+
+export interface UPDATE_BUSINESS_PROFILE_PAYLOAD {
+  firstName?: string;
+  lastName?: string;
+  businessName?: string;
+  businessEntityType?: string;
+  annualRevenueBand?: string;
+  marketplaces?: string[];
+  tools?: string[];
+  useXero?: boolean;
+  useMultipleCurrencies?: boolean;
+}
+
+export interface UPDATE_BUSINESS_PROFILE_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    businessProfile: BusinessProfile;
+  };
+}
+
+export interface SUPPORT_TICKET_PAYLOAD {
+  subject: string;
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+  category: string;
+  description: string;
+}
+
+export interface SUPPORT_TICKET_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    ticketId?: string;
+    ticketNumber?: string;
+    [key: string]: any;
+  };
+}
+
+export interface TEAM_INVITE_PAYLOAD {
+  email: string;
+  role: "MEMBER" | "ADMIN";
+}
+
+export interface TEAM_INVITE_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    invitation: {
+      id: string;
+      email: string;
+      role: "MEMBER" | "ADMIN";
+      status: string;
+      expiresAt: string;
+      createdAt: string;
+      [key: string]: any;
+    };
+  };
+}
+
+export interface TeamInvitation {
+  id: string;
+  email: string;
+  role: "MEMBER" | "ADMIN";
+  status?: string;
+  expiresAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  senderId?: string;
+  teamOwnerId?: string;
+  sender?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  teamOwner?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  [key: string]: any;
+}
+
+export interface TeamMember {
+  id: string;
+  userId?: string;
+  user_id?: string;
+  name?: string;
+  email?: string;
+  profiles?: {
+    email?: string;
+    [key: string]: any;
+  };
+  role: "OWNER" | "ADMIN" | "MEMBER" | string;
+  joined_at?: string;
+  createdAt?: string;
+  [key: string]: any;
+}
+
+export interface TEAM_INVITATIONS_RESPONSE {
+  success: boolean;
+  message: string;
+  data: TeamInvitation[];
+}
+
+export interface TEAM_MEMBERS_RESPONSE {
+  success: boolean;
+  message: string;
+  data: TeamMember[];
+}
+
+export interface TEAM_ANALYTICS_RESPONSE {
+  success: boolean;
+  message: string;
+  data: {
+    totalTeamMembers: number;
+    pendingInvitations: number;
+    adminCount: number;
+  };
+}
+
+export interface DELETE_INVITATION_RESPONSE {
+  success: boolean;
+  message: string;
+}
+
+export interface DELETE_MEMBER_RESPONSE {
+  success: boolean;
+  message: string;
+}
+
+export interface GET_INVITATION_RESPONSE {
+  success: boolean;
+  message: string;
+  data: {
+    email: string;
+    [key: string]: any;
   };
 }

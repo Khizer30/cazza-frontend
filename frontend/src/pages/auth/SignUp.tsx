@@ -9,21 +9,30 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, User, Lock } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Mail, User, Lock, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema } from "@/validators/auth-validator";
 import type { SignUpData } from "@/validators/auth-validator";
 import { useauth } from "@/hooks/useauth";
+import { getInvitationService } from "@/services/teamService";
+import { useToast } from "@/components/ToastProvider";
+import { AxiosError } from "axios";
 
 export const SignUp = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { signUp } = useauth();
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingInvitation, setLoadingInvitation] = useState(false);
+  const [isInvitedUser, setIsInvitedUser] = useState(false);
+
+  const invitationId = searchParams.get("invitation");
 
   const {
     register,
@@ -31,6 +40,7 @@ export const SignUp = () => {
     formState: { errors },
     watch,
     control,
+    setValue,
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -39,12 +49,51 @@ export const SignUp = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      invitationId: "",
+      invitationId: invitationId || "",
       acceptedTerms: false,
     },
   });
 
   const acceptedTerms = watch("acceptedTerms");
+
+  // Fetch invitation details if invitation ID is present
+  useEffect(() => {
+    const fetchInvitation = async () => {
+      if (invitationId) {
+        setLoadingInvitation(true);
+        try {
+          const response = await getInvitationService(invitationId);
+          if (response && response.success && response.data) {
+            const invitationEmail = response.data.email;
+            setValue("email", invitationEmail);
+            setValue("invitationId", invitationId);
+            setIsInvitedUser(true);
+          } else {
+            showToast(response.message || "Invalid invitation", "error");
+            // Remove invalid invitation from URL
+            navigate("/signup", { replace: true });
+          }
+        } catch (error: unknown) {
+          console.error("Fetch invitation error:", error);
+          if (error instanceof AxiosError) {
+            const errorMessage = error.response?.data?.message || error.response?.data?.error || "Invalid or expired invitation";
+            showToast(errorMessage, "error");
+          } else if (error instanceof Error) {
+            showToast(error.message, "error");
+          } else {
+            showToast("Failed to load invitation details", "error");
+          }
+          // Remove invalid invitation from URL
+          navigate("/signup", { replace: true });
+        } finally {
+          setLoadingInvitation(false);
+        }
+      }
+    };
+
+    fetchInvitation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invitationId]);
 
   const onSubmit = async (data: SignUpData) => {
     setLoading(true);
@@ -144,17 +193,29 @@ export const SignUp = () => {
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  {...register("email")}
-                  className="pl-10"
-                  disabled={loading}
-                />
+                {loadingInvitation ? (
+                  <div className="flex items-center pl-10 h-10 border border-input rounded-md bg-background">
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />
+                    <span className="text-sm text-muted-foreground">Loading invitation...</span>
+                  </div>
+                ) : (
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    {...register("email")}
+                    className={`pl-10 ${isInvitedUser ? "bg-muted cursor-not-allowed" : ""}`}
+                    disabled={loading || isInvitedUser}
+                  />
+                )}
               </div>
               {errors.email && (
                 <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
+              {isInvitedUser && !errors.email && (
+                <p className="text-xs text-muted-foreground">
+                  Email is pre-filled from your team invitation
+                </p>
               )}
             </div>
 

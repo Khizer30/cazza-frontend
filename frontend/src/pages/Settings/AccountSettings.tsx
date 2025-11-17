@@ -31,19 +31,24 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Camera, Loader2, Trash2, Upload } from "lucide-react";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "@/hooks/useUser";
+import { useUserStore } from "@/store/userStore";
 
 export const AccountSettings = () => {
   const navigate = useNavigate();
-  // Role can be derived from user context / auth in real implementation.
-  // Defaulting to 'client' for now. Change to 'accountant' to view accountant UI.
-  const [role] = useState<"client" | "accountant">("client");
-  const isClient = role === "client";
+  const { user, fetchUserProfile, updateUser, updateBusinessProfile, isLoading } = useUser();
+  const { user: storeUser } = useUserStore();
+  
+  // Use store user if available, otherwise use hook user
+  const currentUser = storeUser || user;
+  const isClient = currentUser?.profileType === "BUSINESS" || false;
 
   // Avatar upload state
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploading] = useState(false);
 
   // Form and saving state
   const [saving, setSaving] = useState(false);
@@ -52,10 +57,6 @@ export const AccountSettings = () => {
     firstName: string;
     lastName: string;
     email: string;
-    firmName: string;
-    clientCount?: string;
-    staffCount?: string;
-    allowClientInvites?: boolean;
     marketplaces: string[];
     accountingStack: {
       hasXero: boolean;
@@ -68,16 +69,52 @@ export const AccountSettings = () => {
   };
 
   const [formData, setFormData] = useState<AccountFormData>({
-    firstName: "Shahzaib",
-    lastName: "Farooq",
+    firstName: "",
+    lastName: "",
     email: "",
-    firmName: "",
     marketplaces: [],
     accountingStack: { hasXero: false, multiCurrency: false, integrations: [] },
     businessName: "",
     entityType: "",
     revenueBand: "",
   });
+
+  // Load user data when component mounts
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!currentUser && !isLoading) {
+        await fetchUserProfile();
+      }
+    };
+    loadUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount
+
+  // Populate form when user data is available
+  useEffect(() => {
+    if (currentUser) {
+      // Populate form with user data
+      setFormData({
+        firstName: currentUser.firstName || "",
+        lastName: currentUser.lastName || "",
+        email: currentUser.email || "",
+        marketplaces: currentUser.businessProfile?.marketplaces || [],
+        accountingStack: {
+          hasXero: currentUser.businessProfile?.useXero || false,
+          multiCurrency: currentUser.businessProfile?.useMultipleCurrencies || false,
+          integrations: currentUser.businessProfile?.tools || [],
+        },
+        businessName: currentUser.businessProfile?.businessName || "",
+        entityType: currentUser.businessProfile?.businessEntityType || "",
+        revenueBand: currentUser.businessProfile?.annualRevenueBand || "",
+      });
+      
+      // Set avatar preview if profile image exists
+      if (currentUser.profileImage) {
+        setAvatarPreview(currentUser.profileImage);
+      }
+    }
+  }, [currentUser?.id]); // Only update when user ID changes
 
   // Update top-level keys on formData. For nested updates pass the full object (example used in file).
   const updateFormData = useCallback((key: string, value: any) => {
@@ -118,30 +155,64 @@ export const AccountSettings = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      setUploading(true);
-      // For now just create a local preview URL. Replace with actual upload logic.
+      setAvatarFile(file);
+      // Create preview URL
       const url = URL.createObjectURL(file);
-      setAvatarUrl(url);
-      // simulate upload delay
-      setTimeout(() => setUploading(false), 800);
+      setAvatarPreview(url);
     },
     []
   );
 
   const handleRemoveAvatar = useCallback(() => {
-    // Placeholder: remove avatar locally. Add API call as needed.
-    setAvatarUrl(null);
+    setAvatarFile(null);
+    setAvatarPreview(null);
   }, []);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
+    if (!currentUser) return;
+    
     setSaving(true);
-    // Placeholder: call save API here. We'll simulate a save delay.
-    setTimeout(() => {
+    try {
+      // Update user profile (firstName, lastName, profileImage, role)
+      // Role is managed in state but not displayed in UI
+      const userUpdatePayload: any = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        role: currentUser.role, // Include role from current user state
+      };
+      
+      if (avatarFile) {
+        userUpdatePayload.profileImage = avatarFile;
+      }
+      
+      await updateUser(userUpdatePayload);
+
+      // Update business profile if it exists
+      if (currentUser.businessProfile) {
+        const businessUpdatePayload = {
+          firstName: formData.firstName || currentUser.firstName, // Required by API - use formData or fallback to currentUser
+          lastName: formData.lastName || currentUser.lastName, // Required by API - use formData or fallback to currentUser
+          businessName: formData.businessName,
+          businessEntityType: formData.entityType,
+          annualRevenueBand: formData.revenueBand,
+          marketplaces: formData.marketplaces,
+          tools: formData.accountingStack.integrations,
+          useXero: formData.accountingStack.hasXero,
+          useMultipleCurrencies: formData.accountingStack.multiCurrency,
+        };
+        
+        await updateBusinessProfile(businessUpdatePayload);
+      }
+      
+      // Clear avatar file after successful upload
+      setAvatarFile(null);
+    } catch (error) {
+      console.error("Save error:", error);
+      // Error is already handled in the hooks
+    } finally {
       setSaving(false);
-      // Optionally show toast/notification
-      // console.log('Saved', formData);
-    }, 800);
-  }, [formData]);
+    }
+  }, [formData, avatarFile, currentUser, updateUser, updateBusinessProfile]);
 
   const handleDeleteAccount = useCallback(() => {
     // Placeholder delete handler - wire to API and confirmation flow as needed.
@@ -149,8 +220,16 @@ export const AccountSettings = () => {
     // console.log('Delete account requested');
   }, []);
 
+  if (isLoading && !currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl space-y-6 mx-auto my-4">
+    <div className="max-w-4xl space-y-6 mx-auto my-4 p-4">
       {/* Profile Picture Section */}
       <Card>
         <CardHeader>
@@ -188,10 +267,10 @@ export const AccountSettings = () => {
         <CardContent>
           <div className="flex items-center gap-6">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={avatarUrl ?? undefined} alt="Profile" />
+              <AvatarImage src={avatarPreview || currentUser?.profileImage || undefined} alt="Profile" />
               <AvatarFallback className="text-2xl">
-                {formData.firstName.charAt(0)}
-                {formData.lastName.charAt(0)}
+                {formData.firstName?.charAt(0) || currentUser?.firstName?.charAt(0) || ""}
+                {formData.lastName?.charAt(0) || currentUser?.lastName?.charAt(0) || ""}
               </AvatarFallback>
             </Avatar>
             <div className="flex gap-2">
@@ -224,7 +303,7 @@ export const AccountSettings = () => {
               <Button
                 variant="ghost"
                 onClick={handleRemoveAvatar}
-                disabled={uploading || !avatarUrl}
+                disabled={uploading || (!avatarPreview && !currentUser?.profileImage)}
               >
                 Remove
               </Button>
@@ -266,7 +345,7 @@ export const AccountSettings = () => {
             <Input
               id="email"
               type="email"
-              value={formData.email}
+              value={formData.email || currentUser?.email || ""}
               disabled
               className="bg-muted cursor-not-allowed"
             />
@@ -277,16 +356,16 @@ export const AccountSettings = () => {
         </CardContent>
       </Card>
 
-      {/* Business/Firm Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{"Tell us about your business"}</CardTitle>
-          <CardDescription>
-            {"Help us understand your business structure"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {
+      {/* Business/Firm Information - Only show if user has business profile */}
+      {currentUser?.businessProfile && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{"Tell us about your business"}</CardTitle>
+            <CardDescription>
+              {"Help us understand your business structure"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <>
               <div className="space-y-2">
                 <Label htmlFor="businessName">Business Name</Label>
@@ -348,12 +427,12 @@ export const AccountSettings = () => {
                 </Select>
               </div>
             </>
-          }
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Online Marketplaces - Only for Clients */}
-      {isClient && (
+      {/* Online Marketplaces - Only for Clients with business profile */}
+      {isClient && currentUser?.businessProfile && (
         <Card>
           <CardHeader>
             <CardTitle>Online Marketplaces</CardTitle>
@@ -402,8 +481,8 @@ export const AccountSettings = () => {
         </Card>
       )}
 
-      {/* Accounting Stack - Only for Clients */}
-      {isClient && (
+      {/* Accounting Stack - Only for Clients with business profile */}
+      {isClient && currentUser?.businessProfile && (
         <Card>
           <CardHeader>
             <CardTitle>Tech Stack & Integrations</CardTitle>

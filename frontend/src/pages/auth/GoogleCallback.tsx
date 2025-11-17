@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useauth } from "@/hooks/useauth";
+import { useUserStore } from "@/store/userStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
@@ -39,8 +40,19 @@ export const GoogleCallback = () => {
       // OAuth codes are single-use and expire quickly, so we must use it immediately
       try {
         await handleGoogleCallback(code);
-        // Navigate to dashboard after successful authentication
-        navigate("/client");
+        
+        // Check if user needs onboarding (businessProfile is null)
+        // Wait a bit for the store to update
+        setTimeout(() => {
+          const currentUser = useUserStore.getState().user;
+          if (currentUser && !currentUser.businessProfile) {
+            // Redirect to onboarding if business profile is missing
+            navigate("/onboarding");
+          } else {
+            // Navigate to dashboard after successful authentication
+            navigate("/client");
+          }
+        }, 100);
       } catch (err) {
         console.error("Google callback error:", err);
         // Display the actual error message from the API
