@@ -34,6 +34,8 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { useauth } from "@/hooks/useauth";
+import { useUserStore } from "@/store/userStore";
+
 interface HeaderProps {
   onToggleSidebar?: () => void;
 }
@@ -42,6 +44,24 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
   const { logout } = useauth();
+  const { user } = useUserStore();
+
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (!user) return "U";
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    if (firstName && lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    }
+    if (firstName) {
+      return firstName.charAt(0).toUpperCase();
+    }
+    if (lastName) {
+      return lastName.charAt(0).toUpperCase();
+    }
+    return "U";
+  };
   return (
     <header className="h-16 bg-card border-b border-border/50 flex items-center justify-between px-6">
       {/* Logo and Welcome Message */}
@@ -104,9 +124,12 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={"avatarUrl"} alt="User avatar" />
+                <AvatarImage 
+                  src={user?.profileImage || undefined} 
+                  alt={`${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "User avatar"} 
+                />
                 <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                  S
+                  {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -143,7 +166,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => navigate("teams")}
+              onClick={() => navigate("/client/teams")}
             >
               <Users className="mr-2 h-4 w-4" />
               Teams

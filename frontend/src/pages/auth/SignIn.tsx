@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useauth } from "@/hooks/useauth";
+import { useUserStore } from "@/store/userStore";
 import { AlertCircle, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -48,8 +49,17 @@ export const SignIn = () => {
     const paylaod = { ...data, email: data.email.toLowerCase() };
     try {
       await signIn(paylaod);
-      // Navigate to dashboard/client after successful login
-      navigate("/client");
+      // Wait a bit for the store to update with user data
+      setTimeout(() => {
+        const currentUser = useUserStore.getState().user;
+        if (currentUser && !currentUser.businessProfile) {
+          // Redirect to onboarding if business profile is missing
+          navigate("/onboarding");
+        } else {
+          // Navigate to dashboard/client after successful login
+          navigate("/client");
+        }
+      }, 100);
     } catch (err) {
       // Error is already handled in the useauth hook
       console.error("Sign in error:", err);

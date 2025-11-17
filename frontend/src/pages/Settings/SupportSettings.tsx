@@ -17,16 +17,94 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { submitSupportTicketService } from "@/services/supportService";
+import { useToast } from "@/components/ToastProvider";
+import { Loader2 } from "lucide-react";
+import { AxiosError } from "axios";
+
+// Map form category values to API category values
+const categoryMap: Record<string, string> = {
+  technical: "Technical Issue",
+  billing: "Billing Question",
+  feature: "Feature Request",
+  integration: "Integration Issue",
+  other: "Other",
+};
+
+// Map form priority values to API priority values
+const priorityMap: Record<string, "LOW" | "MEDIUM" | "HIGH" | "URGENT"> = {
+  low: "LOW",
+  medium: "MEDIUM",
+  high: "HIGH",
+  urgent: "URGENT",
+};
 
 export const SupportSettings = () => {
+  const { showToast } = useToast();
   const [ticketForm, setTicketForm] = useState({
     subject: "",
     priority: "",
     category: "",
     description: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmitTicket = () => {};
+  const handleSubmitTicket = async () => {
+    // Validate required fields
+    if (!ticketForm.subject.trim()) {
+      showToast("Subject is required", "error");
+      return;
+    }
+    if (!ticketForm.description.trim()) {
+      showToast("Description is required", "error");
+      return;
+    }
+    if (!ticketForm.priority) {
+      showToast("Please select a priority", "error");
+      return;
+    }
+    if (!ticketForm.category) {
+      showToast("Please select a category", "error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        subject: ticketForm.subject.trim(),
+        priority: priorityMap[ticketForm.priority] || "MEDIUM",
+        category: categoryMap[ticketForm.category] || ticketForm.category,
+        description: ticketForm.description.trim(),
+      };
+
+      const response = await submitSupportTicketService(payload);
+      
+      if (response && response.success) {
+        showToast(response.message || "Support ticket submitted successfully", "success");
+        // Reset form after successful submission
+        setTicketForm({
+          subject: "",
+          priority: "",
+          category: "",
+          description: "",
+        });
+      } else {
+        showToast(response.message || "Failed to submit support ticket", "error");
+      }
+    } catch (error: unknown) {
+      console.error("Submit support ticket error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to submit support ticket";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="max-w-6xl space-y-6 mx-auto my-4">
       {/* Create Support Ticket */}
@@ -52,7 +130,7 @@ export const SupportSettings = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
+              <Label htmlFor="priority">Priority *</Label>
               <Select
                 value={ticketForm.priority}
                 onValueChange={(value) =>
@@ -73,7 +151,7 @@ export const SupportSettings = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">Category *</Label>
             <Select
               value={ticketForm.category}
               onValueChange={(value) =>
@@ -106,7 +184,20 @@ export const SupportSettings = () => {
             />
           </div>
 
-          <Button onClick={handleSubmitTicket}>Submit Ticket</Button>
+          <Button 
+            onClick={handleSubmitTicket} 
+            disabled={isSubmitting}
+            className="w-full md:w-auto"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Submit Ticket"
+            )}
+          </Button>
         </CardContent>
       </Card>
     </div>
