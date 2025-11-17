@@ -48,15 +48,15 @@ const App = () => {
             <Route path="/reset-password"element={<ResetPassword />}/>
             <Route path="/set-new-password" element={<SetNewPassword />}/>
             <Route path="/auth/google/callback" element={<GoogleCallback />}/>  
-            <Route path="/onboarding" element={<Onboarding />}/>
             </Route>
                 
                
             
             {/* Private routes that require authentication */}
             <Route element={<PrivateRoute/>}>
-            <Route path="/client" element={<ClientLayout />} >
-             <Route index element={<ClientDashboard />} /></Route>
+            <Route path="/onboarding" element={<Onboarding />}/>
+            <Route path="/client" element={<ClientLayout />}>
+              <Route index element={<ClientDashboard />} />
               <Route path="platforms" element={<ClientPlatforms />} />
               <Route path="channels" element={<Channels />} />
               <Route path="ask-cazza" element={<AIChat />} />
@@ -64,6 +64,7 @@ const App = () => {
               <Route path="support" element={<SupportSettings />} />
               <Route path="settings" element={<AccountSettings />} />
               <Route path="teams" element={<TeamSettings />} />
+            </Route>
             </Route>
             
         

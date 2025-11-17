@@ -7,6 +7,8 @@ import {
   signInService,
   signUpService,
 } from "@/services/authService";
+import { getUserProfileService } from "@/services/userService";
+import { useUserStore } from "@/store/userStore";
 import type {
   FORGOTPASSWORD_PAYLOAD,
   GOOGLE_CALLBACK_PAYLOAD,
@@ -19,13 +21,29 @@ import { AxiosError } from "axios";
 
 export const useauth = () => {
   const { showToast } = useToast();
+  const { setUser } = useUserStore();
+
+  const fetchUserProfile = async () => {
+    try {
+      const res = await getUserProfileService();
+      if (res && res.success && res.data) {
+        setUser(res.data);
+        return res.data;
+      }
+      return null;
+    } catch (error) {
+      console.error("Failed to fetch user profile:", error);
+      return null;
+    }
+  };
+
   const signIn = async (paylaod: LOGIN_PAYLOAD) => {
     try {
       const res = await signInService(paylaod);
       if (res && res.success) {
         // Handle new response structure with data object
         if (res.data) {
-          const { accessToken, refreshToken } = res.data;
+          const { accessToken, refreshToken, user } = res.data;
           
           // Store tokens
           if (accessToken) {
@@ -34,11 +52,21 @@ export const useauth = () => {
           if (refreshToken) {
             setRefreshToken(refreshToken);
           }
+          
+          // Set user in store if provided
+          if (user) {
+            setUser(user);
+          } else {
+            // Fetch user profile if not provided in response
+            await fetchUserProfile();
+          }
         } else {
           // Legacy support for old response format
           const token = res.token || res.accessToken || res.access_token;
           if (token) {
             setToken(token);
+            // Fetch user profile after storing token
+            await fetchUserProfile();
           }
         }
         
@@ -151,12 +179,12 @@ export const useauth = () => {
     try {
       // Send the OAuth authorization code as 'token' field (as per API spec)
       // Note: OAuth codes are single-use and expire quickly (usually 1-10 minutes)
-            const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
+      const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
       const res = await googleCallbackService(payload);
       if (res && res.success) {
         // Handle response similar to regular login
         if (res.data) {
-          const { accessToken, refreshToken } = res.data;
+          const { accessToken, refreshToken, user } = res.data;
           
           // Store tokens
           if (accessToken) {
@@ -166,7 +194,14 @@ export const useauth = () => {
             setRefreshToken(refreshToken);
           }
           
-    }
+          // Set user in store if provided
+          if (user) {
+            setUser(user);
+          } else {
+            // Fetch user profile if not provided in response
+            await fetchUserProfile();
+          }
+        }
         
         showToast(res.message || "Successfully signed in with Google", "success");
         return res;
@@ -196,6 +231,7 @@ export const useauth = () => {
   const logout = () => {
     try {
       removeToken();
+      setUser(null);
       showToast("Successfully signed out", "success");
       // Navigate to login page
       window.location.href = "/login";
@@ -205,5 +241,5 @@ export const useauth = () => {
     }
   };
 
-  return { signIn, signUp, forgotPassword, setNewPassword, getGoogleAuthUrl, handleGoogleCallback, logout };
+  return { signIn, signUp, forgotPassword, setNewPassword, getGoogleAuthUrl, handleGoogleCallback, logout, fetchUserProfile };
 };

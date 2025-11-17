@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,27 +12,43 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useUser } from "@/hooks/useUser";
+import { Loader2 } from "lucide-react";
 
 interface OnboardingData {
   businessName: string;
   businessEntityType: string;
   annualRevenueBand: string;
   marketplaces: string[];
+  tools: string[];
   techStack: {
     useXero: boolean;
     multipleCurrencies: boolean;
   };
 }
 
-const steps = ["Business Info", "Online Marketplaces", "Tech Stack"];
+const steps = ["Business Info", "Online Marketplaces", "Tools & Tech Stack"];
+
+const availableTools = [
+  "QuickBooks",
+  "Stripe",
+  "PayPal",
+  "Xero",
+  "Sage",
+  "FreeAgent",
+  "Other",
+];
 
 export function Onboarding() {
+  const navigate = useNavigate();
+  const { completeOnboarding, isLoading } = useUser();
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<OnboardingData>({
     businessName: "",
     businessEntityType: "",
     annualRevenueBand: "",
     marketplaces: [],
+    tools: [],
     techStack: { useXero: false, multipleCurrencies: false },
   });
 
@@ -47,6 +64,32 @@ export function Onboarding() {
         [field]: exists ? arr.filter((v) => v !== value) : [...arr, value],
       };
     });
+  };
+
+  const handleFinish = async () => {
+    // Validate required fields
+    if (!formData.businessName || !formData.businessEntityType || !formData.annualRevenueBand) {
+      return;
+    }
+
+    try {
+      // Map form data to API payload
+      const payload = {
+        businessName: formData.businessName,
+        businessEntityType: formData.businessEntityType,
+        annualRevenueBand: formData.annualRevenueBand,
+        marketplaces: formData.marketplaces,
+        tools: formData.tools,
+        useXero: formData.techStack.useXero,
+        useMultipleCurrencies: formData.techStack.multipleCurrencies,
+      };
+
+      await completeOnboarding(payload);
+      // Navigate to dashboard after successful onboarding
+      navigate("/client");
+    } catch (error) {
+      console.error("Onboarding submission error:", error);
+    }
   };
 
   return (
@@ -182,52 +225,84 @@ export function Onboarding() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <p className="text-sm mb-3">
-                  Tell us about your current accounting and payment setup:
-                </p>
-                <label className="flex items-center space-x-2 mb-2">
-                  <Checkbox
-                    checked={formData.techStack.useXero}
-                    onCheckedChange={(checked) =>
-                      setFormData({
-                        ...formData,
-                        techStack: {
-                          ...formData.techStack,
-                          useXero: !!checked,
-                        },
-                      })
-                    }
-                  />
-                  <span>I use Xero</span>
-                </label>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm mb-3">
+                      Select the tools you currently use:
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {availableTools.map((tool) => (
+                        <label key={tool} className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={formData.tools.includes(tool)}
+                            onCheckedChange={() =>
+                              handleCheckbox("tools", tool)
+                            }
+                          />
+                          <span>{tool}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
 
-                <label className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={formData.techStack.multipleCurrencies}
-                    onCheckedChange={(checked) =>
-                      setFormData({
-                        ...formData,
-                        techStack: {
-                          ...formData.techStack,
-                          multipleCurrencies: !!checked,
-                        },
-                      })
-                    }
-                  />
-                  <span>I work with multiple currencies</span>
-                </label>
+                  <div className="pt-4 border-t">
+                    <p className="text-sm mb-3">
+                      Additional preferences:
+                    </p>
+                    <label className="flex items-center space-x-2 mb-2">
+                      <Checkbox
+                        checked={formData.techStack.useXero}
+                        onCheckedChange={(checked) =>
+                          setFormData({
+                            ...formData,
+                            techStack: {
+                              ...formData.techStack,
+                              useXero: !!checked,
+                            },
+                          })
+                        }
+                      />
+                      <span>I use Xero</span>
+                    </label>
+
+                    <label className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={formData.techStack.multipleCurrencies}
+                        onCheckedChange={(checked) =>
+                          setFormData({
+                            ...formData,
+                            techStack: {
+                              ...formData.techStack,
+                              multipleCurrencies: !!checked,
+                            },
+                          })
+                        }
+                      />
+                      <span>I work with multiple currencies</span>
+                    </label>
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           <div className="flex justify-between mt-8">
-            <Button variant="outline" onClick={back} disabled={step === 0}>
+            <Button variant="outline" onClick={back} disabled={step === 0 || isLoading}>
               Back
             </Button>
             {step < steps.length - 1 ? (
-              <Button onClick={next}>Next</Button>
+              <Button onClick={next} disabled={isLoading}>Next</Button>
             ) : (
-              <Button onClick={() => console.log(formData)}>Finish</Button>
+              <Button onClick={handleFinish} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Completing...
+                  </>
+                ) : (
+                  "Finish"
+                )}
+              </Button>
             )}
           </div>
         </CardContent>

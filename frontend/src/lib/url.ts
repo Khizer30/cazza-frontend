@@ -8,6 +8,8 @@ auth:{
     googleCallback:"/auth/google/callback"
 },
 user:{
-    profile:""
+    profile:"/user",
+    onboarding:"/user/onboarding",
+    businessProfile:"/user/business-profile"
 }
 } as const

@@ -3,6 +3,19 @@ export interface LOGIN_PAYLOAD{
     password:string;
 }
 
+export interface BusinessProfile {
+  id?: string;
+  businessName: string;
+  businessEntityType: string;
+  annualRevenueBand: string;
+  marketplaces: string[];
+  tools: string[];
+  useXero: boolean;
+  useMultipleCurrencies: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface User {
   id: string;
   firstName: string;
@@ -19,6 +32,7 @@ export interface User {
   planId: string | null;
   planExpiry: string | null;
   ownerId: string | null;
+  businessProfile: BusinessProfile | null;
 }
 
 export interface LOGIN_RESPONSE {
@@ -80,5 +94,62 @@ export interface GOOGLE_CALLBACK_RESPONSE {
     accessToken: string;
     refreshToken: string;
     user: User;
+  };
+}
+
+export interface ONBOARDING_PAYLOAD {
+  businessName: string;
+  businessEntityType: string;
+  annualRevenueBand: string;
+  marketplaces: string[];
+  tools: string[];
+  useXero: boolean;
+  useMultipleCurrencies: boolean;
+}
+
+export interface ONBOARDING_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    businessProfile: BusinessProfile;
+  };
+}
+
+export interface USER_PROFILE_RESPONSE {
+  success: boolean;
+  message: string;
+  data: User;
+}
+
+export interface UPDATE_USER_PAYLOAD {
+  firstName?: string;
+  lastName?: string;
+  profileImage?: File | null;
+  role?: string;
+}
+
+export interface UPDATE_USER_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: User;
+}
+
+export interface UPDATE_BUSINESS_PROFILE_PAYLOAD {
+  firstName?: string;
+  lastName?: string;
+  businessName?: string;
+  businessEntityType?: string;
+  annualRevenueBand?: string;
+  marketplaces?: string[];
+  tools?: string[];
+  useXero?: boolean;
+  useMultipleCurrencies?: boolean;
+}
+
+export interface UPDATE_BUSINESS_PROFILE_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    businessProfile: BusinessProfile;
   };
 }
