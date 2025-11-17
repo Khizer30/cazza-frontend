@@ -41,18 +41,16 @@ export const GoogleCallback = () => {
       try {
         await handleGoogleCallback(code);
         
-        // Check if user needs onboarding (businessProfile is null)
-        // Wait a bit for the store to update
-        setTimeout(() => {
-          const currentUser = useUserStore.getState().user;
-          if (currentUser && !currentUser.businessProfile) {
-            // Redirect to onboarding if business profile is missing
-            navigate("/onboarding");
-          } else {
-            // Navigate to dashboard after successful authentication
-            navigate("/client");
-          }
-        }, 100);
+        // After handleGoogleCallback, user profile is fetched and stored
+        // Check the user from store to determine redirect
+        const currentUser = useUserStore.getState().user;
+        if (currentUser && !currentUser.businessProfile) {
+          // Redirect to onboarding if business profile is missing
+          navigate("/onboarding");
+        } else {
+          // Navigate to dashboard after successful authentication
+          navigate("/client");
+        }
       } catch (err) {
         console.error("Google callback error:", err);
         // Display the actual error message from the API
