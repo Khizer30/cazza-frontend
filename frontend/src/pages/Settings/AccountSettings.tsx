@@ -48,7 +48,7 @@ export const AccountSettings = () => {
   // Avatar upload state
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [uploading] = useState(false);
 
   // Form and saving state
   const [saving, setSaving] = useState(false);
