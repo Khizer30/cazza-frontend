@@ -10,6 +10,15 @@ auth:{
 user:{
     profile:"/user",
     onboarding:"/user/onboarding",
-    businessProfile:"/user/business-profile"
+    businessProfile:"/user/business-profile",
+    support:"/user/support"
+},
+team:{
+    invite:"/team/invite",
+    invitations:"/team/invitations",
+    invitation:"/team/invitation",
+    members:"/team/members",
+    member:"/team/member",
+    analytics:"/team/analytics"
 }
 } as const

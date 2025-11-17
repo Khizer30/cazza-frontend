@@ -5,11 +5,14 @@ import {
   updateUserService,
   updateBusinessProfileService
 } from "@/services/userService";
+import { inviteTeamMemberService } from "@/services/teamService";
 import { useUserStore } from "@/store/userStore";
+import { useTeamStore } from "@/store/teamStore";
 import type { 
   ONBOARDING_PAYLOAD,
   UPDATE_USER_PAYLOAD,
-  UPDATE_BUSINESS_PROFILE_PAYLOAD
+  UPDATE_BUSINESS_PROFILE_PAYLOAD,
+  TEAM_INVITE_PAYLOAD
 } from "@/types/auth";
 import { AxiosError } from "axios";
 
@@ -131,6 +134,38 @@ export const useUser = () => {
     }
   };
 
+  const inviteTeamMember = async (payload: TEAM_INVITE_PAYLOAD) => {
+    try {
+      setLoading(true);
+      const res = await inviteTeamMemberService(payload);
+      if (res && res.success) {
+        // Add invitation to store if data includes invitation
+        if (res.data?.invitation) {
+          const { addInvitation } = useTeamStore.getState();
+          addInvitation(res.data.invitation);
+        }
+        showToast(res.message || "Team member invited successfully", "success");
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to invite team member", "error");
+        throw new Error(res.message || "Invite failed");
+      }
+    } catch (error: unknown) {
+      console.error("Invite team member error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to invite team member";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     user,
     isLoading,
@@ -138,6 +173,7 @@ export const useUser = () => {
     completeOnboarding,
     updateUser,
     updateBusinessProfile,
+    inviteTeamMember,
   };
 };
 
