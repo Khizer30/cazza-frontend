@@ -8,7 +8,8 @@ import type {
   UPDATE_USER_PAYLOAD,
   UPDATE_USER_RESPONSE,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
-  UPDATE_BUSINESS_PROFILE_RESPONSE
+  UPDATE_BUSINESS_PROFILE_RESPONSE,
+  DELETE_USER_RESPONSE
 } from "@/types/auth";
 
 export const getUserProfileService = () => {
@@ -49,5 +50,9 @@ export const updateUserService = async (payload: UPDATE_USER_PAYLOAD) => {
 
 export const updateBusinessProfileService = (payload: UPDATE_BUSINESS_PROFILE_PAYLOAD) => {
   return apiInvoker<UPDATE_BUSINESS_PROFILE_RESPONSE>(END_POINT.user.businessProfile, "PUT", payload);
+};
+
+export const deleteUserService = () => {
+  return apiInvoker<DELETE_USER_RESPONSE>(END_POINT.user.profile, "DELETE");
 };
 

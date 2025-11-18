@@ -65,9 +65,11 @@ export const SignUp = () => {
           const response = await getInvitationService(invitationId);
           if (response && response.success && response.data) {
             const invitationEmail = response.data.email;
-            setValue("email", invitationEmail);
-            setValue("invitationId", invitationId);
+            // Set email and invitationId in the form
+            setValue("email", invitationEmail, { shouldValidate: false });
+            setValue("invitationId", invitationId, { shouldValidate: false });
             setIsInvitedUser(true);
+            // Do NOT auto-submit - user must fill form and submit manually
           } else {
             showToast(response.message || "Invalid invitation", "error");
             // Remove invalid invitation from URL
@@ -321,7 +323,7 @@ export const SignUp = () => {
             <Button
               type="submit"
               className="w-full"
-              disabled={loading || !acceptedTerms}
+              disabled={loading}
             >
               {loading ? "Creating account..." : "Create account"}
             </Button>
