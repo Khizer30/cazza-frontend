@@ -54,7 +54,7 @@ export const SignUp = () => {
     },
   });
 
-  const acceptedTerms = watch("acceptedTerms");
+
 
   // Fetch invitation details if invitation ID is present
   useEffect(() => {
