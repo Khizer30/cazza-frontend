@@ -20,8 +20,6 @@ export const useTeam = () => {
     setInvitations,
     setAnalytics,
     setLoading,
-    removeInvitation: removeInvitationFromStore,
-    removeMember: removeMemberFromStore,
   } = useTeamStore();
 
   const fetchTeamInvitations = async () => {
@@ -118,10 +116,9 @@ export const useTeam = () => {
       setLoading(true);
       const res = await cancelInvitationService(invitationId);
       if (res && res.success) {
-        removeInvitationFromStore(invitationId);
         showToast(res.message || "Invitation cancelled successfully", "success");
-        // Refresh analytics after cancellation
-        await fetchTeamAnalytics();
+        // Refresh all team data to ensure consistency with server
+        await fetchAllTeamData();
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to cancel invitation", "error");
@@ -148,10 +145,9 @@ export const useTeam = () => {
       setLoading(true);
       const res = await removeTeamMemberService(memberId);
       if (res && res.success) {
-        removeMemberFromStore(memberId);
         showToast(res.message || "Team member removed successfully", "success");
-        // Refresh analytics after removal
-        await fetchTeamAnalytics();
+        // Refresh all team data to ensure consistency with server
+        await fetchAllTeamData();
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to remove team member", "error");

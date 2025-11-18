@@ -265,6 +265,11 @@ export interface DELETE_MEMBER_RESPONSE {
   message: string;
 }
 
+export interface DELETE_USER_RESPONSE {
+  success: boolean;
+  message: string;
+}
+
 export interface GET_INVITATION_RESPONSE {
   success: boolean;
   message: string;

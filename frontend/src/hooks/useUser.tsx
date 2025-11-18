@@ -3,7 +3,8 @@ import {
   getUserProfileService, 
   onboardingService,
   updateUserService,
-  updateBusinessProfileService
+  updateBusinessProfileService,
+  deleteUserService
 } from "@/services/userService";
 import { inviteTeamMemberService } from "@/services/teamService";
 import { useUserStore } from "@/store/userStore";
@@ -166,6 +167,35 @@ export const useUser = () => {
     }
   };
 
+  const deleteUser = async () => {
+    try {
+      setLoading(true);
+      const res = await deleteUserService();
+      if (res && res.success) {
+        showToast(res.message || "Account deleted successfully", "success");
+        // Clear user from store
+        setUser(null);
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to delete account", "error");
+        throw new Error(res.message || "Delete account failed");
+      }
+    } catch (error: unknown) {
+      console.error("Delete user error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to delete account";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     user,
     isLoading,
@@ -174,6 +204,7 @@ export const useUser = () => {
     updateUser,
     updateBusinessProfile,
     inviteTeamMember,
+    deleteUser,
   };
 };
 
