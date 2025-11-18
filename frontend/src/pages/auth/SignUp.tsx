@@ -38,8 +38,7 @@ export const SignUp = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
-    control,
+      control,
     setValue,
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
