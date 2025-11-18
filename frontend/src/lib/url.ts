@@ -15,7 +15,7 @@ user:{
 },
 team:{
     invite:"/team/invite",
-    invitations:"/team/invitations",
+    invitations:"/team/invitations?status=PENDING",
     invitation:"/team/invitation",
     members:"/team/members",
     member:"/team/member",

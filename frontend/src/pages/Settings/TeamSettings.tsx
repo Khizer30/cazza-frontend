@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Mail, Shield, Users, Loader2, X } from "lucide-react";
 import { TeamInviteDialog } from "@/components/TeamInviteDialog";
 import { useTeam } from "@/hooks/useTeam";
@@ -209,7 +208,7 @@ export const TeamSettings = () => {
         </Card>
       </div>
 
-      {/*Manage Team Members */}
+      {/* Team Members and Invitations */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -228,10 +227,16 @@ export const TeamSettings = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {/* Pending Invitations - Show at top */}
+          <div className="space-y-6">
+            {/* Pending Members Section */}
             {invitations.length > 0 && (
-              <>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Pending Members</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Invitations that are awaiting acceptance
+                  </p>
+                </div>
                 {invitations.map((invitation) => {
                   const expiresAt = invitation.expiresAt 
                     ? new Date(invitation.expiresAt) 
@@ -274,7 +279,7 @@ export const TeamSettings = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleCancelInvitation(invitation.id)}
-                            className="text-destructive"
+                            className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
                             disabled={isLoading}
                           >
                             <X className="h-4 w-4 mr-1" />
@@ -285,62 +290,73 @@ export const TeamSettings = () => {
                     </div>
                   );
                 })}
-                {filteredMembers.length > 0 && <Separator className="my-4" />}
-              </>
+              </div>
             )}
 
-            {/* Active Team Members */}
-            {filteredMembers.length > 0 ? (
-              filteredMembers.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback>{getInitials(member)}</AvatarFallback>
-                    </Avatar>
+            {/* Team Members Section */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Team Members</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Active team members in your organization
+                </p>
+              </div>
+              {filteredMembers.length > 0 ? (
+                filteredMembers.map((member) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback>{getInitials(member)}</AvatarFallback>
+                      </Avatar>
 
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">
-                          {getDisplayName(member)}
-                        </h3>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {getMemberEmail(member)}
-                      </p>
-                      {member.joined_at && (
-                        <p className="text-xs text-muted-foreground">
-                          Joined {new Date(member.joined_at).toLocaleDateString()}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold">
+                            {getDisplayName(member)}
+                          </h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {getMemberEmail(member)}
                         </p>
+                        {member.joined_at && (
+                          <p className="text-xs text-muted-foreground">
+                            Joined {new Date(member.joined_at).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Badge variant="outline" className="capitalize">
+                        {member.role?.toLowerCase()}
+                      </Badge>
+                      {canManageTeam && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveMember(member.id)}
+                          className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
+                          disabled={isLoading}
+                        >
+                          Remove
+                        </Button>
                       )}
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="capitalize">
-                      {member.role?.toLowerCase()}
-                    </Badge>
-                    {canManageTeam && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveMember(member.id)}
-                        className="text-destructive"
-                        disabled={isLoading}
-                      >
-                        Remove
-                      </Button>
-                    )}
-                  </div>
+                ))
+              ) : invitations.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No team members yet. Invite your first member to get started!
                 </div>
-              ))
-            ) : invitations.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No team members yet. Invite your first member to get started!
-              </div>
-            ) : null}
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No team members yet.
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
