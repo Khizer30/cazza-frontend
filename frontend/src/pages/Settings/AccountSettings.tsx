@@ -35,11 +35,13 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
+import { useauth } from "@/hooks/useauth";
 
 export const AccountSettings = () => {
   const navigate = useNavigate();
-  const { user, fetchUserProfile, updateUser, updateBusinessProfile, isLoading } = useUser();
+  const { user, fetchUserProfile, updateUser, updateBusinessProfile, deleteUser, isLoading } = useUser();
   const { user: storeUser } = useUserStore();
+  const { logout } = useauth();
   
   // Use store user if available, otherwise use hook user
   const currentUser = storeUser || user;
@@ -51,7 +53,8 @@ export const AccountSettings = () => {
   const [uploading] = useState(false);
 
   // Form and saving state
-  const [saving, setSaving] = useState(false);
+  const [savingPersonal, setSavingPersonal] = useState(false);
+  const [savingBusiness, setSavingBusiness] = useState(false);
 
   type AccountFormData = {
     firstName: string;
@@ -168,10 +171,10 @@ export const AccountSettings = () => {
     setAvatarPreview(null);
   }, []);
 
-  const handleSave = useCallback(async () => {
+  const handleSavePersonalInfo = useCallback(async () => {
     if (!currentUser) return;
     
-    setSaving(true);
+    setSavingPersonal(true);
     try {
       // Update user profile (firstName, lastName, profileImage, role)
       // Role is managed in state but not displayed in UI
@@ -186,39 +189,61 @@ export const AccountSettings = () => {
       }
       
       await updateUser(userUpdatePayload);
-
-      // Update business profile if it exists
-      if (currentUser.businessProfile) {
-        const businessUpdatePayload = {
-          firstName: formData.firstName || currentUser.firstName, // Required by API - use formData or fallback to currentUser
-          lastName: formData.lastName || currentUser.lastName, // Required by API - use formData or fallback to currentUser
-          businessName: formData.businessName,
-          businessEntityType: formData.entityType,
-          annualRevenueBand: formData.revenueBand,
-          marketplaces: formData.marketplaces,
-          tools: formData.accountingStack.integrations,
-          useXero: formData.accountingStack.hasXero,
-          useMultipleCurrencies: formData.accountingStack.multiCurrency,
-        };
-        
-        await updateBusinessProfile(businessUpdatePayload);
-      }
       
       // Clear avatar file after successful upload
       setAvatarFile(null);
     } catch (error) {
-      console.error("Save error:", error);
+      console.error("Save personal info error:", error);
       // Error is already handled in the hooks
     } finally {
-      setSaving(false);
+      setSavingPersonal(false);
     }
-  }, [formData, avatarFile, currentUser, updateUser, updateBusinessProfile]);
+  }, [formData, avatarFile, currentUser, updateUser]);
 
-  const handleDeleteAccount = useCallback(() => {
-    // Placeholder delete handler - wire to API and confirmation flow as needed.
-    // For now simply log and close dialog will be handled by AlertDialog.
-    // console.log('Delete account requested');
-  }, []);
+  const handleSaveBusinessInfo = useCallback(async () => {
+    if (!currentUser || !currentUser.businessProfile) return;
+    
+    setSavingBusiness(true);
+    try {
+      // Update business profile only
+      const businessUpdatePayload = {
+        firstName: formData.firstName || currentUser.firstName, // Required by API - use formData or fallback to currentUser
+        lastName: formData.lastName || currentUser.lastName, // Required by API - use formData or fallback to currentUser
+        businessName: formData.businessName,
+        businessEntityType: formData.entityType,
+        annualRevenueBand: formData.revenueBand,
+        marketplaces: formData.marketplaces,
+        tools: formData.accountingStack.integrations,
+        useXero: formData.accountingStack.hasXero,
+        useMultipleCurrencies: formData.accountingStack.multiCurrency,
+      };
+      
+      await updateBusinessProfile(businessUpdatePayload);
+    } catch (error) {
+      console.error("Save business info error:", error);
+      // Error is already handled in the hooks
+    } finally {
+      setSavingBusiness(false);
+    }
+  }, [formData, currentUser, updateBusinessProfile]);
+
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = useCallback(async () => {
+    try {
+      setDeleting(true);
+      await deleteUser();
+      // Logout and redirect to login after successful deletion
+      setTimeout(() => {
+        logout();
+      }, 1000);
+    } catch (error) {
+      console.error("Delete account error:", error);
+      // Error is already handled in the deleteUser hook
+    } finally {
+      setDeleting(false);
+    }
+  }, [deleteUser, logout]);
 
   if (isLoading && !currentUser) {
     return (
@@ -352,6 +377,24 @@ export const AccountSettings = () => {
             <p className="text-xs text-muted-foreground">
               Email cannot be changed
             </p>
+          </div>
+
+          {/* Save Personal Info Button */}
+          <div className="flex justify-end pt-4">
+            <Button 
+              onClick={handleSavePersonalInfo} 
+              disabled={savingPersonal} 
+              className="px-8"
+            >
+              {savingPersonal ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save"
+              )}
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -571,19 +614,21 @@ export const AccountSettings = () => {
         </Card>
       )}
 
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving} className="px-8">
-          {saving ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            "Save Changes"
-          )}
-        </Button>
-      </div>
+      {/* Save Business Info Button - Only show if user has business profile */}
+      {currentUser?.businessProfile && (
+        <div className="flex justify-end">
+          <Button onClick={handleSaveBusinessInfo} disabled={savingBusiness} className="px-8">
+            {savingBusiness ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Business Info"
+            )}
+          </Button>
+        </div>
+      )}
 
       <Separator />
 
@@ -612,12 +657,20 @@ export const AccountSettings = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDeleteAccount}
                   className="bg-destructive text-white hover:bg-destructive/90"
+                  disabled={deleting}
                 >
-                  Delete Account
+                  {deleting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Delete Account"
+                  )}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
