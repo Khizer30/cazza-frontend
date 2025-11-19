@@ -16,6 +16,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema } from "@/validators/auth-validator";
 import type { SignUpData } from "@/validators/auth-validator";
+import type { SIGNUP_PAYLOAD } from "@/types/auth";
 import { useauth } from "@/hooks/useauth";
 import { getInvitationService } from "@/services/teamService";
 import { useToast } from "@/components/ToastProvider";
@@ -38,8 +39,7 @@ export const SignUp = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
-    control,
+      control,
     setValue,
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
@@ -100,11 +100,18 @@ export const SignUp = () => {
   const onSubmit = async (data: SignUpData) => {
     setLoading(true);
     try {
-      const { confirmPassword, acceptedTerms, invitationId, ...signupPayload } = data;
-      // Only include invitationId if it has a value
-      const payload = invitationId && invitationId.trim() 
-        ? { ...signupPayload, invitationId: invitationId.trim() }
-        : signupPayload;
+      // Extract form data (firstName, lastName, email, password)
+      const { confirmPassword, acceptedTerms, invitationId, ...formData } = data;
+      
+      // Build signup payload with form data and invitationId (if exists)
+      const payload: SIGNUP_PAYLOAD = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        ...(invitationId && invitationId.trim() && { invitationId: invitationId.trim() }),
+      };
+      
       await signUp(payload);
       // Optionally navigate to login or show success message
       // navigate("/login");
