@@ -63,15 +63,27 @@ export const SignUp = () => {
         setLoadingInvitation(true);
         try {
           const response = await getInvitationService(invitationId);
+          // Handle both response formats:
+          // 1. Expected format: { success: true, data: { email: "..." } }
+          // 2. Actual format: { email: "..." }
+          let invitationEmail: string | undefined;
+          
           if (response && response.success && response.data) {
-            const invitationEmail = response.data.email;
+            // Standard response format
+            invitationEmail = response.data.email;
+          } else if (response && (response as any).email) {
+            // Direct email response format
+            invitationEmail = (response as any).email;
+          }
+          
+          if (invitationEmail) {
             // Set email and invitationId in the form
             setValue("email", invitationEmail, { shouldValidate: false });
             setValue("invitationId", invitationId, { shouldValidate: false });
             setIsInvitedUser(true);
             // Do NOT auto-submit - user must fill form and submit manually
           } else {
-            showToast(response.message || "Invalid invitation", "error");
+            showToast(response?.message || "Invalid invitation", "error");
             // Remove invalid invitation from URL
             navigate("/signup", { replace: true });
           }
