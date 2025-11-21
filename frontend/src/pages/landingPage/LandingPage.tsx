@@ -685,10 +685,10 @@ export const LandingPage = () => {
                     </h3>
                     <div className="space-y-1">
                       <div className="text-lg font-semibold text-foreground">
-                        Free 30-day trial
+                        $100 per month
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Then pay what you think it's worth.
+                        $50 per admin • $25 per user
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground pt-2">
@@ -733,20 +733,11 @@ export const LandingPage = () => {
                     </ul>
                   </div>
 
-                  <div className="p-3 bg-muted/50 rounded-md">
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Free for 30 days
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Afterwards: Pay what you think it's worth, monthly.
-                    </p>
-                  </div>
-
                   <Button
                     onClick={() => navigate("/login")}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
-                    Start free trial →
+                    Subscribe now
                   </Button>
                 </CardContent>
               </Card>
@@ -759,16 +750,16 @@ export const LandingPage = () => {
                       <h3 className="text-2xl font-bold text-foreground">
                         Master
                       </h3>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-lg font-semibold text-foreground">
-                          From £150/month
-                        </span>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        (ex VAT)
+                      <div className="space-y-1">
+                        <div className="text-lg font-semibold text-foreground">
+                          $1000 per year
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          $500 per admin • $250 per member
+                        </div>
                       </div>
                       <p className="text-sm text-muted-foreground pt-2">
-                        For growing brands ready for expert support.
+                        Same features as Rookie, billed annually.
                       </p>
                     </div>
 
@@ -778,22 +769,18 @@ export const LandingPage = () => {
                       </p>
                       <ul className="space-y-2.5">
                         {[
-                          "Everything in Rookie, plus:",
-                          "Direct live chat with your accountant",
-                          "Forward AI answers for human review",
-                          "Full bookkeeping and bank reconciliations in Xero",
-                          "Year-end accounts and corporation tax filings",
-                          "VAT registration and quarterly/monthly VAT returns",
-                          "Payroll setup and management (including RTI and pensions)",
-                          "Director tax efficiency planning",
-                          "Monthly reconciliations including stock, payment gateways, deferred income, etc",
-                          "Xero integration setup with any eCommerce software",
+                          "AI assistant trained in UK tax and e-commerce",
+                          "Ask anything, like:",
+                          "Unlimited AI searches + full chat history",
+                          "Connect Amazon Seller Central, Shopify, TikTok Shop, Xero",
+                          "Personalised dashboard with live revenue, P&L, expenses",
+                          "Invite your team and create dedicated finance channels (like Slack, built for your books)",
                         ].map((feature, i) => (
                           <li
                             key={i}
                             className="flex items-start gap-2 text-sm"
                           >
-                            {feature.includes("Everything in") ? (
+                            {feature.includes("Ask anything") ? (
                               <span className="text-muted-foreground ml-5">
                                 {feature}
                               </span>
@@ -807,6 +794,13 @@ export const LandingPage = () => {
                             )}
                           </li>
                         ))}
+                        <li className="text-sm text-muted-foreground ml-7">
+                          <div>"Do I need to register for VAT yet?"</div>
+                          <div>
+                            "Why doesn't my Amazon payout match my sales report?"
+                          </div>
+                          <div>"What's my net margin on TikTok vs Amazon?"</div>
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -814,7 +808,7 @@ export const LandingPage = () => {
                     onClick={() => navigate("/login")}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
-                    Book a call →
+                    Subscribe now
                   </Button>
                 </CardContent>
               </Card>

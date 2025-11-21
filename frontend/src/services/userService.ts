@@ -9,7 +9,10 @@ import type {
   UPDATE_USER_RESPONSE,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_RESPONSE,
-  DELETE_USER_RESPONSE
+  DELETE_USER_RESPONSE,
+  START_SUBSCRIPTION_PAYLOAD,
+  START_SUBSCRIPTION_RESPONSE,
+  UNSUBSCRIBE_RESPONSE
 } from "@/types/auth";
 
 export const getUserProfileService = () => {
@@ -54,5 +57,13 @@ export const updateBusinessProfileService = (payload: UPDATE_BUSINESS_PROFILE_PA
 
 export const deleteUserService = () => {
   return apiInvoker<DELETE_USER_RESPONSE>(END_POINT.user.profile, "DELETE");
+};
+
+export const startSubscriptionService = (payload: START_SUBSCRIPTION_PAYLOAD) => {
+  return apiInvoker<START_SUBSCRIPTION_RESPONSE>(END_POINT.user.subscription, "POST", payload);
+};
+
+export const unsubscribeService = () => {
+  return apiInvoker<UNSUBSCRIBE_RESPONSE>(END_POINT.user.unsubscribe, "POST");
 };
 

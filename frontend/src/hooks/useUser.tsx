@@ -4,7 +4,9 @@ import {
   onboardingService,
   updateUserService,
   updateBusinessProfileService,
-  deleteUserService
+  deleteUserService,
+  startSubscriptionService,
+  unsubscribeService
 } from "@/services/userService";
 import { inviteTeamMemberService } from "@/services/teamService";
 import { useUserStore } from "@/store/userStore";
@@ -13,7 +15,8 @@ import type {
   ONBOARDING_PAYLOAD,
   UPDATE_USER_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
-  TEAM_INVITE_PAYLOAD
+  TEAM_INVITE_PAYLOAD,
+  START_SUBSCRIPTION_PAYLOAD
 } from "@/types/auth";
 import { AxiosError } from "axios";
 
@@ -196,6 +199,69 @@ export const useUser = () => {
     }
   };
 
+  const startSubscription = async (payload: START_SUBSCRIPTION_PAYLOAD) => {
+    try {
+      setLoading(true);
+      const res = await startSubscriptionService(payload);
+      if (res && res.success) {
+        // If checkout URL is provided, redirect to it
+        if (res.data?.checkoutUrl) {
+          window.location.href = res.data.checkoutUrl;
+          return res;
+        }
+        // Otherwise, fetch updated user profile after subscription
+        await fetchUserProfile();
+        showToast(res.message || "Subscription started successfully", "success");
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to start subscription", "error");
+        throw new Error(res.message || "Subscription failed");
+      }
+    } catch (error: unknown) {
+      console.error("Start subscription error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to start subscription";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unsubscribe = async () => {
+    try {
+      setLoading(true);
+      const res = await unsubscribeService();
+      if (res && res.success) {
+        // Fetch updated user profile after unsubscribe
+        await fetchUserProfile();
+        showToast(res.message || "Subscription canceled successfully", "success");
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to cancel subscription", "error");
+        throw new Error(res.message || "Unsubscribe failed");
+      }
+    } catch (error: unknown) {
+      console.error("Unsubscribe error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to cancel subscription";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     user,
     isLoading,
@@ -205,6 +271,8 @@ export const useUser = () => {
     updateBusinessProfile,
     inviteTeamMember,
     deleteUser,
+    startSubscription,
+    unsubscribe,
   };
 };
 

@@ -9,10 +9,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Mail, Shield, Users, Loader2, X } from "lucide-react";
+import { Mail, Shield, Users, Loader2, X, CreditCard } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { TeamInviteDialog } from "@/components/TeamInviteDialog";
 import { useTeam } from "@/hooks/useTeam";
 import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/components/ToastProvider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,6 +74,7 @@ const roles = [
 ];
 export const TeamSettings = () => {
   const { user: currentUser } = useUserStore();
+  const { showToast } = useToast();
   const {
     members,
     invitations,
@@ -74,11 +83,15 @@ export const TeamSettings = () => {
     fetchAllTeamData,
     cancelInvitation,
     removeTeamMember,
+    updateTeamMemberRole,
+    payForTeamMember,
   } = useTeam();
 
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [cancelInviteId, setCancelInviteId] = useState<string | null>(null);
   const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
+  const [memberIntervals, setMemberIntervals] = useState<Record<string, "monthly" | "yearly">>({});
+  const [payingForMemberId, setPayingForMemberId] = useState<string | null>(null);
 
   // Fetch team data on mount
   useEffect(() => {
@@ -116,6 +129,32 @@ export const TeamSettings = () => {
   const handleRemoveMember = useCallback((memberId: string) => {
     setRemoveMemberId(memberId);
   }, []);
+
+  const handlePayForMember = useCallback(async (member: any) => {
+    console.log("handlePayForMember called with member:", member);
+    // userId is the id of the member
+    const userId = member.id;
+    console.log("Using member.id as userId:", userId);
+    
+    if (!userId) {
+      console.error("Member ID not found for member:", member);
+      showToast("Member ID not found. Please contact support.", "error");
+      return;
+    }
+    
+    const interval = memberIntervals[member.id] || "monthly";
+    console.log("Using interval:", interval, "for member:", member.id);
+    setPayingForMemberId(member.id);
+    try {
+      console.log("Calling payForTeamMember with:", { userId, interval });
+      await payForTeamMember(userId, interval);
+    } catch (error) {
+      console.error("Error paying for team member:", error);
+      // Error is already handled in payForTeamMember hook
+    } finally {
+      setPayingForMemberId(null);
+    }
+  }, [memberIntervals, payForTeamMember, showToast]);
 
   const confirmRemoveMember = useCallback(async () => {
     if (removeMemberId) {
@@ -334,15 +373,83 @@ export const TeamSettings = () => {
                         {member.role?.toLowerCase()}
                       </Badge>
                       {canManageTeam && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveMember(member.id)}
-                          className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
-                          disabled={isLoading}
-                        >
-                          Remove
-                        </Button>
+                        <>
+                          {/* Subscription checkout for team members */}
+                          {member.role?.toUpperCase() !== "OWNER" && (
+                            <div className="flex items-center gap-2">
+                              <Select
+                                value={memberIntervals[member.id] || "monthly"}
+                                onValueChange={(value: "monthly" | "yearly") => {
+                                  setMemberIntervals(prev => ({
+                                    ...prev,
+                                    [member.id]: value
+                                  }));
+                                }}
+                              >
+                                <SelectTrigger className="w-[120px]">
+                                  <SelectValue placeholder="Interval" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="monthly">Monthly</SelectItem>
+                                  <SelectItem value="yearly">Yearly</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePayForMember(member)}
+                                disabled={isLoading || payingForMemberId === member.id}
+                                className="gap-2"
+                              >
+                                {payingForMemberId === member.id ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Processing...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CreditCard className="h-4 w-4" />
+                                    Pay for him
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          )}
+                          {/* Only show role toggle for members (not OWNER) */}
+                          {member.role?.toUpperCase() !== "OWNER" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={async () => {
+                                try {
+                                  // The API expects the team member's ID (member.id) in the URL
+                                  // Based on endpoint: /team/member/{{userID}}/role where userID is the team member ID
+                                  const teamMemberId = member.id;
+                                  
+                                  if (teamMemberId) {
+                                    await updateTeamMemberRole(teamMemberId, member.role || "MEMBER");
+                                  } else {
+                                    console.error("Team member ID not found:", member);
+                                  }
+                                } catch (error) {
+                                  console.error("Error updating team member role:", error);
+                                }
+                              }}
+                              disabled={isLoading}
+                            >
+                              {member.role?.toUpperCase() === "ADMIN" ? "Make Member" : "Make Admin"}
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveMember(member.id)}
+                            className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
+                            disabled={isLoading}
+                          >
+                            Remove
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
