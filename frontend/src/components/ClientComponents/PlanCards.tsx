@@ -6,9 +6,9 @@ import { Badge } from "../ui/badge";
 export const plans = [
   {
     name: "Rookie",
-    price: "Free 30-day trial",
-    period: "",
-    subtitle: "Then pay what you think it's worth.",
+    price: "$100",
+    period: "per month",
+    subtitle: "$50 per admin • $25 per user",
     description:
       "Perfect for founders who want instant clarity without the jargon.",
     features: [
@@ -22,28 +22,24 @@ export const plans = [
       "Personalised dashboard with live revenue, P&L, expenses",
       "Invite your team and create dedicated finance channels (like Slack, built for your books)",
     ],
-    pricing: {
-      trial: "Free for 30 days",
-      after: "Afterwards: Pay what you think it's worth, monthly.",
-    },
     type: "rookie",
   },
   {
     name: "Master",
-    price: "From £150/month",
-    period: "(ex VAT)",
-    description: "For growing brands ready for expert support.",
+    price: "$1000",
+    period: "per year",
+    subtitle: "$500 per admin • $250 per member",
+    description: "Same features as Rookie, billed annually.",
     features: [
-      "Everything in Rookie, plus:",
-      "Direct live chat with your accountant",
-      "Forward AI answers for human review",
-      "Full bookkeeping and bank reconciliations in Xero",
-      "Year-end accounts and corporation tax filings",
-      "VAT registration and quarterly/monthly VAT returns",
-      "Payroll setup and management (including RTI and pensions)",
-      "Director tax efficiency planning",
-      "Monthly reconciliations including stock, payment gateways, deferred income, etc",
-      "Xero integration setup with any eCommerce software",
+      "AI assistant trained in UK tax and e-commerce",
+      "Ask anything, like:",
+      '"Do I need to register for VAT yet?"',
+      '"Why doesn\'t my Amazon payout match my sales report?"',
+      '"What\'s my net margin on TikTok vs Amazon?"',
+      "Unlimited AI searches + full chat history",
+      "Connect Amazon Seller Central, Shopify, TikTok Shop, Xero",
+      "Personalised dashboard with live revenue, P&L, expenses",
+      "Invite your team and create dedicated finance channels (like Slack, built for your books)",
     ],
     type: "master",
   },
@@ -126,16 +122,6 @@ export const PlanCards = ({
             ))}
           </ul>
 
-          {plan.type === "rookie" && plan.pricing && (
-            <div className="mb-4 p-3 bg-muted/50 rounded-md">
-              <p className="text-xs text-muted-foreground mb-1">
-                {plan.pricing.trial}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {plan.pricing.after}
-              </p>
-            </div>
-          )}
 
           {showActions && onSelectPlan && (
             <Button
@@ -146,9 +132,7 @@ export const PlanCards = ({
             >
               {currentPlan === plan.name
                 ? "Current Plan"
-                : plan.type === "rookie"
-                ? "Start free trial →"
-                : "Book a call →"}
+                : "Subscribe now"}
             </Button>
           )}
         </div>

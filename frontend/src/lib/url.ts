@@ -11,7 +11,9 @@ user:{
     profile:"/user",
     onboarding:"/user/onboarding",
     businessProfile:"/user/business-profile",
-    support:"/user/support"
+    support:"/user/support",
+    subscription:"/billing/checkout",
+    unsubscribe:"/billing/unsubscribe"
 },
 team:{
     invite:"/team/invite",
