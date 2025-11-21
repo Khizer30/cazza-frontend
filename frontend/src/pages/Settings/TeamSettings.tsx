@@ -74,6 +74,7 @@ export const TeamSettings = () => {
     fetchAllTeamData,
     cancelInvitation,
     removeTeamMember,
+    updateTeamMemberRole,
   } = useTeam();
 
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
@@ -334,15 +335,42 @@ export const TeamSettings = () => {
                         {member.role?.toLowerCase()}
                       </Badge>
                       {canManageTeam && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveMember(member.id)}
-                          className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
-                          disabled={isLoading}
-                        >
-                          Remove
-                        </Button>
+                        <>
+                          {/* Only show role toggle for members (not OWNER) */}
+                          {member.role?.toUpperCase() !== "OWNER" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={async () => {
+                                try {
+                                  // The API expects the team member's ID (member.id) in the URL
+                                  // Based on endpoint: /team/member/{{userID}}/role where userID is the team member ID
+                                  const teamMemberId = member.id;
+                                  
+                                  if (teamMemberId) {
+                                    await updateTeamMemberRole(teamMemberId, member.role || "MEMBER");
+                                  } else {
+                                    console.error("Team member ID not found:", member);
+                                  }
+                                } catch (error) {
+                                  console.error("Error updating team member role:", error);
+                                }
+                              }}
+                              disabled={isLoading}
+                            >
+                              {member.role?.toUpperCase() === "ADMIN" ? "Make Member" : "Make Admin"}
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveMember(member.id)}
+                            className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
+                            disabled={isLoading}
+                          >
+                            Remove
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>

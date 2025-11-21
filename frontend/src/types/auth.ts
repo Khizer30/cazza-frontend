@@ -277,6 +277,18 @@ export interface DELETE_MEMBER_RESPONSE {
   message: string;
 }
 
+export interface UPDATE_TEAM_MEMBER_ROLE_PAYLOAD {
+  role: "ADMIN" | "MEMBER";
+}
+
+export interface UPDATE_TEAM_MEMBER_ROLE_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    member: TeamMember;
+  };
+}
+
 export interface DELETE_USER_RESPONSE {
   success: boolean;
   message: string;

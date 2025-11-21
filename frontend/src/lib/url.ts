@@ -21,6 +21,7 @@ team:{
     invitation:"/team/invitation",
     members:"/team/members",
     member:"/team/member",
+    updateMemberRole:"/team/member",
     analytics:"/team/analytics"
 }
 } as const
