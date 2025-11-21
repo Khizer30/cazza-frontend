@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { CreditCard } from "lucide-react";
 import { useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/components/ToastProvider";
@@ -26,8 +26,7 @@ export const BillingSettings = () => {
   const { startSubscription, unsubscribe, isLoading, fetchUserProfile } = useUser();
   const { user } = useUserStore();
   const { showToast } = useToast();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const subscription = user?.subscription || null;
   
@@ -41,17 +40,22 @@ export const BillingSettings = () => {
   useEffect(() => {
     const message = searchParams.get("message");
     if (message) {
+      // Show toast first
       if (message === "success") {
         showToast("Payment successful! Your subscription is now active.", "success");
       } else {
         showToast("Payment failed. Please try again.", "error");
       }
-      // Remove query parameter from URL
-      navigate("/client/billing", { replace: true });
+      
+      // Remove query parameter from URL without causing navigation/re-render
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete("message");
+      setSearchParams(newSearchParams, { replace: true });
+      
       // Refresh user profile to get updated subscription status
       fetchUserProfile();
     }
-  }, [searchParams, navigate, showToast, fetchUserProfile]);
+  }, [searchParams, setSearchParams, showToast, fetchUserProfile]);
   
   // Helper function to get plan name from subscription
   const getPlanName = (sub: Subscription | null) => {
