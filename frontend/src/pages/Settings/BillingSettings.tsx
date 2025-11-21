@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CreditCard } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
@@ -27,6 +27,7 @@ export const BillingSettings = () => {
   const { user } = useUserStore();
   const { showToast } = useToast();
   const [searchParams] = useSearchParams();
+  const hasProcessedMessage = useRef(false);
   
   const subscription = user?.subscription || null;
   
@@ -39,7 +40,9 @@ export const BillingSettings = () => {
   // Check for payment success/failure message in URL
   useEffect(() => {
     const message = searchParams.get("message");
-    if (message) {
+    if (message && !hasProcessedMessage.current) {
+      hasProcessedMessage.current = true;
+      
       // Show toast first
       if (message === "success") {
         showToast("Payment successful! Your subscription is now active.", "success");
@@ -47,15 +50,22 @@ export const BillingSettings = () => {
         showToast("Payment failed. Please try again.", "error");
       }
       
-      // Remove query parameter from URL using window.history to avoid React Router re-render
+      // Remove query parameter from URL
       const newUrl = window.location.pathname;
       window.history.replaceState({}, "", newUrl);
       
-      // Refresh user profile to get updated subscription status
-      // Use setTimeout to ensure component has rendered first
-      setTimeout(() => {
-        fetchUserProfile();
-      }, 100);
+      // Refresh user profile and then reload the page to ensure everything is updated
+      fetchUserProfile().then(() => {
+        // Reload the page after a short delay to ensure data is fetched
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      }).catch(() => {
+        // Even if fetch fails, reload to ensure clean state
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      });
     }
   }, [searchParams, showToast, fetchUserProfile]);
   

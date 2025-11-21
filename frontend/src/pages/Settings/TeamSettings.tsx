@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -94,11 +94,14 @@ export const TeamSettings = () => {
   const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
   const [memberIntervals, setMemberIntervals] = useState<Record<string, "monthly" | "yearly">>({});
   const [payingForMemberId, setPayingForMemberId] = useState<string | null>(null);
+  const hasProcessedMessage = useRef(false);
 
   // Check for payment success/failure message in URL
   useEffect(() => {
     const message = searchParams.get("message");
-    if (message) {
+    if (message && !hasProcessedMessage.current) {
+      hasProcessedMessage.current = true;
+      
       // Show toast first
       if (message === "success") {
         showToast("Payment successful! Team member subscription is now active.", "success");
@@ -106,15 +109,22 @@ export const TeamSettings = () => {
         showToast("Payment failed. Please try again.", "error");
       }
       
-      // Remove query parameter from URL using window.history to avoid React Router re-render
+      // Remove query parameter from URL
       const newUrl = window.location.pathname;
       window.history.replaceState({}, "", newUrl);
       
-      // Refresh team data to get updated subscription status
-      // Use setTimeout to ensure component has rendered first
-      setTimeout(() => {
-        fetchAllTeamData();
-      }, 100);
+      // Refresh team data and then reload the page to ensure everything is updated
+      fetchAllTeamData().then(() => {
+        // Reload the page after a short delay to ensure data is fetched
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      }).catch(() => {
+        // Even if fetch fails, reload to ensure clean state
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      });
     }
   }, [searchParams, showToast, fetchAllTeamData]);
 
