@@ -113,18 +113,8 @@ export const TeamSettings = () => {
       const newUrl = window.location.pathname;
       window.history.replaceState({}, "", newUrl);
       
-      // Refresh team data and then reload the page to ensure everything is updated
-      fetchAllTeamData().then(() => {
-        // Reload the page after a short delay to ensure data is fetched
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      }).catch(() => {
-        // Even if fetch fails, reload to ensure clean state
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      });
+      // Refresh team data to get updated subscription status
+      fetchAllTeamData();
     }
   }, [searchParams, showToast, fetchAllTeamData]);
 

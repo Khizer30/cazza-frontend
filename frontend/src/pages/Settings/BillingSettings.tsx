@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CreditCard } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
@@ -54,18 +53,8 @@ export const BillingSettings = () => {
       const newUrl = window.location.pathname;
       window.history.replaceState({}, "", newUrl);
       
-      // Refresh user profile and then reload the page to ensure everything is updated
-      fetchUserProfile().then(() => {
-        // Reload the page after a short delay to ensure data is fetched
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      }).catch(() => {
-        // Even if fetch fails, reload to ensure clean state
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      });
+      // Refresh user profile to get updated subscription status
+      fetchUserProfile();
     }
   }, [searchParams, showToast, fetchUserProfile]);
   
@@ -101,19 +90,6 @@ export const BillingSettings = () => {
            new Date(sub.expiryDate) > new Date();
   };
   
-  // Handlers (placeholders) - replace with real API integration
-  const handleManageSubscription = async () => {
-    try {
-      // TODO: call backend to create/open Stripe customer portal
-      console.log("Open customer portal (TODO: implement)");
-      // placeholder: simulate async
-      await new Promise((res) => setTimeout(res, 500));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-
   const handleStartTrial = async (planType: "rookie" | "master" = "rookie") => {
     try {
       const interval = planType === "rookie" ? "monthly" : "yearly";
@@ -129,8 +105,8 @@ export const BillingSettings = () => {
 
   return (
     <div className="max-w-6xl space-y-6 mx-auto my-4">
-      {/* Current Plan */}
-      {subscription && (
+      {/* Current Plan - Only show if plan is active */}
+      {subscription && isActive && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -195,24 +171,14 @@ export const BillingSettings = () => {
             </div>
             <div className="mt-4 flex gap-2">
               {subscription.status === "ACTIVE" && (
-                <>
-                  <Button
-                    onClick={handleManageSubscription}
-                    disabled={isLoading}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Manage Subscription
-                  </Button>
-                  <Button
-                    onClick={unsubscribe}
-                    disabled={isLoading}
-                    variant="destructive"
-                    className="flex-1"
-                  >
-                    Unsubscribe
-                  </Button>
-                </>
+                <Button
+                  onClick={unsubscribe}
+                  disabled={isLoading}
+                  variant="destructive"
+                  className="w-full"
+                >
+                  Unsubscribe
+                </Button>
               )}
               {subscription.status === "CANCELED" && (
                 <Button
@@ -280,35 +246,6 @@ export const BillingSettings = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Subscription Management */}
-      {subscription && subscription.status === "ACTIVE" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Subscription Management</CardTitle>
-            <CardDescription>
-              Manage your subscription, payment methods, and billing history
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <Button
-                onClick={handleManageSubscription}
-                disabled={isLoading}
-                className="w-full"
-                variant="outline"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Open Stripe Customer Portal
-              </Button>
-              <p className="text-sm text-muted-foreground text-center">
-                Update payment methods, view invoices, and manage your
-                subscription
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
