@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   History,
+  Trash2,
 } from "lucide-react";
 
 interface ChatHistoryItem {
@@ -22,6 +23,7 @@ interface ChatLayoutProps {
   chatHistory?: ChatHistoryItem[];
   onNewChat?: () => void;
   onSelectChat?: (chatId: string) => void;
+  onDeleteChat?: (chatId: string) => void;
   currentChatId?: string;
   isSidebarOpen?: boolean;
   onToggleSidebar?: () => void;
@@ -32,6 +34,7 @@ export function ChatLayout({
   chatHistory = [],
   onNewChat,
   onSelectChat,
+  onDeleteChat,
   currentChatId,
   isSidebarOpen = false,
   onToggleSidebar,
@@ -121,6 +124,19 @@ export function ChatLayout({
                         {chat.timestamp}
                       </p>
                     </div>
+                    {onDeleteChat && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteChat(chat.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-destructive/10 rounded text-muted-foreground hover:text-destructive flex-shrink-0"
+                        title="Delete chat"
+                        type="button"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
