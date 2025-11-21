@@ -44,8 +44,9 @@ export const GoogleCallback = () => {
         // After handleGoogleCallback, user profile is fetched and stored
         // Check the user from store to determine redirect
         const currentUser = useUserStore.getState().user;
-        if (currentUser && !currentUser.businessProfile) {
-          // Redirect to onboarding if business profile is missing
+        // Only OWNER role users need onboarding, skip for other roles
+        if (currentUser && !currentUser.businessProfile && currentUser.role === "OWNER") {
+          // Redirect to onboarding if business profile is missing and user is OWNER
           navigate("/onboarding");
         } else {
           // Navigate to dashboard after successful authentication
