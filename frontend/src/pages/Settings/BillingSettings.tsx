@@ -90,6 +90,19 @@ export const BillingSettings = () => {
            new Date(sub.expiryDate) > new Date();
   };
   
+  // Handlers (placeholders) - replace with real API integration
+  const handleManageSubscription = async () => {
+    try {
+      // TODO: call backend to create/open Stripe customer portal
+      console.log("Open customer portal (TODO: implement)");
+      // placeholder: simulate async
+      await new Promise((res) => setTimeout(res, 500));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
   const handleStartTrial = async (planType: "rookie" | "master" = "rookie") => {
     try {
       const interval = planType === "rookie" ? "monthly" : "yearly";
@@ -171,14 +184,24 @@ export const BillingSettings = () => {
             </div>
             <div className="mt-4 flex gap-2">
               {subscription.status === "ACTIVE" && (
-                <Button
-                  onClick={unsubscribe}
-                  disabled={isLoading}
-                  variant="destructive"
-                  className="w-full"
-                >
-                  Unsubscribe
-                </Button>
+                <>
+                  <Button
+                    onClick={handleManageSubscription}
+                    disabled={isLoading}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Manage Subscription
+                  </Button>
+                  <Button
+                    onClick={unsubscribe}
+                    disabled={isLoading}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    Unsubscribe
+                  </Button>
+                </>
               )}
               {subscription.status === "CANCELED" && (
                 <Button
@@ -204,7 +227,7 @@ export const BillingSettings = () => {
         </CardHeader>
         <CardContent>
           <PlanCards
-            currentPlan={planName || null}
+            currentPlan={isActive ? planName || null : null}
             loading={isLoading}
             showActions={false}
           />
