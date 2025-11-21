@@ -213,6 +213,74 @@ export const TeamSettings = () => {
     return m.email || m.profiles?.email || "No email";
   };
 
+  // Helper function to get member's current subscription interval (normalized)
+  const getMemberSubscriptionInterval = (member: any): "monthly" | "yearly" | null => {
+    if (!member.subscription || member.subscription.status !== "ACTIVE") {
+      return null;
+    }
+    const interval = member.subscription.interval?.toLowerCase();
+    if (interval === "month" || interval === "monthly") {
+      return "monthly";
+    }
+    if (interval === "year" || interval === "yearly") {
+      return "yearly";
+    }
+    return null;
+  };
+
+  // Helper function to check if button should be disabled
+  const isPayButtonDisabled = (member: any): boolean => {
+    const selectedInterval = memberIntervals[member.id] || "monthly";
+    const currentSubscriptionInterval = getMemberSubscriptionInterval(member);
+    
+    // If member has an active subscription with the same interval, disable the button
+    if (currentSubscriptionInterval && currentSubscriptionInterval === selectedInterval) {
+      return true;
+    }
+    
+    return false;
+  };
+
+  // Helper function to get subscription display text
+  const getSubscriptionDisplay = (member: any): string | null => {
+    if (!member.subscription) {
+      return null;
+    }
+
+    const subscription = member.subscription;
+    const status = subscription.status;
+    
+    if (status === "ACTIVE") {
+      const planName = subscription.name || "Active Plan";
+      const interval = subscription.interval || "";
+      const price = subscription.price ? `£${subscription.price}` : "";
+      const expiryDate = subscription.expiryDate 
+        ? new Date(subscription.expiryDate).toLocaleDateString() 
+        : "";
+      
+      let display = `${planName}`;
+      if (price) {
+        display += ` • ${price}/${interval}`;
+      }
+      if (expiryDate) {
+        display += ` • Expires ${expiryDate}`;
+      }
+      return display;
+    } else if (status === "TRIAL") {
+      const expiryDate = subscription.expiryDate 
+        ? new Date(subscription.expiryDate).toLocaleDateString() 
+        : "";
+      return `Trial • ${expiryDate ? `Expires ${expiryDate}` : "Active"}`;
+    } else if (status === "CANCELED") {
+      const expiryDate = subscription.expiryDate 
+        ? new Date(subscription.expiryDate).toLocaleDateString() 
+        : "";
+      return `Canceled${expiryDate ? ` • Expires ${expiryDate}` : ""}`;
+    }
+    
+    return null;
+  };
+
   // Filter out current user from members list
   const filteredMembers = members.filter(
     (member) => member.userId !== currentUser?.id && member.user_id !== currentUser?.id
@@ -385,6 +453,11 @@ export const TeamSettings = () => {
                         <p className="text-sm text-muted-foreground">
                           {getMemberEmail(member)}
                         </p>
+                        {getSubscriptionDisplay(member) && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {getSubscriptionDisplay(member)}
+                          </p>
+                        )}
                         {member.joined_at && (
                           <p className="text-xs text-muted-foreground">
                             Joined {new Date(member.joined_at).toLocaleDateString()}
@@ -423,7 +496,7 @@ export const TeamSettings = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handlePayForMember(member)}
-                                disabled={isLoading || payingForMemberId === member.id}
+                                disabled={isLoading || payingForMemberId === member.id || isPayButtonDisabled(member)}
                                 className="gap-2"
                               >
                                 {payingForMemberId === member.id ? (

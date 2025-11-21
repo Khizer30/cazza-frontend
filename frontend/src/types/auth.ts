@@ -229,10 +229,23 @@ export interface TeamInvitation {
   [key: string]: any;
 }
 
+export interface TeamMemberSubscription {
+  id: string;
+  status: "ACTIVE" | "TRIAL" | "CANCELED" | "EXPIRED" | "PENDING";
+  expiryDate: string | null;
+  autoRenew: boolean;
+  paymentDate: string | null;
+  interval: string; // "Month" or "Year" from API, can be normalized to "monthly" | "yearly"
+  price: number;
+  name: string;
+}
+
 export interface TeamMember {
   id: string;
   userId?: string;
   user_id?: string;
+  firstName?: string;
+  lastName?: string;
   name?: string;
   email?: string;
   profiles?: {
@@ -240,8 +253,15 @@ export interface TeamMember {
     [key: string]: any;
   };
   role: "OWNER" | "ADMIN" | "MEMBER" | string;
+  profileType?: string;
+  profileImage?: string | null;
+  verified?: boolean;
+  isActive?: boolean;
   joined_at?: string;
   createdAt?: string;
+  updatedAt?: string;
+  ownerId?: string;
+  subscription?: TeamMemberSubscription | null;
   [key: string]: any;
 }
 
