@@ -9,10 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CreditCard } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/components/ToastProvider";
 import type { Subscription } from "@/types/auth";
 
 // Minimal plans data used by this page. Replace with API-driven data as needed.
@@ -24,8 +25,9 @@ const plans: { name: string; price?: number; type: "rookie" | "master" }[] = [
 export const BillingSettings = () => {
   const { startSubscription, unsubscribe, isLoading, fetchUserProfile } = useUser();
   const { user } = useUserStore();
-  const [customAmount, setCustomAmount] = useState("");
-  const [showCustomAmount, setShowCustomAmount] = useState(false);
+  const { showToast } = useToast();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   
   const subscription = user?.subscription || null;
   
@@ -34,6 +36,22 @@ export const BillingSettings = () => {
       fetchUserProfile();
     }
   }, [user, fetchUserProfile]);
+
+  // Check for payment success/failure message in URL
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message) {
+      if (message === "success") {
+        showToast("Payment successful! Your subscription is now active.", "success");
+      } else {
+        showToast("Payment failed. Please try again.", "error");
+      }
+      // Remove query parameter from URL
+      navigate("/client/billing", { replace: true });
+      // Refresh user profile to get updated subscription status
+      fetchUserProfile();
+    }
+  }, [searchParams, navigate, showToast, fetchUserProfile]);
   
   // Helper function to get plan name from subscription
   const getPlanName = (sub: Subscription | null) => {
@@ -79,20 +97,6 @@ export const BillingSettings = () => {
     }
   };
 
-  const handleCustomSubscription = async () => {
-    if (!customAmount) return;
-    const amount = Number(customAmount);
-    if (isNaN(amount) || amount <= 0) return;
-    try {
-      // TODO: call API to create subscription with custom amount
-      // After API call, fetch updated user profile
-      await fetchUserProfile();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setShowCustomAmount(false);
-    }
-  };
 
   const handleStartTrial = async (planType: "rookie" | "master" = "rookie") => {
     try {
@@ -235,35 +239,15 @@ export const BillingSettings = () => {
                         Trial Active • Ends:{" "}
                         {subscription.expiryDate && new Date(subscription.expiryDate).toLocaleDateString()}
                       </Button>
-                    ) : isPlanActive ? (
-                      <div className="space-y-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowCustomAmount(!showCustomAmount)}
-                          className="w-full"
-                        >
-                          Set {plan.type === "rookie" ? "Monthly" : "Yearly"} Amount
-                        </Button>
-                        {showCustomAmount && (
-                          <div className="space-y-2">
-                            <Input
-                              type="number"
-                              placeholder={`Enter amount (£) ${plan.type === "rookie" ? "per month" : "per year"}`}
-                              value={customAmount}
-                              onChange={(e) => setCustomAmount(e.target.value)}
-                              min="1"
-                              step="0.01"
-                            />
-                            <Button
-                              onClick={handleCustomSubscription}
-                              disabled={isLoading || !customAmount}
-                              className="w-full"
-                            >
-                              Subscribe for £{customAmount}/{plan.type === "rookie" ? "month" : "year"}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
+                    ) : isPlanActive && subscription ? (
+                      // Show subscription status for active paid subscriptions
+                      <Button variant="secondary" className="w-full" disabled>
+                        {subscription.customAmount
+                          ? `Active • £${(subscription.customAmount / 100).toFixed(2)}/${subscription.interval || "month"}`
+                          : subscription.status === "ACTIVE"
+                          ? "Active Subscription"
+                          : "Trial Active"}
+                      </Button>
                     ) : (
                       <Button
                         className="w-full"
