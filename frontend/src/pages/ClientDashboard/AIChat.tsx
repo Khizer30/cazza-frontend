@@ -1,75 +1,152 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatLayout } from "@/layouts/ChatLayout";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import ZZLogo from "@/assets/imgs/ZZ logo.png";
-import { suggestedPrompts, cannedResponses } from "@/constants/AiChat";
+import { suggestedPrompts } from "@/constants/AiChat";
+import { sendMessageToGemini, type ChatMessage as GeminiChatMessage } from "@/services/geminiService";
+import { useToast } from "@/components/ToastProvider";
+import { useChatStore, type ChatMessage } from "@/store/chatStore";
+import { formatDistanceToNow } from "date-fns";
 
 export const AIChat = () => {
+  const { showToast } = useToast();
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<
-    Array<{
-      id: string;
-      type: "user" | "assistant";
-      content: string;
-      timestamp: Date;
-    }>
-  >([]);
-
-  const [responseIndex, setResponseIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const {
+    conversations,
+    currentConversationId,
+    createNewConversation,
+    setCurrentConversation,
+    addMessageToConversation,
+    getCurrentConversation,
+    deleteConversation,
+  } = useChatStore();
+
+  // Get current conversation messages
+  const currentConversation = getCurrentConversation();
+  const messages = currentConversation?.messages || [];
+
+  // Create initial conversation if none exists
+  useEffect(() => {
+    if (conversations.length === 0) {
+      createNewConversation();
+    } else if (!currentConversationId) {
+      setCurrentConversation(conversations[0].id);
+    }
+  }, []);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // 📨 Send a message and simulate AI response
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
+  // Convert messages to Gemini format
+  const convertToGeminiFormat = (msgs: ChatMessage[]): GeminiChatMessage[] => {
+    return msgs.map((msg) => ({
+      role: msg.type === "user" ? "user" : "model",
+      parts: [{ text: msg.content }],
+    }));
+  };
 
-    const userMessage = {
+  // Send a message and get AI response from Gemini
+  const handleSendMessage = async () => {
+    if (!input.trim() || isLoading || !currentConversationId) return;
+
+    const userMessage: ChatMessage = {
       id: Date.now().toString(),
-      type: "user" as const,
+      type: "user",
       content: input.trim(),
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const userInput = input.trim();
+    addMessageToConversation(currentConversationId, userMessage);
     setInput("");
+    setIsLoading(true);
 
-    setTimeout(() => {
-      // Get the next canned response
-      const nextResponse = cannedResponses[responseIndex] || {
-        question: input.trim(),
-        answer:
-          "I'm still learning that one! Try asking about TikTok sales, refunds, or profit breakdowns.",
-      };
+    try {
+      // Convert existing messages to Gemini format (before adding the new user message)
+      const chatHistory = convertToGeminiFormat(messages);
+      
+      // Get response from Gemini
+      const response = await sendMessageToGemini(userInput, chatHistory);
 
-      const aiMessage = {
+      const aiMessage: ChatMessage = {
         id: Date.now().toString() + "-ai",
-        type: "assistant" as const,
-        content: nextResponse.answer,
+        type: "assistant",
+        content: response,
         timestamp: new Date(),
       };
 
-      setMessages((prev) => [...prev, aiMessage]);
-      setResponseIndex((prev) =>
-        Math.min(prev + 1, cannedResponses.length - 1)
-      );
-    }, 800); // slight delay for realism
+      addMessageToConversation(currentConversationId, aiMessage);
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to get response. Please try again.";
+
+      showToast(errorMessage, "error");
+
+      // Add error message to chat
+      const errorAiMessage: ChatMessage = {
+        id: Date.now().toString() + "-error",
+        type: "assistant",
+        content: `Sorry, I encountered an error: ${errorMessage}. Please try again.`,
+        timestamp: new Date(),
+      };
+
+      addMessageToConversation(currentConversationId, errorAiMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  
+  // Handle new chat
+  const handleNewChat = () => {
+    createNewConversation();
+  };
+
+  // Handle chat selection
+  const handleSelectChat = (chatId: string) => {
+    setCurrentConversation(chatId);
+  };
+
+  // Handle delete chat
+  const handleDeleteChat = (chatId: string) => {
+    deleteConversation(chatId);
+    showToast("Chat deleted", "success");
+  };
+
+  // Format chat history for sidebar
+  const chatHistoryItems = conversations.map((conv) => ({
+    id: conv.id,
+    title: conv.title,
+    timestamp: formatDistanceToNow(conv.updatedAt, { addSuffix: true }),
+  }));
 
   return (
-    <ChatLayout>
+    <ChatLayout
+      chatHistory={chatHistoryItems}
+      onNewChat={handleNewChat}
+      onSelectChat={handleSelectChat}
+      onDeleteChat={handleDeleteChat}
+      currentChatId={currentConversationId || undefined}
+      isSidebarOpen={isSidebarOpen}
+      onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+    >
       <div className="h-[92vh] flex flex-col bg-background">
         {/* Header - fixed at top */}
         <div className="flex-shrink-0 p-4 border-b border-border bg-card">
-          <h1 className="text-lg font-semibold">Ask Cazza</h1>
+          <h1 className="text-lg font-semibold">
+            {currentConversation?.title || "Ask Cazza"}
+          </h1>
         </div>
 
         {/* Messages container */}
@@ -98,6 +175,13 @@ export const AIChat = () => {
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="relative max-w-xs lg:max-w-md px-4 py-3 rounded-lg bg-card border border-border shadow-sm">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
           ) : (
@@ -152,10 +236,14 @@ export const AIChat = () => {
             />
             <Button
               onClick={handleSendMessage}
-              disabled={!input.trim()}
+              disabled={!input.trim() || isLoading}
               className="px-3 py-2 rounded-lg bg-primary text-secondary"
             >
-              <Send className="w-4 h-4" />
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
             </Button>
           </div>
         </div>
