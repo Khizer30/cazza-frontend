@@ -26,7 +26,7 @@ export const BillingSettings = () => {
   const { startSubscription, unsubscribe, isLoading, fetchUserProfile } = useUser();
   const { user } = useUserStore();
   const { showToast } = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   
   const subscription = user?.subscription || null;
   
@@ -47,15 +47,17 @@ export const BillingSettings = () => {
         showToast("Payment failed. Please try again.", "error");
       }
       
-      // Remove query parameter from URL without causing navigation/re-render
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete("message");
-      setSearchParams(newSearchParams, { replace: true });
+      // Remove query parameter from URL using window.history to avoid React Router re-render
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
       
       // Refresh user profile to get updated subscription status
-      fetchUserProfile();
+      // Use setTimeout to ensure component has rendered first
+      setTimeout(() => {
+        fetchUserProfile();
+      }, 100);
     }
-  }, [searchParams, setSearchParams, showToast, fetchUserProfile]);
+  }, [searchParams, showToast, fetchUserProfile]);
   
   // Helper function to get plan name from subscription
   const getPlanName = (sub: Subscription | null) => {

@@ -76,7 +76,7 @@ const roles = [
 export const TeamSettings = () => {
   const { user: currentUser } = useUserStore();
   const { showToast } = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const {
     members,
     invitations,
@@ -106,15 +106,17 @@ export const TeamSettings = () => {
         showToast("Payment failed. Please try again.", "error");
       }
       
-      // Remove query parameter from URL without causing navigation/re-render
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete("message");
-      setSearchParams(newSearchParams, { replace: true });
+      // Remove query parameter from URL using window.history to avoid React Router re-render
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
       
       // Refresh team data to get updated subscription status
-      fetchAllTeamData();
+      // Use setTimeout to ensure component has rendered first
+      setTimeout(() => {
+        fetchAllTeamData();
+      }, 100);
     }
-  }, [searchParams, setSearchParams, showToast, fetchAllTeamData]);
+  }, [searchParams, showToast, fetchAllTeamData]);
 
   // Fetch team data on mount
   useEffect(() => {
