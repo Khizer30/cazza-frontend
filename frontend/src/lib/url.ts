@@ -22,6 +22,7 @@ team:{
     members:"/team/members",
     member:"/team/member",
     updateMemberRole:"/team/member",
-    analytics:"/team/analytics"
+    analytics:"/team/analytics",
+    memberSubscription:"/billing/checkout-team-member"
 }
 } as const

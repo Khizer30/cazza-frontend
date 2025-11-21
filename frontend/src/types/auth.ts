@@ -331,3 +331,25 @@ export interface UNSUBSCRIBE_RESPONSE {
     subscription: Subscription;
   };
 }
+
+export interface TEAM_MEMBER_SUBSCRIPTION_PAYLOAD {
+  userId: string;
+  interval: "monthly" | "yearly";
+}
+
+export interface TEAM_MEMBER_SUBSCRIPTION_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    checkoutUrl: string;
+    subscription?: {
+      id: string;
+      planType: string;
+      trialEnd?: string;
+      subscribed: boolean;
+      subscriptionEnd?: string;
+      customAmount?: number;
+      [key: string]: any;
+    };
+  };
+}

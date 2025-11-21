@@ -11,7 +11,9 @@ import type {
   DELETE_MEMBER_RESPONSE,
   GET_INVITATION_RESPONSE,
   UPDATE_TEAM_MEMBER_ROLE_PAYLOAD,
-  UPDATE_TEAM_MEMBER_ROLE_RESPONSE
+  UPDATE_TEAM_MEMBER_ROLE_RESPONSE,
+  TEAM_MEMBER_SUBSCRIPTION_PAYLOAD,
+  TEAM_MEMBER_SUBSCRIPTION_RESPONSE
 } from "@/types/auth";
 
 export const inviteTeamMemberService = (payload: TEAM_INVITE_PAYLOAD) => {
@@ -66,5 +68,12 @@ export const updateTeamMemberRoleService = async (teamMemberId: string, payload:
   });
   
   return response.data as UPDATE_TEAM_MEMBER_ROLE_RESPONSE;
+};
+
+export const teamMemberSubscriptionService = (payload: TEAM_MEMBER_SUBSCRIPTION_PAYLOAD) => {
+  // Use the team member checkout endpoint
+  const endpoint = "/billing/checkout-team-member";
+  
+  return apiInvoker<TEAM_MEMBER_SUBSCRIPTION_RESPONSE>(endpoint, "POST", payload);
 };
 

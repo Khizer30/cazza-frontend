@@ -6,6 +6,7 @@ import {
   cancelInvitationService,
   removeTeamMemberService,
   updateTeamMemberRoleService,
+  teamMemberSubscriptionService,
 } from "@/services/teamService";
 import { useTeamStore } from "@/store/teamStore";
 import { AxiosError } from "axios";
@@ -202,6 +203,38 @@ export const useTeam = () => {
     }
   };
 
+  const payForTeamMember = async (userId: string, interval: "monthly" | "yearly") => {
+    try {
+      setLoading(true);
+      const res = await teamMemberSubscriptionService({ userId, interval });
+      if (res && res.success) {
+        // If checkout URL is provided, redirect to it
+        if (res.data?.checkoutUrl) {
+          window.location.href = res.data.checkoutUrl;
+          return res;
+        }
+        showToast(res.message || "Subscription checkout initiated successfully", "success");
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to initiate subscription checkout", "error");
+        throw new Error(res.message || "Subscription checkout failed");
+      }
+    } catch (error: unknown) {
+      console.error("Team member subscription error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to initiate subscription checkout";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     members,
     invitations,
@@ -214,6 +247,7 @@ export const useTeam = () => {
     cancelInvitation,
     removeTeamMember,
     updateTeamMemberRole,
+    payForTeamMember,
   };
 };
 
