@@ -13,7 +13,6 @@ import {
   ChevronLeft,
   ChevronRight,
   MessageSquare,
-  Play,
   Star,
   Zap,
   RefreshCw,
@@ -176,6 +175,9 @@ export const LandingPage = () => {
                 Connect your Amazon, TikTok Shop, Shopify & Xero accounts
                 securely — and get instant financial insights powered by OpenAI.
               </p>
+              <p className="text-base text-green-400 font-medium py-0">
+                We never alter your data. Read-only access.
+              </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
@@ -224,7 +226,7 @@ export const LandingPage = () => {
                     <div className="flex justify-end">
                       <div className="bg-primary/10 text-foreground px-4 py-3 rounded-2xl max-w-[80%]">
                         <p className="text-sm font-medium">
-                          Why doesn't my Amazon payout match sales?
+                          How much profit did I make on TikTok Shop yesterday vs. Shopify?
                         </p>
                       </div>
                     </div>
@@ -237,40 +239,32 @@ export const LandingPage = () => {
                         <Logo size="sm" />
                       </div>
 
-                      <p className="text-sm text-muted-foreground">
-                        Your payout differs from sales due to:
+                      <p className="text-sm text-muted-foreground dark:text-white">
+                        Yesterday's profit comparison:
                       </p>
 
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between py-2 border-b border-border">
-                          <span className="text-muted-foreground">
-                            Total Sales
+                          <span className="text-muted-foreground dark:text-white">
+                            TikTok Shop Profit
                           </span>
-                          <span className="font-medium text-foreground">
-                            £12,450
-                          </span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-border">
-                          <span className="text-muted-foreground">
-                            Amazon Fees
-                          </span>
-                          <span className="font-medium text-destructive">
-                            -£2,890
+                          <span className="font-bold text-green-400 text-lg">
+                            £2,840
                           </span>
                         </div>
                         <div className="flex justify-between py-2 border-b border-border">
-                          <span className="text-muted-foreground">
-                            FBA Fees
+                          <span className="text-muted-foreground dark:text-white">
+                            Shopify Profit
                           </span>
-                          <span className="font-medium text-destructive">
-                            -£1,230
+                          <span className="font-bold text-green-400 text-lg">
+                            £1,920
                           </span>
                         </div>
                         <div className="flex justify-between py-2 bg-primary/10 px-2 rounded">
-                          <span className="font-medium text-foreground">
-                            Net Payout
+                          <span className="font-medium text-foreground dark:text-white">
+                            Difference
                           </span>
-                          <span className="font-bold text-primary">£8,330</span>
+                          <span className="font-bold text-green-400 text-xl">+£920</span>
                         </div>
                       </div>
                     </div>
@@ -282,52 +276,61 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* Problem Section */}
+      {/* Data Protection and Security Section */}
       <section id="problem" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center space-y-12">
+          <div className="max-w-6xl mx-auto text-center space-y-12">
             <div className="space-y-4 animate-fade-in-up">
               <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
-                Right now, this is your life:
+                Data Protection and Security
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {[
-                "Why doesn't my payout match my sales?",
-                "Am I close to the £90k VAT threshold?",
-                "What's my profit on TikTok vs Amazon?",
-                "How do I map Shopify into Xero?",
-              ].map((question, index) => (
-                <Card
-                  key={index}
-                  className="border-2 hover:border-accent/50 transition-colors animate-scale-in hover:shadow-lg"
-                >
-                  <CardContent className="px-4 py-2 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-                      <MessageSquare className="w-5 h-5 text-black/80" />
-                    </div>
-                    <p className="text-left font-medium text-foreground">
-                      "{question}"
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in">
+                <CardContent className="p-6 space-y-4 flex flex-col items-center">
+                  <div className="w-40 h-40 flex items-center justify-center">
+                    <img 
+                      src="/ISO.png" 
+                      alt="ISO 27001" 
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground dark:text-white">
+                    ISO 27001 Compliant
+                  </h3>
+                </CardContent>
+              </Card>
 
-            <div className="max-w-2xl mx-auto space-y-4 text-lg text-muted-foreground">
-              <p>You either:</p>
-              <div className="flex flex-col gap-2">
-                <p className="font-medium">
-                  • Spend hours digging through spreadsheets, or
-                </p>
-                <p className="font-medium">
-                  • Email your accountant and wait days for a reply.
-                </p>
-              </div>
-              <p className="text-xl font-semibold text-foreground mt-6">
-                Meanwhile, decisions can't wait.
-              </p>
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in">
+                <CardContent className="p-6 space-y-4 flex flex-col items-center">
+                  <div className="w-40 h-40 flex items-center justify-center">
+                    <img 
+                      src="/AES.png" 
+                      alt="AES-256 Encryption" 
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground dark:text-white">
+                    Bank-Level AES-256 Encryption
+                  </h3>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in">
+                <CardContent className="p-6 space-y-4 flex flex-col items-center">
+                  <div className="w-40 h-40 flex items-center justify-center">
+                    <img 
+                      src="/GDPR.png" 
+                      alt="GDPR Compliant" 
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground dark:text-white">
+                    GDPR Compliant
+                  </h3>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
@@ -408,37 +411,13 @@ export const LandingPage = () => {
               <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
                 Our Partner Integrations
               </h2>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-muted-foreground dark:text-white max-w-2xl mx-auto">
                 Cazza connects securely to major platforms so you can view
                 trusted sales, payout and accounting data in one place.
               </p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Amazon */}
-              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in group">
-                <CardContent className="p-6 space-y-3">
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
-                      <FontAwesomeIcon icon={faAmazon} />
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Amazon
-                    </h3>
-                  </div>
-                  <p className="text-base text-muted-foreground">
-                    Cazza securely connects to Amazon’s Selling Partner API to
-                    retrieve authorised seller data (orders, settlements, fees,
-                    and performance metrics).
-                  </p>
-                  <p className="text-base text-muted-foreground">
-                    We use this data exclusively to generate analytics for the
-                    account owner — never for resale or cross-account
-                    benchmarking.
-                  </p>
-                </CardContent>
-              </Card>
-
               {/* TikTok Shop */}
               <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in group">
                 <CardContent className="p-6 space-y-3">
@@ -446,17 +425,44 @@ export const LandingPage = () => {
                     <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
                       <FontAwesomeIcon icon={faTiktok} />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground">
+                    <h3 className="text-lg font-semibold text-foreground dark:text-white">
                       TikTok Shop
                     </h3>
                   </div>
-                  <p className="text-base text-muted-foreground">
-                    We connect through TikTok Shop’s official API to display
+                  <p className="text-sm font-medium text-primary text-center dark:text-white">
+                    Real-time reconciliation for TikTok Shop payouts.
+                  </p>
+                  <p className="text-base text-muted-foreground dark:text-white">
+                    We connect through TikTok Shop's official API to display
                     sales, refunds, and payout data.
                   </p>
-                  <p className="text-base text-muted-foreground">
-                    Cazza complies with TikTok’s Data Security and Partner
+                  <p className="text-base text-muted-foreground dark:text-white">
+                    Cazza complies with TikTok's Data Security and Partner
                     Integration policies.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Amazon */}
+              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in group">
+                <CardContent className="p-6 space-y-3">
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
+                      <FontAwesomeIcon icon={faAmazon} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground dark:text-white">
+                      Amazon
+                    </h3>
+                  </div>
+                  <p className="text-base text-muted-foreground dark:text-white">
+                    Cazza securely connects to Amazon's Selling Partner API to
+                    retrieve authorised seller data (orders, settlements, fees,
+                    and performance metrics).
+                  </p>
+                  <p className="text-base text-muted-foreground dark:text-white">
+                    We use this data exclusively to generate analytics for the
+                    account owner — never for resale or cross-account
+                    benchmarking.
                   </p>
                 </CardContent>
               </Card>
@@ -468,15 +474,15 @@ export const LandingPage = () => {
                     <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
                       <FontAwesomeIcon icon={faShopify} />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground">
+                    <h3 className="text-lg font-semibold text-foreground dark:text-white">
                       Shopify
                     </h3>
                   </div>
-                  <p className="text-base text-muted-foreground">
-                    Cazza uses Shopify’s OAuth process to sync sales, orders,
+                  <p className="text-base text-muted-foreground dark:text-white">
+                    Cazza uses Shopify's OAuth process to sync sales, orders,
                     and refunds.
                   </p>
-                  <p className="text-base text-muted-foreground">
+                  <p className="text-base text-muted-foreground dark:text-white">
                     We never alter or push data back into Shopify — insights
                     only.
                   </p>
@@ -490,15 +496,15 @@ export const LandingPage = () => {
                     <div className="text-4xl bg-foreground/20 rounded-full p-2 ">
                       <FontAwesomeIcon icon={faMixer} />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground">
+                    <h3 className="text-lg font-semibold text-foreground dark:text-white">
                       Xero
                     </h3>
                   </div>
-                  <p className="text-base text-muted-foreground">
-                    Cazza connects via Xero’s official partner integration to
+                  <p className="text-base text-muted-foreground dark:text-white">
+                    Cazza connects via Xero's official partner integration to
                     show live accounting data and automate reconciliation.
                   </p>
-                  <p className="text-base text-muted-foreground">
+                  <p className="text-base text-muted-foreground dark:text-white">
                     Your credentials are encrypted and stored using bank-level
                     security standards.
                   </p>
@@ -507,7 +513,7 @@ export const LandingPage = () => {
             </div>
 
             <div className="text-center">
-              <p className="text-xs sm:text-base text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-xs sm:text-base text-muted-foreground dark:text-white max-w-2xl mx-auto">
                 Cazza is independently developed by Social Commerce Accountants
                 Ltd, a UK-registered accounting firm.
               </p>
@@ -535,7 +541,7 @@ export const LandingPage = () => {
                   <div className="flex justify-end">
                     <div className="bg-primary/10 text-foreground px-4 py-3 rounded-2xl max-w-[80%]">
                       <p className="text-sm font-medium">
-                        What were my TACoS in Q2?
+                        What is my TikTok avg sales?
                       </p>
                     </div>
                   </div>
@@ -549,17 +555,17 @@ export const LandingPage = () => {
                     </div>
 
                     <div className="space-y-3">
-                      <p className="text-sm text-muted-foreground">
-                        Your Q2 TACoS (Total Advertising Cost of Sale):
+                      <p className="text-sm text-muted-foreground dark:text-white">
+                        Your TikTok Shop average sales:
                       </p>
 
                       <div className="bg-muted/50 p-4 rounded-lg">
                         <div className="text-center">
-                          <div className="text-4xl font-bold text-primary">
-                            18.5%
+                          <div className="text-4xl font-bold text-green-400">
+                            £125,000
                           </div>
-                          <div className="text-sm text-muted-foreground mt-1">
-                            Average TACoS
+                          <div className="text-sm text-muted-foreground dark:text-white mt-1">
+                            Average Yearly Sale
                           </div>
                         </div>
                       </div>
@@ -569,19 +575,19 @@ export const LandingPage = () => {
                           <div className="font-semibold text-foreground">
                             April
                           </div>
-                          <div className="text-muted-foreground">19.2%</div>
+                          <div className="font-bold text-green-400">£12,500</div>
                         </div>
                         <div className="text-center p-2 bg-background rounded">
                           <div className="font-semibold text-foreground">
                             May
                           </div>
-                          <div className="text-muted-foreground">17.5%</div>
+                          <div className="font-bold text-green-400">£10,800</div>
                         </div>
                         <div className="text-center p-2 bg-background rounded">
                           <div className="font-semibold text-foreground">
                             June
                           </div>
-                          <div className="text-muted-foreground">18.8%</div>
+                          <div className="font-bold text-green-400">£11,200</div>
                         </div>
                       </div>
                     </div>
@@ -589,16 +595,137 @@ export const LandingPage = () => {
                 </CardContent>
               </Card>
 
-              <div className="relative aspect-video bg-muted rounded-2xl overflow-hidden border-2 border-border animate-slide-in-right group cursor-pointer hover:border-primary/50 transition-all">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
-                    <Play className="w-8 h-8 text-primary-foreground ml-1" />
+              <div className="relative bg-card rounded-2xl overflow-hidden border-2 border-border animate-slide-in-right shadow-xl h-full w-xl mx-auto">
+                <div className="p-6 h-full flex flex-col bg-gradient-to-br from-background to-muted/30">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-bold text-foreground dark:text-white mb-1">
+                      Sales Comparison
+                    </h3>
+                    <p className="text-sm text-muted-foreground dark:text-white">
+                      Last 3 Months
+                    </p>
                   </div>
-                </div>
-                <div className="absolute bottom-6 left-6 right-6 text-center">
-                  <p className="text-lg font-semibold text-foreground">
-                    Watch 2-minute demo
-                  </p>
+                  
+                  {/* Bar Chart */}
+                  <div className="flex-1 flex items-end justify-center gap-2 mb-4 relative min-h-[200px]">
+                    {/* January */}
+                    <div className="flex flex-col items-center gap-1 flex-1 h-full">
+                      <div className="w-full flex gap-1 items-end justify-center relative h-full">
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-green-400 whitespace-nowrap">
+                            £12.5k
+                          </div>
+                          <div 
+                            className="w-full bg-green-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '85%', minHeight: '120px' }}
+                          />
+                        </div>
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-yellow-600 dark:text-yellow-500 whitespace-nowrap">
+                            £8.2k
+                          </div>
+                          <div 
+                            className="w-full bg-yellow-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '55%', minHeight: '78px' }}
+                          />
+                        </div>
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-blue-500 whitespace-nowrap">
+                            £6.5k
+                          </div>
+                          <div 
+                            className="w-full bg-blue-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '43%', minHeight: '61px' }}
+                          />
+                        </div>
+                      </div>
+                      <span className="text-xs text-muted-foreground dark:text-white mt-2">Jan</span>
+                    </div>
+                    
+                    {/* February */}
+                    <div className="flex flex-col items-center gap-1 flex-1 h-full">
+                      <div className="w-full flex gap-1 items-end justify-center relative h-full">
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-green-400 whitespace-nowrap">
+                            £14.2k
+                          </div>
+                          <div 
+                            className="w-full bg-green-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '95%', minHeight: '134px' }}
+                          />
+                        </div>
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-yellow-600 dark:text-yellow-500 whitespace-nowrap">
+                            £9.1k
+                          </div>
+                          <div 
+                            className="w-full bg-yellow-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '60%', minHeight: '85px' }}
+                          />
+                        </div>
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-blue-500 whitespace-nowrap">
+                            £7.2k
+                          </div>
+                          <div 
+                            className="w-full bg-blue-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '48%', minHeight: '68px' }}
+                          />
+                        </div>
+                      </div>
+                      <span className="text-xs text-muted-foreground dark:text-white mt-2">Feb</span>
+                    </div>
+                    
+                    {/* March */}
+                    <div className="flex flex-col items-center gap-1 flex-1 h-full">
+                      <div className="w-full flex gap-1 items-end justify-center relative h-full">
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-green-400 whitespace-nowrap">
+                            £15.8k
+                          </div>
+                          <div 
+                            className="w-full bg-green-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '100%', minHeight: '141px' }}
+                          />
+                        </div>
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-yellow-600 dark:text-yellow-500 whitespace-nowrap">
+                            £10.5k
+                          </div>
+                          <div 
+                            className="w-full bg-yellow-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '66%', minHeight: '93px' }}
+                          />
+                        </div>
+                        <div className="w-1/3 relative flex flex-col items-center">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-blue-500 whitespace-nowrap">
+                            £8.1k
+                          </div>
+                          <div 
+                            className="w-full bg-blue-500 rounded-t shadow-md min-h-[20px]"
+                            style={{ height: '51%', minHeight: '72px' }}
+                          />
+                        </div>
+                      </div>
+                      <span className="text-xs text-muted-foreground dark:text-white mt-2">Mar</span>
+                    </div>
+                  </div>
+
+                  {/* Legend */}
+                  <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded bg-green-500 shadow-sm"></div>
+                      <span className="text-sm font-medium text-foreground dark:text-white">TikTok Shop (Green)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded bg-yellow-500 shadow-sm"></div>
+                      <span className="text-sm font-medium text-foreground dark:text-white">Amazon (Yellow)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded bg-blue-500 shadow-sm"></div>
+                      <span className="text-sm font-medium text-foreground dark:text-white">Shopify (Blue)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -625,7 +752,7 @@ export const LandingPage = () => {
                         (_, i) => (
                           <Star
                             key={i}
-                            className="w-6 h-6 fill-accent text-accent"
+                            className="w-6 h-6 fill-yellow-500 text-yellow-500"
                           />
                         )
                       )}
