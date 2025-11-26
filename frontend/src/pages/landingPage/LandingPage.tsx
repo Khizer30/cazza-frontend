@@ -6,7 +6,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   ArrowRight,
   CheckCircle2,
@@ -17,9 +18,21 @@ import {
   Zap,
   RefreshCw,
   Users,
+  Send,
+  Bot,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { tempRevenueData } from "@/constants/ClientDashboard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAmazon,
@@ -90,12 +103,6 @@ export const LandingPage = () => {
 
             <div className="hidden md:flex items-center space-x-8">
               <a
-                href="#problem"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Problem
-              </a>
-              <a
                 href="#solution"
                 className="text-foreground hover:text-primary transition-colors"
               >
@@ -120,12 +127,6 @@ export const LandingPage = () => {
               >
                 FAQ
               </a>
-              <Link
-                to="/amazon-sellers"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                For Amazon Sellers
-              </Link>
             </div>
 
             <div className="flex items-center gap-4">
@@ -276,66 +277,6 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* Data Protection and Security Section */}
-      <section id="problem" className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto text-center space-y-12">
-            <div className="space-y-4 animate-fade-in-up">
-              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
-                Data Protection and Security
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in">
-                <CardContent className="p-6 space-y-4 flex flex-col items-center">
-                  <div className="w-40 h-40 flex items-center justify-center">
-                    <img 
-                      src="/ISO.png" 
-                      alt="ISO 27001" 
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold text-foreground dark:text-white">
-                    ISO 27001 Compliant
-                  </h3>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in">
-                <CardContent className="p-6 space-y-4 flex flex-col items-center">
-                  <div className="w-40 h-40 flex items-center justify-center">
-                    <img 
-                      src="/AES.png" 
-                      alt="AES-256 Encryption" 
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold text-foreground dark:text-white">
-                    Bank-Level AES-256 Encryption
-                  </h3>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in">
-                <CardContent className="p-6 space-y-4 flex flex-col items-center">
-                  <div className="w-40 h-40 flex items-center justify-center">
-                    <img 
-                      src="/GDPR.png" 
-                      alt="GDPR Compliant" 
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold text-foreground dark:text-white">
-                    GDPR Compliant
-                  </h3>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Solution Section */}
       <section id="solution" className="py-20 bg-background">
         <div className="container mx-auto px-4">
@@ -403,6 +344,8 @@ export const LandingPage = () => {
           </div>
         </div>
       </section>
+
+
       {/* Partner Integrations / Compliance Hub Section */}
       <section id="platforms" className="py-20 bg-muted/10">
         <div className="container mx-auto px-4">
@@ -521,7 +464,7 @@ export const LandingPage = () => {
           </div>
         </div>
       </section>
-      {/* Demo Section */}
+      {/* See it in action - Key Features Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto space-y-12">
@@ -535,197 +478,266 @@ export const LandingPage = () => {
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-              <Card className="border-2 animate-slide-in-left">
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex justify-end">
-                    <div className="bg-primary/10 text-foreground px-4 py-3 rounded-2xl max-w-[80%]">
-                      <p className="text-sm font-medium">
-                        What is my TikTok avg sales?
-                      </p>
+            <div className="space-y-16">
+              {/* Feature 1: Break Down Data Silos */}
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="space-y-4">
+                  <h3 className="text-3xl lg:text-4xl font-bold text-foreground">
+                    1. Break Down Data Silos
+                  </h3>
+                  <p className="text-lg text-muted-foreground">
+                    Stop logging into five different dashboards. We centralize your Amazon Seller Central, TikTok Shop, and Shopify data into one single source of truth.
+                  </p>
+                </div>
+                <div className="relative bg-card border-2 border-border rounded-lg p-8 flex items-center justify-center">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-foreground/10 rounded-lg flex items-center justify-center">
+                      <FontAwesomeIcon icon={faAmazon} className="text-3xl" />
+                    </div>
+                    <div className="flex-1 h-0.5 bg-primary/50 relative">
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                    </div>
+                    <div className="w-16 h-16 bg-foreground/10 rounded-lg flex items-center justify-center">
+                      <FontAwesomeIcon icon={faTiktok} className="text-3xl" />
+                    </div>
+                    <div className="flex-1 h-0.5 bg-primary/50 relative">
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                    </div>
+                    <div className="w-16 h-16 bg-foreground/10 rounded-lg flex items-center justify-center">
+                      <FontAwesomeIcon icon={faShopify} className="text-3xl" />
+                    </div>
+                    <div className="flex-1 h-0.5 bg-primary/50 relative">
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                    </div>
+                    <div className="w-16 h-16 bg-primary/20 rounded-lg flex items-center justify-center">
+                      <FontAwesomeIcon icon={faMixer} className="text-3xl text-primary" />
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="bg-card border border-border p-4 rounded-2xl space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Zap className="w-4 h-4 text-primary" />
+              {/* Feature 2: Automate the Grunt Work */}
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="relative bg-card border-2 border-border rounded-lg p-8 order-2 md:order-1">
+                  <div className="space-y-4">
+                    <div className="bg-muted/50 p-4 rounded border border-border">
+                      <div className="grid grid-cols-4 gap-1 text-[10px] font-mono">
+                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">£12,450</div>
+                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">#REF!</div>
+                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">£8,320</div>
+                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">£15,680</div>
+                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">£9,210</div>
+                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">£7,890</div>
+                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">#VALUE!</div>
+                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">£11,230</div>
+                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">£6,540</div>
+                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">£13,780</div>
+                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">£4,920</div>
+                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">£18,450</div>
+                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">#NAME?</div>
+                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">£10,670</div>
+                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">£5,380</div>
+                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">£14,290</div>
                       </div>
-                      {/* <Logo size="sm" /> */}
                     </div>
-
-                    <div className="space-y-3">
-                      <p className="text-sm text-muted-foreground dark:text-white">
-                        Your TikTok Shop average sales:
-                      </p>
-
-                      <div className="bg-muted/50 p-4 rounded-lg">
+                    <div className="flex items-center justify-center gap-2">
+                      <RefreshCw className="w-5 h-5 text-primary animate-spin" />
+                      <span className="text-sm text-muted-foreground">Processing...</span>
+                    </div>
+                    <div className="bg-primary/10 p-4 rounded border border-primary/30">
+                      <div className="h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded flex items-center justify-center">
                         <div className="text-center">
-                          <div className="text-4xl font-bold text-green-400">
-                            £125,000
-                          </div>
-                          <div className="text-sm text-muted-foreground dark:text-white mt-1">
-                            Average Yearly Sale
-                          </div>
+                          <div className="text-2xl font-bold text-primary">✓ Synced</div>
+                          <div className="text-xs text-muted-foreground mt-1">All data reconciled</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4 order-1 md:order-2">
+                  <h3 className="text-3xl lg:text-4xl font-bold text-foreground">
+                    2. Automate the Grunt Work
+                  </h3>
+                  <p className="text-lg text-muted-foreground">
+                    Cazza automates the heavy lifting of reconciliation. We map every penny of revenue and expense to Xero, ensuring your books are tax-ready 24/7.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 3: Your 24/7 AI CFO */}
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="space-y-4">
+                  <h3 className="text-3xl lg:text-4xl font-bold text-foreground">
+                    3. Your 24/7 AI CFO
+                  </h3>
+                  <p className="text-lg text-muted-foreground">
+                    Don't wait days for your accountant to reply to an email. Your AI assistant is always awake, trained on UK tax laws and e-commerce nuance, ready to answer complex queries.
+                  </p>
+                </div>
+                <Card className="border-2 animate-slide-in-left">
+                  {/* Chat Header */}
+                  <div className="border-b border-border px-4 py-2 flex items-center justify-center gap-2">
+                    <Bot className="w-5 h-5 text-primary" />
+                    <h3 className="text-base font-semibold text-foreground">Ask Cazza</h3>
+                  </div>
+                  <CardContent className="p-4 flex flex-col h-full">
+                    <div className="space-y-4 flex-1 overflow-y-auto mb-4">
+                      {/* User Message */}
+                      <div className="flex justify-end">
+                        <div className="relative max-w-xs lg:max-w-md px-4 py-3 rounded-lg bg-primary text-primary-foreground">
+                          <span className="text-sm">What is my TikTok avg sales?</span>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div className="text-center p-2 bg-background rounded">
-                          <div className="font-semibold text-foreground">
-                            April
+                      {/* AI Assistant Response */}
+                      <div className="flex justify-start">
+                        <div className="relative max-w-xs lg:max-w-md px-4 py-3 rounded-lg bg-card border border-border shadow-sm text-foreground">
+                          <div className="text-sm space-y-2">
+                            <p className="text-foreground">
+                              Your TikTok Shop average sales are <strong>£125,000</strong> per year.
+                            </p>
+                            <p className="text-foreground">
+                              Here's a breakdown of your recent monthly averages:
+                            </p>
+                            <ul className="list-disc ml-4 space-y-1 text-foreground">
+                              <li><strong>April:</strong> £12,500</li>
+                              <li><strong>May:</strong> £10,800</li>
+                              <li><strong>June:</strong> £11,200</li>
+                            </ul>
+                            <p className="text-foreground">
+                              Your average monthly sales are around <strong>£11,500</strong>, showing consistent performance across these months.
+                            </p>
                           </div>
-                          <div className="font-bold text-green-400">£12,500</div>
-                        </div>
-                        <div className="text-center p-2 bg-background rounded">
-                          <div className="font-semibold text-foreground">
-                            May
-                          </div>
-                          <div className="font-bold text-green-400">£10,800</div>
-                        </div>
-                        <div className="text-center p-2 bg-background rounded">
-                          <div className="font-semibold text-foreground">
-                            June
-                          </div>
-                          <div className="font-bold text-green-400">£11,200</div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
 
-              <div className="relative bg-card rounded-2xl overflow-hidden border-2 border-border animate-slide-in-right shadow-xl h-full w-xl mx-auto">
-                <div className="p-6 h-full flex flex-col bg-gradient-to-br from-background to-muted/30">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-bold text-foreground dark:text-white mb-1">
-                      Sales Comparison
-                    </h3>
-                    <p className="text-sm text-muted-foreground dark:text-white">
-                      Last 3 Months
-                    </p>
-                  </div>
-                  
-                  {/* Bar Chart */}
-                  <div className="flex-1 flex items-end justify-center gap-2 mb-4 relative min-h-[200px]">
-                    {/* January */}
-                    <div className="flex flex-col items-center gap-1 flex-1 h-full">
-                      <div className="w-full flex gap-1 items-end justify-center relative h-full">
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-green-400 whitespace-nowrap">
-                            £12.5k
-                          </div>
-                          <div 
-                            className="w-full bg-green-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '85%', minHeight: '120px' }}
-                          />
-                        </div>
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-yellow-600 dark:text-yellow-500 whitespace-nowrap">
-                            £8.2k
-                          </div>
-                          <div 
-                            className="w-full bg-yellow-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '55%', minHeight: '78px' }}
-                          />
-                        </div>
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-blue-500 whitespace-nowrap">
-                            £6.5k
-                          </div>
-                          <div 
-                            className="w-full bg-blue-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '43%', minHeight: '61px' }}
-                          />
-                        </div>
-                      </div>
-                      <span className="text-xs text-muted-foreground dark:text-white mt-2">Jan</span>
+                    {/* Chat Input */}
+                    <div className="flex items-center gap-2 border-t border-border pt-4 mt-auto">
+                      <Input
+                        value="What's my profit margin on TikTok?"
+                        readOnly
+                        className="flex-1 border border-border rounded-lg"
+                        placeholder="Ask Cazza a question..."
+                      />
+                      <Button
+                        size="icon"
+                        className="px-3 py-2 rounded-lg bg-primary text-primary-foreground"
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
                     </div>
-                    
-                    {/* February */}
-                    <div className="flex flex-col items-center gap-1 flex-1 h-full">
-                      <div className="w-full flex gap-1 items-end justify-center relative h-full">
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-green-400 whitespace-nowrap">
-                            £14.2k
-                          </div>
-                          <div 
-                            className="w-full bg-green-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '95%', minHeight: '134px' }}
-                          />
-                        </div>
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-yellow-600 dark:text-yellow-500 whitespace-nowrap">
-                            £9.1k
-                          </div>
-                          <div 
-                            className="w-full bg-yellow-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '60%', minHeight: '85px' }}
-                          />
-                        </div>
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-blue-500 whitespace-nowrap">
-                            £7.2k
-                          </div>
-                          <div 
-                            className="w-full bg-blue-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '48%', minHeight: '68px' }}
-                          />
-                        </div>
-                      </div>
-                      <span className="text-xs text-muted-foreground dark:text-white mt-2">Feb</span>
-                    </div>
-                    
-                    {/* March */}
-                    <div className="flex flex-col items-center gap-1 flex-1 h-full">
-                      <div className="w-full flex gap-1 items-end justify-center relative h-full">
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-green-400 whitespace-nowrap">
-                            £15.8k
-                          </div>
-                          <div 
-                            className="w-full bg-green-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '100%', minHeight: '141px' }}
-                          />
-                        </div>
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-yellow-600 dark:text-yellow-500 whitespace-nowrap">
-                            £10.5k
-                          </div>
-                          <div 
-                            className="w-full bg-yellow-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '66%', minHeight: '93px' }}
-                          />
-                        </div>
-                        <div className="w-1/3 relative flex flex-col items-center">
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] font-medium text-blue-500 whitespace-nowrap">
-                            £8.1k
-                          </div>
-                          <div 
-                            className="w-full bg-blue-500 rounded-t shadow-md min-h-[20px]"
-                            style={{ height: '51%', minHeight: '72px' }}
-                          />
-                        </div>
-                      </div>
-                      <span className="text-xs text-muted-foreground dark:text-white mt-2">Mar</span>
-                    </div>
-                  </div>
+                  </CardContent>
+                </Card>
+              </div>
 
-                  {/* Legend */}
-                  <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-border">
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded bg-green-500 shadow-sm"></div>
-                      <span className="text-sm font-medium text-foreground dark:text-white">TikTok Shop (Green)</span>
+              {/* Feature 4: Scale With Confidence */}
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <Card className="border-2 animate-slide-in-right order-2 md:order-1">
+                  <CardHeader>
+                    <CardTitle>TikTok Sales vs Shopify Sales</CardTitle>
+                    <CardDescription>Monthly sales comparison</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="mb-4 flex justify-center gap-6">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-[#96BF47]"></div>
+                        <span className="text-sm font-medium text-foreground">TikTok</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-[#4A90E2]"></div>
+                        <span className="text-sm font-medium text-foreground">Shopify</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded bg-yellow-500 shadow-sm"></div>
-                      <span className="text-sm font-medium text-foreground dark:text-white">Amazon (Yellow)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded bg-blue-500 shadow-sm"></div>
-                      <span className="text-sm font-medium text-foreground dark:text-white">Shopify (Blue)</span>
-                    </div>
-                  </div>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <AreaChart data={tempRevenueData.map(item => ({ 
+                        month: item.month, 
+                        tiktok: item.revenue, 
+                        shopify: item.expenses 
+                      }))}>
+                        <defs>
+                          <linearGradient
+                            id="tiktokGradient"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop offset="5%" stopColor="#96BF47" stopOpacity={0.3} />
+                            <stop
+                              offset="95%"
+                              stopColor="#96BF47"
+                              stopOpacity={0.05}
+                            />
+                          </linearGradient>
+                          <linearGradient
+                            id="shopifyGradient"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop offset="5%" stopColor="#4A90E2" stopOpacity={0.3} />
+                            <stop
+                              offset="95%"
+                              stopColor="#4A90E2"
+                              stopOpacity={0.05}
+                            />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke="hsl(var(--border))"
+                        />
+                        <XAxis
+                          dataKey="month"
+                          stroke="var(--muted-foreground)"
+                          fontSize={12}
+                        />
+                        <YAxis
+                          tickFormatter={(value) => `£${value.toLocaleString()}`}
+                          stroke="var(--muted-foreground)"
+                          fontSize={12}
+                        />
+                        <Tooltip
+                          formatter={(value: number, name: string) => [
+                            `£${value.toLocaleString()}`,
+                            name,
+                          ]}
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                            boxShadow: "0 4px 6px -1px hsl(210 11% 15% / 0.1)",
+                          }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="tiktok"
+                          stroke="#96BF47"
+                          strokeWidth={2}
+                          fill="url(#tiktokGradient)"
+                          name="TikTok"
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="shopify"
+                          stroke="#4A90E2"
+                          strokeWidth={2}
+                          fill="url(#shopifyGradient)"
+                          name="Shopify"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+                <div className="space-y-4 order-1 md:order-2">
+                  <h3 className="text-3xl lg:text-4xl font-bold text-foreground">
+                    4. Scale With Confidence
+                  </h3>
+                  <p className="text-lg text-muted-foreground">
+                    Understand your true unit economics. Spot unprofitable SKUs instantly and double down on winners with financial visibility previously reserved for 7-figure sellers.
+                  </p>
                 </div>
               </div>
             </div>
@@ -841,6 +853,178 @@ export const LandingPage = () => {
                   <p className="text-sm text-muted-foreground text-center">
                     Instant answers, automated insights, and real-time financial clarity
                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How it works Section */}
+      <section id="how-it-works" className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto space-y-12">
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
+                How it works
+              </h2>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+                Get started in three simple steps
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Step 1: Connect */}
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-xl mb-4">
+                    1
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    Connect
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Link your platforms in seconds
+                  </p>
+                </div>
+                
+                {/* Toggle Switch UI Mockup */}
+                <div className="border-2 border-border rounded-lg p-6 bg-card">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center">
+                          <span className="text-lg">🎵</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">TikTok Shop</p>
+                          <p className="text-xs text-muted-foreground">Connected</p>
+                        </div>
+                      </div>
+                      {/* Toggle Switch */}
+                      <div className="relative inline-flex items-center">
+                        <div className="w-14 h-7 bg-primary rounded-full relative cursor-pointer">
+                          <div className="absolute top-0.5 right-1 w-6 h-6 bg-white rounded-full shadow-sm transition-transform"></div>
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-primary-foreground">ON</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-border">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span>Active connection</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2: Ask */}
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-xl mb-4">
+                    2
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    Ask
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Get instant answers to your questions
+                  </p>
+                </div>
+                
+                {/* Chat Bar UI Mockup */}
+                <div className="border-2 border-border rounded-lg p-6 bg-card">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-primary" />
+                      </div>
+                      <Logo size="sm" />
+                    </div>
+                    
+                    {/* Chat Input Mockup */}
+                    <div className="relative">
+                      <div className="border-2 border-primary/30 rounded-lg bg-background p-4">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 text-sm text-foreground">
+                              <span className="animate-pulse">|</span>
+                              <span>What's my TikTok profit this month?</span>
+                            </div>
+                          </div>
+                          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                            <ArrowRight className="w-4 h-4 text-primary-foreground" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute -bottom-1 left-4 w-2 h-2 bg-primary rotate-45 border-l border-b border-primary/30"></div>
+                    </div>
+                    
+                    <div className="text-xs text-muted-foreground text-center pt-2">
+                      Type your question and get instant insights
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3: Act */}
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary font-bold text-xl mb-4">
+                    3
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    Act
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Export, share, and take action
+                  </p>
+                </div>
+                
+                {/* Action Buttons UI Mockup */}
+                <div className="border-2 border-border rounded-lg p-6 bg-card">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-foreground mb-3">
+                        Your TikTok Shop Profit Report
+                      </p>
+                      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Total Sales</span>
+                            <span className="font-semibold text-foreground">£12,450</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Net Profit</span>
+                            <span className="font-semibold text-green-500">£8,330</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="space-y-2 pt-2">
+                      <Button 
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                        variant="default"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download PDF Report
+                      </Button>
+                      <Button 
+                        className="w-full bg-[#4A154B] hover:bg-[#4A154B]/90 text-white"
+                        variant="default"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52-2.523c0-1.393 1.128-2.527 2.52-2.527h.075c.281-2.28 2.186-4.068 4.56-4.068 1.29 0 2.462.592 3.223 1.527a2.547 2.547 0 0 1 2.523-1.758c1.394 0 2.527 1.13 2.527 2.523v.075c2.28.28 4.068 2.186 4.068 4.56 0 1.29-.592 2.462-1.527 3.223a2.547 2.547 0 0 1 1.758 2.523c0 1.394-1.13 2.527-2.523 2.527h-.075a4.068 4.068 0 0 1-4.068 4.068c-1.29 0-2.462-.592-3.223-1.527a2.547 2.547 0 0 1-2.523 1.758c-1.394 0-2.527-1.13-2.527-2.523v-.075a4.068 4.068 0 0 1-4.068-4.068zm1.896-3.688h-.075c-.7 0-1.27.57-1.27 1.27s.57 1.27 1.27 1.27H6.938c.7 0 1.27-.57 1.27-1.27s-.57-1.27-1.27-1.27zm11.125 0c-.7 0-1.27.57-1.27 1.27s.57 1.27 1.27 1.27h.075c.7 0 1.27-.57 1.27-1.27s-.57-1.27-1.27-1.27zm-11.2 7.523h.075c.7 0 1.27.57 1.27 1.27s-.57 1.27-1.27 1.27h-.075c-.7 0-1.27-.57-1.27-1.27s.57-1.27 1.27-1.27zm11.125 0c.7 0 1.27.57 1.27 1.27s-.57 1.27-1.27 1.27h-.075c-.7 0-1.27-.57-1.27-1.27s.57-1.27 1.27-1.27z"/>
+                        </svg>
+                        Share to Slack
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1070,6 +1254,34 @@ export const LandingPage = () => {
               Start Free Trial
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            
+            {/* Compliance Logos */}
+            <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
+              <div className="flex flex-col items-center gap-1">
+                <img 
+                  src="/ISO.png" 
+                  alt="ISO 27001" 
+                  className="w-16 h-16 object-contain"
+                />
+                <span className="text-xs text-background/70">ISO 27001 Compliant</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <img 
+                  src="/AES.png" 
+                  alt="AES-256 Encryption" 
+                  className="w-16 h-16 object-contain"
+                />
+                <span className="text-xs text-background/70">Bank-Level AES-256 Encryption</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <img 
+                  src="/GDPR.png" 
+                  alt="GDPR Compliant" 
+                  className="w-16 h-16 object-contain"
+                />
+                <span className="text-xs text-background/70">GDPR Compliant</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1095,15 +1307,6 @@ export const LandingPage = () => {
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-background/70">
-                <li>
-                  <a
-                    href="#problem"
-                    className="hover:text-background transition-colors"
-                  >
-                    Problem
-                  </a>
-                </li>
-
                 <li>
                   <a
                     href="#solution"
