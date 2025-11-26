@@ -1052,15 +1052,14 @@ export const LandingPage = () => {
                     </h3>
                     <div className="space-y-1">
                       <div className="text-lg font-semibold text-foreground">
-                        $100 per month
+                        Free 30-day trial
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        $50 per admin • $25 per user
+                        Then pay what you think it's worth.
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground pt-2">
-                      Perfect for founders who want instant clarity without the
-                      jargon.
+                      Perfect for founders who want instant clarity without the jargon.
                     </p>
                   </div>
 
@@ -1100,6 +1099,15 @@ export const LandingPage = () => {
                     </ul>
                   </div>
 
+                  <div className="space-y-2 pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground">
+                      <strong>Free for 30 days</strong>
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Afterwards: Pay what you think it's worth, monthly.
+                    </p>
+                  </div>
+
                   <Button
                     onClick={() => navigate("/login")}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
@@ -1119,14 +1127,14 @@ export const LandingPage = () => {
                       </h3>
                       <div className="space-y-1">
                         <div className="text-lg font-semibold text-foreground">
-                          $1000 per year
+                          From £150/month
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          $500 per admin • $250 per member
+                          (ex VAT)
                         </div>
                       </div>
                       <p className="text-sm text-muted-foreground pt-2">
-                        Same features as Rookie, billed annually.
+                        For growing brands ready for expert support.
                       </p>
                     </div>
 
@@ -1136,38 +1144,27 @@ export const LandingPage = () => {
                       </p>
                       <ul className="space-y-2.5">
                         {[
-                          "AI assistant trained in UK tax and e-commerce",
-                          "Ask anything, like:",
-                          "Unlimited AI searches + full chat history",
-                          "Connect Amazon Seller Central, Shopify, TikTok Shop, Xero",
-                          "Personalised dashboard with live revenue, P&L, expenses",
-                          "Invite your team and create dedicated finance channels (like Slack, built for your books)",
+                          "Everything in Rookie, plus:",
+                          "Direct live chat with your accountant",
+                          "Forward AI answers for human review",
+                          "Full bookkeeping and bank reconciliations in Xero",
+                          "Year-end accounts and corporation tax filings",
+                          "VAT registration and quarterly/monthly VAT returns",
+                          "Payroll setup and management (including RTI and pensions)",
+                          "Director tax efficiency planning",
+                          "Monthly reconciliations including stock, payment gateways, deferred income, etc",
+                          "Xero integration setup with any eCommerce software",
                         ].map((feature, i) => (
                           <li
                             key={i}
                             className="flex items-start gap-2 text-sm"
                           >
-                            {feature.includes("Ask anything") ? (
-                              <span className="text-muted-foreground ml-5">
-                                {feature}
-                              </span>
-                            ) : (
-                              <>
-                                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                                <span className="text-foreground">
-                                  {feature}
-                                </span>
-                              </>
-                            )}
+                            <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                            <span className="text-foreground">
+                              {feature}
+                            </span>
                           </li>
                         ))}
-                        <li className="text-sm text-muted-foreground ml-7">
-                          <div>"Do I need to register for VAT yet?"</div>
-                          <div>
-                            "Why doesn't my Amazon payout match my sales report?"
-                          </div>
-                          <div>"What's my net margin on TikTok vs Amazon?"</div>
-                        </li>
                       </ul>
                     </div>
                   </div>
@@ -1175,7 +1172,7 @@ export const LandingPage = () => {
                     onClick={() => navigate("/login")}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
-                    Subscribe now
+                    Book call
                   </Button>
                 </CardContent>
               </Card>
