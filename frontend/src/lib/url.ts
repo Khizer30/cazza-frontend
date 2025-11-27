@@ -24,5 +24,10 @@ team:{
     updateMemberRole:"/team/member",
     analytics:"/team/analytics",
     memberSubscription:"/billing/checkout-team-member"
+},
+chatbot:{
+    ask:"/chatbot/ask",
+    history:"/chatbot/history",
+    deleteMessage:"/chatbot/message"
 }
 } as const

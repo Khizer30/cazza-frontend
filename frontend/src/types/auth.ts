@@ -373,3 +373,44 @@ export interface TEAM_MEMBER_SUBSCRIPTION_RESPONSE {
     };
   };
 }
+
+export interface CHATBOT_ASK_PAYLOAD {
+  question: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  question: string;
+  answer: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CHATBOT_ASK_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    id: string;
+    question: string;
+    answer: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  errors?: string;
+}
+
+export interface CHATBOT_HISTORY_RESPONSE {
+  success: boolean;
+  message: string;
+  data: {
+    messages: ChatMessage[];
+    total: number;
+    limit: number;
+    offset: number;
+  };
+}
+
+export interface CHATBOT_DELETE_MESSAGE_RESPONSE {
+  success: boolean;
+  message: string;
+}
