@@ -1,15 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatLayout } from "@/layouts/ChatLayout";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import ZZLogo from "@/assets/imgs/ZZ logo.png";
 import { suggestedPrompts } from "@/constants/AiChat";
-import { sendMessageToGemini, type ChatMessage as GeminiChatMessage } from "@/services/geminiService";
 import { useToast } from "@/components/ToastProvider";
 import { useChatStore, type ChatMessage } from "@/store/chatStore";
+import { useChatbot } from "@/hooks/useChatbot";
 import { formatDistanceToNow } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const AIChat = () => {
   const { showToast } = useToast();
@@ -17,6 +27,9 @@ export const AIChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const {
     conversations,
@@ -26,79 +39,114 @@ export const AIChat = () => {
     addMessageToConversation,
     getCurrentConversation,
     deleteConversation,
+    loadChatHistoryFromBackend,
+    removeMessageFromConversation,
+    isLoadingHistory,
+    setLoadingHistory,
   } = useChatStore();
+
+  const { askQuestion, getChatHistory, deleteMessage } = useChatbot();
 
   // Get current conversation messages
   const currentConversation = getCurrentConversation();
   const messages = currentConversation?.messages || [];
 
-  // Create initial conversation if none exists
+  // Load chat history from backend on mount
   useEffect(() => {
-    if (conversations.length === 0) {
-      createNewConversation();
-    } else if (!currentConversationId) {
+    const loadHistory = async () => {
+      try {
+        setLoadingHistory(true);
+        const historyData = await getChatHistory();
+        if (historyData && historyData.messages) {
+          loadChatHistoryFromBackend(historyData.messages);
+        } else if (conversations.length === 0) {
+          // If no history and no conversations, create a new one
+          createNewConversation();
+        }
+      } catch (error) {
+        console.error("Failed to load chat history:", error);
+        // Create new conversation if loading fails
+        if (conversations.length === 0) {
+          createNewConversation();
+        }
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+
+    loadHistory();
+  }, []); // Only run on mount
+
+  // Set current conversation if none is selected
+  useEffect(() => {
+    if (conversations.length > 0 && !currentConversationId) {
       setCurrentConversation(conversations[0].id);
     }
-  }, []);
+  }, [conversations, currentConversationId]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Convert messages to Gemini format
-  const convertToGeminiFormat = (msgs: ChatMessage[]): GeminiChatMessage[] => {
-    return msgs.map((msg) => ({
-      role: msg.type === "user" ? "user" : "model",
-      parts: [{ text: msg.content }],
-    }));
-  };
-
-  // Send a message and get AI response from Gemini
+  // Send a message and get AI response from backend
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading || !currentConversationId) return;
 
+    const userInput = input.trim();
+    const tempUserMessageId = `temp-user-${Date.now()}`;
+    
+    // Add user message optimistically
     const userMessage: ChatMessage = {
-      id: Date.now().toString(),
+      id: tempUserMessageId,
       type: "user",
-      content: input.trim(),
+      content: userInput,
       timestamp: new Date(),
     };
 
-    const userInput = input.trim();
     addMessageToConversation(currentConversationId, userMessage);
     setInput("");
     setIsLoading(true);
 
     try {
-      // Convert existing messages to Gemini format (before adding the new user message)
-      const chatHistory = convertToGeminiFormat(messages);
-      
-      // Get response from Gemini
-      const response = await sendMessageToGemini(userInput, chatHistory);
+      // Send question to backend
+      const response = await askQuestion(userInput);
 
-      const aiMessage: ChatMessage = {
-        id: Date.now().toString() + "-ai",
-        type: "assistant",
-        content: response,
-        timestamp: new Date(),
+      // Remove temporary user message
+      removeMessageFromConversation(currentConversationId, tempUserMessageId);
+      
+      // Add user message with backend ID
+      const backendUserMessage: ChatMessage = {
+        id: `user-${response.id}`,
+        type: "user",
+        content: response.question,
+        timestamp: new Date(response.createdAt),
+        backendId: response.id,
       };
 
-      addMessageToConversation(currentConversationId, aiMessage);
+      // Add assistant message with backend ID
+      const backendAiMessage: ChatMessage = {
+        id: `assistant-${response.id}`,
+        type: "assistant",
+        content: response.answer,
+        timestamp: new Date(response.updatedAt),
+        backendId: response.id,
+      };
+
+      // Add backend messages to conversation
+      addMessageToConversation(currentConversationId, backendUserMessage);
+      addMessageToConversation(currentConversationId, backendAiMessage);
     } catch (error) {
       console.error("Error getting AI response:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to get response. Please try again.";
-
-      showToast(errorMessage, "error");
-
+      
+      // Remove temporary user message on error
+      removeMessageFromConversation(currentConversationId, tempUserMessageId);
+      
       // Add error message to chat
       const errorAiMessage: ChatMessage = {
         id: Date.now().toString() + "-error",
         type: "assistant",
-        content: `Sorry, I encountered an error: ${errorMessage}. Please try again.`,
+        content: "Sorry, I encountered an error. Please try again.",
         timestamp: new Date(),
       };
 
@@ -122,6 +170,41 @@ export const AIChat = () => {
   const handleDeleteChat = (chatId: string) => {
     deleteConversation(chatId);
     showToast("Chat deleted", "success");
+  };
+
+  // Handle delete message click - opens confirmation dialog
+  const handleDeleteMessageClick = (messageId: string) => {
+    setMessageToDelete(messageId);
+    setDeleteDialogOpen(true);
+  };
+
+  // Confirm and delete message
+  const handleConfirmDelete = async () => {
+    if (!currentConversationId || !messageToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      // Find the message to get its backendId
+      const message = messages.find((msg) => msg.id === messageToDelete);
+      if (!message?.backendId) {
+        // If no backendId, just remove from local store
+        removeMessageFromConversation(currentConversationId, messageToDelete);
+        setDeleteDialogOpen(false);
+        setMessageToDelete(null);
+        return;
+      }
+
+      await deleteMessage(message.backendId);
+      // Remove message from conversation after successful deletion
+      removeMessageFromConversation(currentConversationId, messageToDelete);
+      setDeleteDialogOpen(false);
+      setMessageToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+      // Error toast is already shown in the hook
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Format chat history for sidebar
@@ -151,17 +234,21 @@ export const AIChat = () => {
 
         {/* Messages container */}
         <div className="flex-1 overflow-y-auto p-6">
-          {messages.length > 0 ? (
+          {isLoadingHistory ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+          ) : messages.length > 0 ? (
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${
+                  className={`flex group ${
                     message.type === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
-                    className={`relative max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
+                    className={`relative max-w-xs lg:max-w-md px-4 py-3 pb-8 rounded-lg ${
                       message.type === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-card border border-border shadow-sm text-foreground"
@@ -171,6 +258,15 @@ export const AIChat = () => {
                       <ReactMarkdown>{message.content}</ReactMarkdown>
                     ) : (
                       <span>{message.content}</span>
+                    )}
+                    {message.backendId && (
+                      <button
+                        onClick={() => handleDeleteMessageClick(message.id)}
+                        className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
+                        title="Delete message"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -248,6 +344,43 @@ export const AIChat = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          setDeleteDialogOpen(open);
+          if (!open) {
+            setMessageToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ChatLayout>
   );
 };
