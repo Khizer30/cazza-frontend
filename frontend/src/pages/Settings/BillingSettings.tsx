@@ -14,6 +14,7 @@ import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/components/ToastProvider";
 import type { Subscription } from "@/types/auth";
+import { SettingsSidebar } from "@/components/SettingsSidebar";
 
 // Minimal plans data used by this page. Replace with API-driven data as needed.
 const plans: { name: string; price?: number; type: "rookie" | "master" }[] = [
@@ -117,7 +118,10 @@ export const BillingSettings = () => {
   const isTrialActive = isTrial(subscription);
 
   return (
-    <div className="max-w-6xl space-y-6 mx-auto my-4">
+    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
+      <SettingsSidebar />
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
       {/* Current Plan - Only show if plan is active */}
       {subscription && isActive && (
         <Card>
@@ -269,6 +273,8 @@ export const BillingSettings = () => {
           </div>
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 };
