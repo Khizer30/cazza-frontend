@@ -36,6 +36,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
 import { useauth } from "@/hooks/useauth";
+import { SettingsSidebar } from "@/components/SettingsSidebar";
 
 export const AccountSettings = () => {
   const navigate = useNavigate();
@@ -254,7 +255,10 @@ export const AccountSettings = () => {
   }
 
   return (
-    <div className="max-w-4xl space-y-6 mx-auto my-4 p-4">
+    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
+      <SettingsSidebar />
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl space-y-6 mx-auto my-4 p-4 md:p-6">
       {/* Profile Picture Section */}
       <Card>
         <CardHeader>
@@ -677,6 +681,8 @@ export const AccountSettings = () => {
           </AlertDialog>
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 };

@@ -22,6 +22,7 @@ import { TeamInviteDialog } from "@/components/TeamInviteDialog";
 import { useTeam } from "@/hooks/useTeam";
 import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/components/ToastProvider";
+import { SettingsSidebar } from "@/components/SettingsSidebar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -295,7 +296,10 @@ export const TeamSettings = () => {
   }
 
   return (
-    <div className="max-w-6xl space-y-6 mx-auto my-4">
+    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
+      <SettingsSidebar />
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
       {/* Team overview  */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
@@ -676,6 +680,8 @@ export const TeamSettings = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+        </div>
+      </div>
     </div>
   );
 };
