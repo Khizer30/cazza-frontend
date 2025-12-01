@@ -1,12 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import {
   Dialog,
   DialogContent,
@@ -18,13 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+
 import {
   Popover,
   PopoverContent,
@@ -44,8 +33,7 @@ import {
   Plus,
   Hash,
   Users,
-  Settings,
-  MoreVertical,
+    MoreVertical,
   Edit,
   Trash2,
   UserPlus,
@@ -73,7 +61,6 @@ import {
   Book,
   Code,
   Palette,
-  X,
   Send,
   type LucideIcon,
 } from "lucide-react";
@@ -363,18 +350,7 @@ export const Channels = () => {
     setShowAddMemberDialog(null);
   };
 
-  const handleRemoveMember = (channelId: string, memberId: string) => {
-    setChannels(
-      channels.map((channel) =>
-        channel.id === channelId
-          ? {
-              ...channel,
-              members: channel.members.filter((m) => m.id !== memberId),
-            }
-          : channel
-      )
-    );
-  };
+  
 
   const handleSendMessage = () => {
     if (!messageInput.trim() || !selectedChannelId) return;
@@ -444,12 +420,30 @@ export const Channels = () => {
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Channels</h2>
-            <Dialog open={showCreateDialog} onOpenChange={closeDialog}>
+            <Dialog open={showCreateDialog} onOpenChange={(open) => {
+              if (!open) {
+                closeDialog();
+              } else {
+                if (!editingChannel) {
+                  setEditingChannel(null);
+                  setChannelName("");
+                  setChannelDescription("");
+                  setSelectedIcon(availableIcons[0]);
+                }
+                setShowCreateDialog(true);
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={() => setShowCreateDialog(true)}
+                  onClick={() => {
+                    setEditingChannel(null);
+                    setChannelName("");
+                    setChannelDescription("");
+                    setSelectedIcon(availableIcons[0]);
+                    setShowCreateDialog(true);
+                  }}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -467,7 +461,7 @@ export const Channels = () => {
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="name">Channel Name *</Label>
+                    <Label htmlFor="name">Title *</Label>
                     <Input
                       id="name"
                       placeholder="e.g., Sales Team"
@@ -477,11 +471,13 @@ export const Channels = () => {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="description">Description</Label>
-                    <Input
+                    <Textarea
                       id="description"
-                      placeholder="What is this channel about?"
+                      placeholder="What is this channel about? (Optional)"
                       value={channelDescription}
                       onChange={(e) => setChannelDescription(e.target.value)}
+                      rows={4}
+                      className="resize-none"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -596,7 +592,7 @@ export const Channels = () => {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <p
                           className={`font-medium truncate ${
                             isSelected ? "text-primary-foreground" : ""
@@ -609,7 +605,7 @@ export const Channels = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 flex-shrink-0"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <MoreVertical className="h-4 w-4" />
@@ -648,6 +644,18 @@ export const Channels = () => {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
+                      {channel.description && (
+                        <p
+                          className={`text-xs truncate mt-1 ${
+                            isSelected
+                              ? "text-primary-foreground/70"
+                              : "text-muted-foreground"
+                          }`}
+                          title={channel.description}
+                        >
+                          {channel.description}
+                        </p>
+                      )}
                       {lastMessage && (
                         <p
                           className={`text-xs truncate mt-1 ${
