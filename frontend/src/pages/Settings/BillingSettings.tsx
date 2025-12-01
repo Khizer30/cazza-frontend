@@ -8,9 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CreditCard } from "lucide-react";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import { useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useUser } from "@/hooks/useUser";
+import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/components/ToastProvider";
+import type { Subscription } from "@/types/auth";
+import { SettingsSidebar } from "@/components/SettingsSidebar";
 
 // Minimal plans data used by this page. Replace with API-driven data as needed.
 const plans: { name: string; price?: number; type: "rookie" | "master" }[] = [
@@ -19,13 +23,76 @@ const plans: { name: string; price?: number; type: "rookie" | "master" }[] = [
 ];
 
 export const BillingSettings = () => {
-  const [subscription, setSubscription] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [customAmount, setCustomAmount] = useState("");
-  const [showCustomAmount, setShowCustomAmount] = useState(false);
+  const { startSubscription, unsubscribe, isLoading, fetchUserProfile } = useUser();
+  const { user } = useUserStore();
+  const { showToast } = useToast();
+  const [searchParams] = useSearchParams();
+  const hasProcessedMessage = useRef(false);
+  
+  const subscription = user?.subscription || null;
+  
+  useEffect(() => {
+    if (!user) {
+      fetchUserProfile();
+    }
+  }, [user, fetchUserProfile]);
+
+  // Check for payment success/failure message in URL
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message && !hasProcessedMessage.current) {
+      hasProcessedMessage.current = true;
+      
+      // Show toast first
+      if (message === "success") {
+        showToast("Payment successful! Your subscription is now active.", "success");
+      } else {
+        showToast("Payment failed. Please try again.", "error");
+      }
+      
+      // Remove query parameter from URL
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
+      
+      // Refresh user profile to get updated subscription status
+      fetchUserProfile();
+    }
+  }, [searchParams, showToast, fetchUserProfile]);
+  
+  // Helper function to get plan name from subscription
+  const getPlanName = (sub: Subscription | null) => {
+    if (!sub) return null;
+    
+    // First check if planType is explicitly set
+    if (sub.planType) {
+      return sub.planType === "master" ? "Master" : "Rookie";
+    }
+    
+    // Fallback to interval: monthly = Rookie, yearly = Master
+    if (sub.interval) {
+      return sub.interval === "yearly" ? "Master" : "Rookie";
+    }
+    
+    // Default to Rookie if neither is available
+    return "Rookie";
+  };
+  
+  // Helper function to check if subscription is active
+  const isSubscriptionActive = (sub: Subscription | null) => {
+    if (!sub) return false;
+    return sub.status === "ACTIVE" || sub.status === "TRIAL";
+  };
+  
+  // Helper function to check if subscription is in trial
+  const isTrial = (sub: Subscription | null) => {
+    if (!sub) return false;
+    return sub.status === "TRIAL" && 
+           sub.expiryDate && 
+           new Date(sub.expiryDate) > new Date();
+  };
+  
   // Handlers (placeholders) - replace with real API integration
   const handleManageSubscription = async () => {
-    setLoading(true);
     try {
       // TODO: call backend to create/open Stripe customer portal
       console.log("Open customer portal (TODO: implement)");
@@ -33,73 +100,36 @@ export const BillingSettings = () => {
       await new Promise((res) => setTimeout(res, 500));
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleCustomSubscription = async () => {
-    if (!customAmount) return;
-    const amount = Number(customAmount);
-    if (isNaN(amount) || amount <= 0) return;
-    setLoading(true);
-    try {
-      // TODO: call API to create subscription with custom amount
-      const custom_amount_pence = Math.round(amount * 100);
-      const subscriptionEnd = new Date();
-      subscriptionEnd.setMonth(subscriptionEnd.getMonth() + 1);
 
-      setSubscription((s: any) => ({
-        ...(s || {}),
-        subscribed: true,
-        custom_amount: custom_amount_pence,
-        subscription_end: subscriptionEnd.toISOString(),
-        subscription_tier: s?.subscription_tier || "Rookie",
-      }));
+  const handleStartTrial = async (planType: "rookie" | "master" = "rookie") => {
+    try {
+      const interval = planType === "rookie" ? "monthly" : "yearly";
+      await startSubscription({ interval });
+      // The subscription data will be updated via the user profile fetch in the hook
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
-      setShowCustomAmount(false);
     }
   };
+  const planName = getPlanName(subscription);
+  const isActive = isSubscriptionActive(subscription);
+  const isTrialActive = isTrial(subscription);
 
-  const handleStartTrial = async () => {
-    setLoading(true);
-    try {
-      // TODO: call backend to start trial
-      const trialEnd = new Date();
-      trialEnd.setDate(trialEnd.getDate() + 7); // 7-day trial
-
-      setSubscription((s: any) => ({
-        ...(s || {}),
-        subscribed: false,
-        subscription_tier: "Rookie",
-        trial_end: trialEnd.toISOString(),
-      }));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBookCall = () => {
-    // TODO: implement booking flow (open calendar, external link, or contact form)
-    console.log("Book a call (TODO: implement)");
-    // placeholder: open mailto as a minimal UX
-    window.open("mailto:sales@example.com?subject=Book%20a%20demo", "_blank");
-  };
   return (
-    <div className="max-w-6xl space-y-6 mx-auto my-4">
-      {/* Current Plan */}
-      {subscription && (
+    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
+      <SettingsSidebar />
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
+      {/* Current Plan - Only show if plan is active */}
+      {subscription && isActive && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Current Plan</CardTitle>
               <div className="ml-4">
-                <Badge>{subscription.subscription_tier || "No Plan"}</Badge>
+                <Badge>{planName || "No Plan"}</Badge>
               </div>
             </div>
             <CardDescription>
@@ -110,26 +140,27 @@ export const BillingSettings = () => {
             <div className="flex items-center justify-between p-4 bg-accent rounded-lg">
               <div>
                 <h3 className="font-semibold text-lg text-accent-foreground">
-                  {subscription.subscription_tier || "No Active Plan"}
+                  {planName || "No Active Plan"}
                 </h3>
-                {subscription.trial_end &&
-                new Date(subscription.trial_end) > new Date() &&
-                !subscription.subscribed ? (
+                {isTrialActive ? (
                   <p className="text-accent-foreground/70">
                     Free trial active • Ends:{" "}
-                    {new Date(subscription.trial_end).toLocaleDateString()}
+                    {subscription.expiryDate && new Date(subscription.expiryDate).toLocaleDateString()}
                   </p>
-                ) : subscription.subscribed ? (
+                ) : subscription.status === "ACTIVE" ? (
                   <p className="text-accent-foreground/70">
-                    {subscription.custom_amount
-                      ? `£${(subscription.custom_amount / 100).toFixed(
-                          2
-                        )}/month • Next billing: ${new Date(
-                          subscription.subscription_end
-                        ).toLocaleDateString()}`
-                      : `Next billing: ${new Date(
-                          subscription.subscription_end
-                        ).toLocaleDateString()}`}
+                    {subscription.customAmount
+                      ? `£${(subscription.customAmount / 100).toFixed(2)}/${subscription.interval || "month"} • `
+                      : ""}
+                    {subscription.expiryDate
+                      ? `Next billing: ${new Date(subscription.expiryDate).toLocaleDateString()}`
+                      : "Active subscription"}
+                    {subscription.autoRenew ? " • Auto-renew enabled" : " • Auto-renew disabled"}
+                  </p>
+                ) : subscription.status === "CANCELED" ? (
+                  <p className="text-accent-foreground/70">
+                    Subscription canceled
+                    {subscription.expiryDate && ` • Expires: ${new Date(subscription.expiryDate).toLocaleDateString()}`}
                   </p>
                 ) : (
                   <p className="text-accent-foreground/70">
@@ -139,33 +170,53 @@ export const BillingSettings = () => {
               </div>
               <Badge
                 variant={
-                  subscription.subscribed
+                  subscription.status === "ACTIVE"
                     ? "default"
-                    : subscription.trial_end &&
-                      new Date(subscription.trial_end) > new Date()
+                    : subscription.status === "TRIAL"
                     ? "secondary"
                     : "outline"
                 }
               >
-                {subscription.subscribed
+                {subscription.status === "ACTIVE"
                   ? "Active"
-                  : subscription.trial_end &&
-                    new Date(subscription.trial_end) > new Date()
+                  : subscription.status === "TRIAL"
                   ? "Trial"
+                  : subscription.status === "CANCELED"
+                  ? "Canceled"
                   : "No Plan"}
               </Badge>
             </div>
-            {subscription.subscribed && (
-              <div className="mt-4">
+            <div className="mt-4 flex gap-2">
+              {subscription.status === "ACTIVE" && (
+                <>
+                  <Button
+                    onClick={handleManageSubscription}
+                    disabled={isLoading}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Manage Subscription
+                  </Button>
+                  <Button
+                    onClick={unsubscribe}
+                    disabled={isLoading}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    Unsubscribe
+                  </Button>
+                </>
+              )}
+              {subscription.status === "CANCELED" && (
                 <Button
-                  onClick={handleManageSubscription}
-                  disabled={loading}
+                  disabled={true}
+                  variant="outline"
                   className="w-full"
                 >
-                  Manage Subscription
+                  Subscription Canceled
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -180,100 +231,50 @@ export const BillingSettings = () => {
         </CardHeader>
         <CardContent>
           <PlanCards
-            currentPlan={subscription?.subscription_tier}
-            loading={loading}
+            currentPlan={isActive ? planName || null : null}
+            loading={isLoading}
             showActions={false}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            {plans.map((plan) => (
-              <div key={plan.name}>
-                {plan.type === "rookie" ? (
+            {plans.map((plan) => {
+              const isCurrentPlan = planName === plan.name;
+              const isPlanActive = isCurrentPlan && isActive;
+              
+              return (
+                <div key={plan.name}>
                   <div className="space-y-2">
-                    {subscription?.trial_end &&
-                    new Date(subscription.trial_end) > new Date() &&
-                    !subscription?.subscribed ? (
+                    {isTrialActive && subscription?.planType === plan.type ? (
                       <Button variant="secondary" className="w-full" disabled>
                         Trial Active • Ends:{" "}
-                        {new Date(subscription.trial_end).toLocaleDateString()}
+                        {subscription.expiryDate && new Date(subscription.expiryDate).toLocaleDateString()}
                       </Button>
-                    ) : subscription?.subscribed ? (
-                      <div className="space-y-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowCustomAmount(!showCustomAmount)}
-                          className="w-full"
-                        >
-                          Set Monthly Amount
-                        </Button>
-                        {showCustomAmount && (
-                          <div className="space-y-2">
-                            <Input
-                              type="number"
-                              placeholder="Enter amount (£)"
-                              value={customAmount}
-                              onChange={(e) => setCustomAmount(e.target.value)}
-                              min="1"
-                              step="0.01"
-                            />
-                            <Button
-                              onClick={handleCustomSubscription}
-                              disabled={loading || !customAmount}
-                              className="w-full"
-                            >
-                              Subscribe for £{customAmount}/month
-                            </Button>
-                          </div>
-                        )}
-                      </div>
+                    ) : isPlanActive && subscription ? (
+                      // Show subscription status for active paid subscriptions
+                      <Button variant="secondary" className="w-full" disabled>
+                        {subscription.customAmount
+                          ? `Active • £${(subscription.customAmount / 100).toFixed(2)}/${subscription.interval || "month"}`
+                          : subscription.status === "ACTIVE"
+                          ? "Active Subscription"
+                          : "Trial Active"}
+                      </Button>
                     ) : (
                       <Button
                         className="w-full"
-                        onClick={handleStartTrial}
-                        disabled={loading}
+                        onClick={() => handleStartTrial(plan.type)}
+                        disabled={isLoading}
                       >
-                        Start free trial →
+                        Subscribe now
                       </Button>
                     )}
                   </div>
-                ) : (
-                  <Button className="w-full" onClick={handleBookCall}>
-                    Book a call →
-                  </Button>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
-
-      {/* Subscription Management */}
-      {subscription?.subscribed && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Subscription Management</CardTitle>
-            <CardDescription>
-              Manage your subscription, payment methods, and billing history
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <Button
-                onClick={handleManageSubscription}
-                disabled={loading}
-                className="w-full"
-                variant="outline"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Open Stripe Customer Portal
-              </Button>
-              <p className="text-sm text-muted-foreground text-center">
-                Update payment methods, view invoices, and manage your
-                subscription
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

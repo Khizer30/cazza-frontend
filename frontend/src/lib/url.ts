@@ -11,7 +11,9 @@ user:{
     profile:"/user",
     onboarding:"/user/onboarding",
     businessProfile:"/user/business-profile",
-    support:"/user/support"
+    support:"/user/support",
+    subscription:"/billing/checkout",
+    unsubscribe:"/billing/unsubscribe"
 },
 team:{
     invite:"/team/invite",
@@ -19,6 +21,13 @@ team:{
     invitation:"/team/invitation",
     members:"/team/members",
     member:"/team/member",
-    analytics:"/team/analytics"
+    updateMemberRole:"/team/member",
+    analytics:"/team/analytics",
+    memberSubscription:"/billing/checkout-team-member"
+},
+chatbot:{
+    ask:"/chatbot/ask",
+    history:"/chatbot/history",
+    deleteMessage:"/chatbot/message"
 }
 } as const

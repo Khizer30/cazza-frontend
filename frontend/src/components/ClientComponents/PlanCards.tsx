@@ -32,6 +32,7 @@ export const plans = [
     name: "Master",
     price: "From £150/month",
     period: "(ex VAT)",
+    subtitle: "",
     description: "For growing brands ready for expert support.",
     features: [
       "Everything in Rookie, plus:",
@@ -106,6 +107,17 @@ export const PlanCards = ({
               </p>
             )}
 
+            {plan.pricing && (
+              <div className="space-y-1 pt-2 border-t border-border mb-4">
+                <p className="text-xs text-muted-foreground">
+                  <strong>{plan.pricing.trial}</strong>
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {plan.pricing.after}
+                </p>
+              </div>
+            )}
+
             <p className="text-sm font-medium mb-3">Includes:</p>
           </div>
 
@@ -126,16 +138,6 @@ export const PlanCards = ({
             ))}
           </ul>
 
-          {plan.type === "rookie" && plan.pricing && (
-            <div className="mb-4 p-3 bg-muted/50 rounded-md">
-              <p className="text-xs text-muted-foreground mb-1">
-                {plan.pricing.trial}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {plan.pricing.after}
-              </p>
-            </div>
-          )}
 
           {showActions && onSelectPlan && (
             <Button
@@ -146,9 +148,9 @@ export const PlanCards = ({
             >
               {currentPlan === plan.name
                 ? "Current Plan"
-                : plan.type === "rookie"
-                ? "Start free trial →"
-                : "Book a call →"}
+                : plan.type === "master"
+                ? "Book call"
+                : "Subscribe now"}
             </Button>
           )}
         </div>

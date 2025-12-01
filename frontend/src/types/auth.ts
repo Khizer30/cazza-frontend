@@ -16,6 +16,17 @@ export interface BusinessProfile {
   updatedAt?: string;
 }
 
+export interface Subscription {
+  id: string;
+  status: "ACTIVE" | "TRIAL" | "CANCELED" | "EXPIRED" | "PENDING";
+  expiryDate: string | null;
+  autoRenew: boolean;
+  paymentDate: string | null;
+  planType?: "rookie" | "master";
+  interval?: "monthly" | "yearly";
+  customAmount?: number;
+}
+
 export interface User {
   id: string;
   firstName: string;
@@ -32,6 +43,7 @@ export interface User {
   planId: string | null;
   planExpiry: string | null;
   ownerId: string | null;
+  subscription: Subscription | null;
   businessProfile: BusinessProfile | null;
 }
 
@@ -217,10 +229,23 @@ export interface TeamInvitation {
   [key: string]: any;
 }
 
+export interface TeamMemberSubscription {
+  id: string;
+  status: "ACTIVE" | "TRIAL" | "CANCELED" | "EXPIRED" | "PENDING";
+  expiryDate: string | null;
+  autoRenew: boolean;
+  paymentDate: string | null;
+  interval: string; // "Month" or "Year" from API, can be normalized to "monthly" | "yearly"
+  price: number;
+  name: string;
+}
+
 export interface TeamMember {
   id: string;
   userId?: string;
   user_id?: string;
+  firstName?: string;
+  lastName?: string;
   name?: string;
   email?: string;
   profiles?: {
@@ -228,8 +253,15 @@ export interface TeamMember {
     [key: string]: any;
   };
   role: "OWNER" | "ADMIN" | "MEMBER" | string;
+  profileType?: string;
+  profileImage?: string | null;
+  verified?: boolean;
+  isActive?: boolean;
   joined_at?: string;
   createdAt?: string;
+  updatedAt?: string;
+  ownerId?: string;
+  subscription?: TeamMemberSubscription | null;
   [key: string]: any;
 }
 
@@ -265,6 +297,18 @@ export interface DELETE_MEMBER_RESPONSE {
   message: string;
 }
 
+export interface UPDATE_TEAM_MEMBER_ROLE_PAYLOAD {
+  role: "ADMIN" | "MEMBER";
+}
+
+export interface UPDATE_TEAM_MEMBER_ROLE_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    member: TeamMember;
+  };
+}
+
 export interface DELETE_USER_RESPONSE {
   success: boolean;
   message: string;
@@ -277,4 +321,96 @@ export interface GET_INVITATION_RESPONSE {
     email: string;
     [key: string]: any;
   };
+}
+
+export interface START_SUBSCRIPTION_PAYLOAD {
+  interval: "monthly" | "yearly";
+}
+
+export interface START_SUBSCRIPTION_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    checkoutUrl: string;
+    subscription?: {
+      id: string;
+      planType: string;
+      trialEnd?: string;
+      subscribed: boolean;
+      subscriptionEnd?: string;
+      customAmount?: number;
+      [key: string]: any;
+    };
+  };
+}
+
+export interface UNSUBSCRIBE_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    subscription: Subscription;
+  };
+}
+
+export interface TEAM_MEMBER_SUBSCRIPTION_PAYLOAD {
+  userId: string;
+  interval: "monthly" | "yearly";
+}
+
+export interface TEAM_MEMBER_SUBSCRIPTION_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    checkoutUrl: string;
+    subscription?: {
+      id: string;
+      planType: string;
+      trialEnd?: string;
+      subscribed: boolean;
+      subscriptionEnd?: string;
+      customAmount?: number;
+      [key: string]: any;
+    };
+  };
+}
+
+export interface CHATBOT_ASK_PAYLOAD {
+  question: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  question: string;
+  answer: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CHATBOT_ASK_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    id: string;
+    question: string;
+    answer: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  errors?: string;
+}
+
+export interface CHATBOT_HISTORY_RESPONSE {
+  success: boolean;
+  message: string;
+  data: {
+    messages: ChatMessage[];
+    total: number;
+    limit: number;
+    offset: number;
+  };
+}
+
+export interface CHATBOT_DELETE_MESSAGE_RESPONSE {
+  success: boolean;
+  message: string;
 }

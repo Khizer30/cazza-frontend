@@ -1,4 +1,5 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Mail, Shield, Users, Loader2, X } from "lucide-react";
+import { Mail, Shield, Users, Loader2, X, CreditCard } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { TeamInviteDialog } from "@/components/TeamInviteDialog";
 import { useTeam } from "@/hooks/useTeam";
 import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/components/ToastProvider";
+import { SettingsSidebar } from "@/components/SettingsSidebar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,6 +76,8 @@ const roles = [
 ];
 export const TeamSettings = () => {
   const { user: currentUser } = useUserStore();
+  const { showToast } = useToast();
+  const [searchParams] = useSearchParams();
   const {
     members,
     invitations,
@@ -74,11 +86,38 @@ export const TeamSettings = () => {
     fetchAllTeamData,
     cancelInvitation,
     removeTeamMember,
+    updateTeamMemberRole,
+    payForTeamMember,
   } = useTeam();
 
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [cancelInviteId, setCancelInviteId] = useState<string | null>(null);
   const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
+  const [memberIntervals, setMemberIntervals] = useState<Record<string, "monthly" | "yearly">>({});
+  const [payingForMemberId, setPayingForMemberId] = useState<string | null>(null);
+  const hasProcessedMessage = useRef(false);
+
+  // Check for payment success/failure message in URL
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message && !hasProcessedMessage.current) {
+      hasProcessedMessage.current = true;
+      
+      // Show toast first
+      if (message === "success") {
+        showToast("Payment successful! Team member subscription is now active.", "success");
+      } else {
+        showToast("Payment failed. Please try again.", "error");
+      }
+      
+      // Remove query parameter from URL
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
+      
+      // Refresh team data to get updated subscription status
+      fetchAllTeamData();
+    }
+  }, [searchParams, showToast, fetchAllTeamData]);
 
   // Fetch team data on mount
   useEffect(() => {
@@ -117,6 +156,32 @@ export const TeamSettings = () => {
     setRemoveMemberId(memberId);
   }, []);
 
+  const handlePayForMember = useCallback(async (member: any) => {
+    console.log("handlePayForMember called with member:", member);
+    // userId is the id of the member
+    const userId = member.id;
+    console.log("Using member.id as userId:", userId);
+    
+    if (!userId) {
+      console.error("Member ID not found for member:", member);
+      showToast("Member ID not found. Please contact support.", "error");
+      return;
+    }
+    
+    const interval = memberIntervals[member.id] || "monthly";
+    console.log("Using interval:", interval, "for member:", member.id);
+    setPayingForMemberId(member.id);
+    try {
+      console.log("Calling payForTeamMember with:", { userId, interval });
+      await payForTeamMember(userId, interval);
+    } catch (error) {
+      console.error("Error paying for team member:", error);
+      // Error is already handled in payForTeamMember hook
+    } finally {
+      setPayingForMemberId(null);
+    }
+  }, [memberIntervals, payForTeamMember, showToast]);
+
   const confirmRemoveMember = useCallback(async () => {
     if (removeMemberId) {
       try {
@@ -149,6 +214,74 @@ export const TeamSettings = () => {
     return m.email || m.profiles?.email || "No email";
   };
 
+  // Helper function to get member's current subscription interval (normalized)
+  const getMemberSubscriptionInterval = (member: any): "monthly" | "yearly" | null => {
+    if (!member.subscription || member.subscription.status !== "ACTIVE") {
+      return null;
+    }
+    const interval = member.subscription.interval?.toLowerCase();
+    if (interval === "month" || interval === "monthly") {
+      return "monthly";
+    }
+    if (interval === "year" || interval === "yearly") {
+      return "yearly";
+    }
+    return null;
+  };
+
+  // Helper function to check if button should be disabled
+  const isPayButtonDisabled = (member: any): boolean => {
+    const selectedInterval = memberIntervals[member.id] || "monthly";
+    const currentSubscriptionInterval = getMemberSubscriptionInterval(member);
+    
+    // If member has an active subscription with the same interval, disable the button
+    if (currentSubscriptionInterval && currentSubscriptionInterval === selectedInterval) {
+      return true;
+    }
+    
+    return false;
+  };
+
+  // Helper function to get subscription display text
+  const getSubscriptionDisplay = (member: any): string | null => {
+    if (!member.subscription) {
+      return null;
+    }
+
+    const subscription = member.subscription;
+    const status = subscription.status;
+    
+    if (status === "ACTIVE") {
+      const planName = subscription.name || "Active Plan";
+      const interval = subscription.interval || "";
+      const price = subscription.price ? `£${subscription.price}` : "";
+      const expiryDate = subscription.expiryDate 
+        ? new Date(subscription.expiryDate).toLocaleDateString() 
+        : "";
+      
+      let display = `${planName}`;
+      if (price) {
+        display += ` • ${price}/${interval}`;
+      }
+      if (expiryDate) {
+        display += ` • Expires ${expiryDate}`;
+      }
+      return display;
+    } else if (status === "TRIAL") {
+      const expiryDate = subscription.expiryDate 
+        ? new Date(subscription.expiryDate).toLocaleDateString() 
+        : "";
+      return `Trial • ${expiryDate ? `Expires ${expiryDate}` : "Active"}`;
+    } else if (status === "CANCELED") {
+      const expiryDate = subscription.expiryDate 
+        ? new Date(subscription.expiryDate).toLocaleDateString() 
+        : "";
+      return `Canceled${expiryDate ? ` • Expires ${expiryDate}` : ""}`;
+    }
+    
+    return null;
+  };
+
   // Filter out current user from members list
   const filteredMembers = members.filter(
     (member) => member.userId !== currentUser?.id && member.user_id !== currentUser?.id
@@ -163,7 +296,10 @@ export const TeamSettings = () => {
   }
 
   return (
-    <div className="max-w-6xl space-y-6 mx-auto my-4">
+    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
+      <SettingsSidebar />
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
       {/* Team overview  */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
@@ -321,6 +457,11 @@ export const TeamSettings = () => {
                         <p className="text-sm text-muted-foreground">
                           {getMemberEmail(member)}
                         </p>
+                        {getSubscriptionDisplay(member) && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {getSubscriptionDisplay(member)}
+                          </p>
+                        )}
                         {member.joined_at && (
                           <p className="text-xs text-muted-foreground">
                             Joined {new Date(member.joined_at).toLocaleDateString()}
@@ -334,15 +475,83 @@ export const TeamSettings = () => {
                         {member.role?.toLowerCase()}
                       </Badge>
                       {canManageTeam && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveMember(member.id)}
-                          className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
-                          disabled={isLoading}
-                        >
-                          Remove
-                        </Button>
+                        <>
+                          {/* Subscription checkout for team members */}
+                          {member.role?.toUpperCase() !== "OWNER" && (
+                            <div className="flex items-center gap-2">
+                              <Select
+                                value={memberIntervals[member.id] || "monthly"}
+                                onValueChange={(value: "monthly" | "yearly") => {
+                                  setMemberIntervals(prev => ({
+                                    ...prev,
+                                    [member.id]: value
+                                  }));
+                                }}
+                              >
+                                <SelectTrigger className="w-[120px]">
+                                  <SelectValue placeholder="Interval" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="monthly">Monthly</SelectItem>
+                                  <SelectItem value="yearly">Yearly</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePayForMember(member)}
+                                disabled={isLoading || payingForMemberId === member.id || isPayButtonDisabled(member)}
+                                className="gap-2"
+                              >
+                                {payingForMemberId === member.id ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Processing...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CreditCard className="h-4 w-4" />
+                                    Pay for him
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          )}
+                          {/* Only show role toggle for members (not OWNER) */}
+                          {member.role?.toUpperCase() !== "OWNER" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={async () => {
+                                try {
+                                  // The API expects the team member's ID (member.id) in the URL
+                                  // Based on endpoint: /team/member/{{userID}}/role where userID is the team member ID
+                                  const teamMemberId = member.id;
+                                  
+                                  if (teamMemberId) {
+                                    await updateTeamMemberRole(teamMemberId, member.role || "MEMBER");
+                                  } else {
+                                    console.error("Team member ID not found:", member);
+                                  }
+                                } catch (error) {
+                                  console.error("Error updating team member role:", error);
+                                }
+                              }}
+                              disabled={isLoading}
+                            >
+                              {member.role?.toUpperCase() === "ADMIN" ? "Make Member" : "Make Admin"}
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveMember(member.id)}
+                            className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
+                            disabled={isLoading}
+                          >
+                            Remove
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -471,6 +680,8 @@ export const TeamSettings = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+        </div>
+      </div>
     </div>
   );
 };

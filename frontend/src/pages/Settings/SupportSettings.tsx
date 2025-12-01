@@ -21,6 +21,7 @@ import { submitSupportTicketService } from "@/services/supportService";
 import { useToast } from "@/components/ToastProvider";
 import { Loader2 } from "lucide-react";
 import { AxiosError } from "axios";
+import { SettingsSidebar } from "@/components/SettingsSidebar";
 
 // Map form category values to API category values
 const categoryMap: Record<string, string> = {
@@ -106,7 +107,10 @@ export const SupportSettings = () => {
     }
   };
   return (
-    <div className="max-w-6xl space-y-6 mx-auto my-4">
+    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
+      <SettingsSidebar />
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
       {/* Create Support Ticket */}
       <Card>
         <CardHeader>
@@ -200,6 +204,8 @@ export const SupportSettings = () => {
           </Button>
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 };
