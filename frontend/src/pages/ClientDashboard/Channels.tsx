@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -65,6 +65,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useChat } from "@/hooks/useChat";
+import { Loader2 } from "lucide-react";
+import type { ChatGroup } from "@/services/chatService";
 
 // Types
 interface TeamMember {
@@ -158,93 +161,45 @@ const dummyTeamMembers: TeamMember[] = [
   },
 ];
 
-// Dummy messages
-const dummyMessages: ChannelMessage[] = [
-  {
-    id: "1",
-    channelId: "1",
-    senderId: "1",
-    senderName: "John Doe",
-    content:
-      "Hey team! Welcome to the General channel. Let's keep everyone updated here.",
-    timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
-  },
-  {
-    id: "2",
-    channelId: "1",
-    senderId: "2",
-    senderName: "Jane Smith",
-    content: "Thanks John! Excited to be part of the team.",
-    timestamp: new Date(Date.now() - 86400000 * 2 + 3600000), // 2 days ago + 1 hour
-  },
-  {
-    id: "3",
-    channelId: "2",
-    senderId: "1",
-    senderName: "John Doe",
-    content: "Great work on the sales numbers this quarter!",
-    timestamp: new Date(Date.now() - 86400000), // 1 day ago
-  },
-  {
-    id: "4",
-    channelId: "2",
-    senderId: "3",
-    senderName: "Mike Johnson",
-    content: "Thank you! The team really pulled together on this one.",
-    timestamp: new Date(Date.now() - 86400000 + 1800000), // 1 day ago + 30 min
-  },
-  {
-    id: "5",
-    channelId: "3",
-    senderId: "1",
-    senderName: "John Doe",
-    content: "Let's discuss the new marketing campaign strategy.",
-    timestamp: new Date(Date.now() - 3600000), // 1 hour ago
-  },
-];
 
-// Initial dummy channels with messages
-const initialChannels: Channel[] = [
-  {
-    id: "1",
-    name: "General",
-    description: "General discussions and announcements",
-    icon: Hash,
-    iconName: "Hash",
-    color: "hsl(var(--primary))",
-    members: [dummyTeamMembers[0], dummyTeamMembers[1]],
-    createdAt: new Date().toISOString(),
-    messages: dummyMessages.filter((m) => m.channelId === "1"),
-  },
-  {
-    id: "2",
-    name: "Sales Team",
-    description: "Sales updates and strategies",
-    icon: TrendingUp,
-    iconName: "TrendingUp",
-    color: "hsl(var(--chart-3))",
-    members: [dummyTeamMembers[0], dummyTeamMembers[2], dummyTeamMembers[3]],
-    createdAt: new Date().toISOString(),
-    messages: dummyMessages.filter((m) => m.channelId === "2"),
-  },
-  {
-    id: "3",
-    name: "Marketing",
-    description: "Marketing campaigns and content",
-    icon: Target,
-    iconName: "Target",
-    color: "hsl(var(--chart-5))",
-    members: [dummyTeamMembers[1], dummyTeamMembers[4]],
-    createdAt: new Date().toISOString(),
-    messages: dummyMessages.filter((m) => m.channelId === "3"),
-  },
-];
 
 export const Channels = () => {
-  const [channels, setChannels] = useState<Channel[]>(initialChannels);
-  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(
-    channels[0]?.id || null
-  );
+  const { getUserChatGroups } = useChat();
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
+  
+  const convertChatGroupToChannel = useCallback((chatGroup: ChatGroup): Channel => {
+    if (!chatGroup || !chatGroup.id || !chatGroup.name) {
+      const fallbackIcon = { name: "Hash", icon: Hash, color: "hsl(var(--primary))" };
+      return {
+        id: chatGroup?.id || `temp-${Date.now()}`,
+        name: chatGroup?.name || "Unknown",
+        description: "",
+        icon: fallbackIcon.icon,
+        iconName: fallbackIcon.name,
+        color: fallbackIcon.color,
+        members: [],
+        createdAt: chatGroup?.createdAt || new Date().toISOString(),
+        messages: [],
+      };
+    }
+    
+    const defaultIcon = availableIcons[0] || { name: "Hash", icon: Hash, color: "hsl(var(--primary))" };
+    const icon = availableIcons.find((i) => i.name === "Hash") || defaultIcon;
+    
+    return {
+      id: chatGroup.id,
+      name: chatGroup.name || "",
+      description: "",
+      icon: icon?.icon || Hash,
+      iconName: icon?.name || "Hash",
+      color: icon?.color || "hsl(var(--primary))",
+      members: [],
+      createdAt: chatGroup.createdAt || new Date().toISOString(),
+      messages: [],
+    };
+  }, []);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showAddMemberDialog, setShowAddMemberDialog] = useState<string | null>(
     null
@@ -253,7 +208,7 @@ export const Channels = () => {
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const currentUser = dummyTeamMembers[0]; // Current user is John Doe
+  const currentUser = dummyTeamMembers[0];
 
   // Form state for create/edit
   const [channelName, setChannelName] = useState("");
@@ -266,6 +221,43 @@ export const Channels = () => {
 
   const selectedChannel = channels.find((c) => c.id === selectedChannelId);
 
+  useEffect(() => {
+    const loadChatGroups = async () => {
+      try {
+        setIsLoading(true);
+        const chatGroups = await getUserChatGroups();
+        
+        if (chatGroups && Array.isArray(chatGroups) && chatGroups.length > 0) {
+          const convertedChannels = chatGroups
+            .filter((group) => group && group.id && group.name)
+            .map(convertChatGroupToChannel);
+          
+          if (convertedChannels.length > 0) {
+            setChannels(convertedChannels);
+            
+            setSelectedChannelId((prev) => {
+              if (!prev) {
+                return convertedChannels[0].id;
+              }
+              return prev;
+            });
+          } else {
+            setChannels([]);
+          }
+        } else {
+          setChannels([]);
+        }
+      } catch (error) {
+        console.error("Failed to load chat groups:", error);
+        setChannels([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadChatGroups();
+  }, []);
+
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -274,8 +266,8 @@ export const Channels = () => {
   // Filter channels based on search
   const filteredChannels = channels.filter(
     (channel) =>
-      channel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      channel.description.toLowerCase().includes(searchQuery.toLowerCase())
+      channel.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      channel.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleCreateChannel = () => {
@@ -567,7 +559,11 @@ export const Channels = () => {
         {/* Channels List */}
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {filteredChannels.length === 0 ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : filteredChannels.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 No channels found
               </div>
