@@ -164,10 +164,12 @@ const dummyTeamMembers: TeamMember[] = [
 
 
 export const Channels = () => {
-  const { getUserChatGroups, createChatGroup } = useChat();
+  const { getUserChatGroups, createChatGroup, updateChatGroup, deleteChatGroup } = useChat();
   const [channels, setChannels] = useState<Channel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   
   const convertChatGroupToChannel = useCallback((chatGroup: ChatGroup): Channel => {
@@ -261,22 +263,18 @@ export const Channels = () => {
 
     try {
       setIsCreating(true);
-      const createdGroup = await createChatGroup({ name: channelName });
+      const createdGroup = await createChatGroup({ name: channelName.trim() });
       
       if (createdGroup) {
         const newChannel = convertChatGroupToChannel(createdGroup);
-        newChannel.description = channelDescription;
-        newChannel.icon = selectedIcon.icon;
-        newChannel.iconName = selectedIcon.name;
-        newChannel.color = selectedIcon.color;
-
         setChannels([newChannel, ...channels]);
-        setChannelName("");
-        setChannelDescription("");
-        setSelectedIcon(availableIcons[0]);
-        setShowCreateDialog(false);
         setSelectedChannelId(newChannel.id);
       }
+
+      setChannelName("");
+      setChannelDescription("");
+      setSelectedIcon(availableIcons[0]);
+      setShowCreateDialog(false);
     } catch (error) {
       console.error("Failed to create channel:", error);
     } finally {
@@ -284,36 +282,57 @@ export const Channels = () => {
     }
   };
 
-  const handleEditChannel = () => {
-    if (!editingChannel || !channelName.trim()) return;
+  const handleEditChannel = async () => {
+    if (!editingChannel || !channelName.trim() || isUpdating) return;
 
-    setChannels(
-      channels.map((channel) =>
-        channel.id === editingChannel.id
-          ? {
-              ...channel,
-              name: channelName,
-              description: channelDescription,
-              icon: selectedIcon.icon,
-              iconName: selectedIcon.name,
-              color: selectedIcon.color,
-            }
-          : channel
-      )
-    );
+    try {
+      setIsUpdating(true);
+      await updateChatGroup(editingChannel.id, channelName.trim());
+      
+      setChannels(
+        channels.map((channel) =>
+          channel.id === editingChannel.id
+            ? {
+                ...channel,
+                name: channelName.trim(),
+                description: channelDescription.trim(),
+                icon: selectedIcon.icon,
+                iconName: selectedIcon.name,
+                color: selectedIcon.color,
+              }
+            : channel
+        )
+      );
 
-    setEditingChannel(null);
-    setChannelName("");
-    setChannelDescription("");
-    setSelectedIcon(availableIcons[0]);
+      setEditingChannel(null);
+      setChannelName("");
+      setChannelDescription("");
+      setSelectedIcon(availableIcons[0]);
+      setShowCreateDialog(false);
+    } catch (error) {
+      console.error("Failed to update channel:", error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  const handleDeleteChannel = (channelId: string) => {
-    setChannels(channels.filter((channel) => channel.id !== channelId));
-    if (selectedChannelId === channelId) {
-      setSelectedChannelId(
-        channels.find((c) => c.id !== channelId)?.id || null
-      );
+  const handleDeleteChannel = async (channelId: string) => {
+    if (isDeleting === channelId) return;
+
+    try {
+      setIsDeleting(channelId);
+      await deleteChatGroup(channelId);
+      
+      const updatedChannels = channels.filter((channel) => channel.id !== channelId);
+      setChannels(updatedChannels);
+      
+      if (selectedChannelId === channelId) {
+        setSelectedChannelId(updatedChannels[0]?.id || null);
+      }
+    } catch (error) {
+      console.error("Failed to delete channel:", error);
+    } finally {
+      setIsDeleting(null);
     }
   };
 
@@ -528,15 +547,25 @@ export const Channels = () => {
                     onClick={
                       editingChannel ? handleEditChannel : handleCreateChannel
                     }
-                    disabled={!channelName.trim() || isCreating}
+                    disabled={
+                      !channelName.trim() ||
+                      (editingChannel ? isUpdating : isCreating)
+                    }
                   >
-                    {isCreating ? (
+                    {editingChannel ? (
+                      isUpdating ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Changes"
+                      )
+                    ) : isCreating ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Creating...
                       </>
-                    ) : editingChannel ? (
-                      "Save Changes"
                     ) : (
                       "Create Channel"
                     )}
