@@ -30,4 +30,15 @@ export const END_POINT = {
     history: "/chatbot/history",
     deleteMessage: "/chatbot/message",
   },
+  chat: {
+    createGroup: "/chat/group",
+    getGroups: "/chat/groups",
+    getGroupById: "/chat/group",
+    updateGroup: "/chat/group",
+    deleteGroup: "/chat/group",
+    getFirebaseToken: "/chat/token",
+    addMember: "/chat/group",
+    removeMember: "/chat/group",
+    updateMemberRole: "/chat/group",
+  },
 } as const;
