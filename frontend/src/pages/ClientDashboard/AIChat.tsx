@@ -95,7 +95,7 @@ export const AIChat = () => {
 
     const userInput = input.trim();
     const tempUserMessageId = `temp-user-${Date.now()}`;
-    
+
     // Add user message optimistically
     const userMessage: ChatMessage = {
       id: tempUserMessageId,
@@ -114,7 +114,7 @@ export const AIChat = () => {
 
       // Remove temporary user message
       removeMessageFromConversation(currentConversationId, tempUserMessageId);
-      
+
       // Add user message with backend ID
       const backendUserMessage: ChatMessage = {
         id: `user-${response.id}`,
@@ -138,10 +138,10 @@ export const AIChat = () => {
       addMessageToConversation(currentConversationId, backendAiMessage);
     } catch (error) {
       console.error("Error getting AI response:", error);
-      
+
       // Remove temporary user message on error
       removeMessageFromConversation(currentConversationId, tempUserMessageId);
-      
+
       // Add error message to chat
       const errorAiMessage: ChatMessage = {
         id: Date.now().toString() + "-error",
@@ -359,7 +359,8 @@ export const AIChat = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Message</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this message? This action cannot be undone.
+              Are you sure you want to delete this message? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

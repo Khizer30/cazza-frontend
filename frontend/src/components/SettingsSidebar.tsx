@@ -45,7 +45,11 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           className="gap-2"
         >
-          {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {isMobileOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
           <span>Settings Menu</span>
         </Button>
       </div>
@@ -86,7 +90,7 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
+
             return (
               <Link
                 key={item.path}
@@ -109,4 +113,3 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
     </>
   );
 };
-

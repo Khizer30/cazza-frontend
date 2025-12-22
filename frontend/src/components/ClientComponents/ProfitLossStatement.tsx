@@ -155,8 +155,8 @@ export const ProfitLossStatement = () => {
                     profitMargin >= 20
                       ? "text-success"
                       : profitMargin >= 10
-                      ? "text-warning"
-                      : "text-destructive"
+                        ? "text-warning"
+                        : "text-destructive"
                   }`}
                 >
                   {profitMargin.toFixed(1)}%
@@ -166,16 +166,16 @@ export const ProfitLossStatement = () => {
                     profitMargin >= 20
                       ? "default"
                       : profitMargin >= 10
-                      ? "secondary"
-                      : "destructive"
+                        ? "secondary"
+                        : "destructive"
                   }
                   className="text-xs"
                 >
                   {profitMargin >= 20
                     ? "Excellent"
                     : profitMargin >= 10
-                    ? "Good"
-                    : "Needs Attention"}
+                      ? "Good"
+                      : "Needs Attention"}
                 </Badge>
               </div>
             </div>

@@ -300,8 +300,8 @@ export const PlatformRevenueChart = () => {
                     chartView === "revenue"
                       ? "Revenue"
                       : chartView === "profit"
-                      ? "Profit"
-                      : "Expenses",
+                        ? "Profit"
+                        : "Expenses",
                   ]}
                   labelFormatter={(label) => `Month: ${label}`}
                   contentStyle={{

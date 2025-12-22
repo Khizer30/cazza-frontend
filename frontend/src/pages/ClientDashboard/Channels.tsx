@@ -33,7 +33,7 @@ import {
   Plus,
   Hash,
   Users,
-    MoreVertical,
+  MoreVertical,
   Edit,
   Trash2,
   UserPlus,
@@ -165,7 +165,8 @@ const dummyMessages: ChannelMessage[] = [
     channelId: "1",
     senderId: "1",
     senderName: "John Doe",
-    content: "Hey team! Welcome to the General channel. Let's keep everyone updated here.",
+    content:
+      "Hey team! Welcome to the General channel. Let's keep everyone updated here.",
     timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
   },
   {
@@ -327,7 +328,9 @@ export const Channels = () => {
   const handleDeleteChannel = (channelId: string) => {
     setChannels(channels.filter((channel) => channel.id !== channelId));
     if (selectedChannelId === channelId) {
-      setSelectedChannelId(channels.find((c) => c.id !== channelId)?.id || null);
+      setSelectedChannelId(
+        channels.find((c) => c.id !== channelId)?.id || null
+      );
     }
   };
 
@@ -349,8 +352,6 @@ export const Channels = () => {
     );
     setShowAddMemberDialog(null);
   };
-
-  
 
   const handleSendMessage = () => {
     if (!messageInput.trim() || !selectedChannelId) return;
@@ -405,7 +406,9 @@ export const Channels = () => {
   };
 
   const getSender = (senderId: string) => {
-    return dummyTeamMembers.find((m) => m.id === senderId) || dummyTeamMembers[0];
+    return (
+      dummyTeamMembers.find((m) => m.id === senderId) || dummyTeamMembers[0]
+    );
   };
 
   const formatMessageTime = (date: Date) => {
@@ -420,19 +423,22 @@ export const Channels = () => {
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Channels</h2>
-            <Dialog open={showCreateDialog} onOpenChange={(open) => {
-              if (!open) {
-                closeDialog();
-              } else {
-                if (!editingChannel) {
-                  setEditingChannel(null);
-                  setChannelName("");
-                  setChannelDescription("");
-                  setSelectedIcon(availableIcons[0]);
+            <Dialog
+              open={showCreateDialog}
+              onOpenChange={(open) => {
+                if (!open) {
+                  closeDialog();
+                } else {
+                  if (!editingChannel) {
+                    setEditingChannel(null);
+                    setChannelName("");
+                    setChannelDescription("");
+                    setSelectedIcon(availableIcons[0]);
+                  }
+                  setShowCreateDialog(true);
                 }
-                setShowCreateDialog(true);
-              }
-            }}>
+              }}
+            >
               <DialogTrigger asChild>
                 <Button
                   size="icon"
@@ -520,7 +526,9 @@ export const Channels = () => {
                                   className="h-6 w-6 mb-1"
                                   style={{ color: iconOption.color }}
                                 />
-                                <span className="text-xs">{iconOption.name}</span>
+                                <span className="text-xs">
+                                  {iconOption.name}
+                                </span>
                               </button>
                             );
                           })}
@@ -534,7 +542,9 @@ export const Channels = () => {
                     Cancel
                   </Button>
                   <Button
-                    onClick={editingChannel ? handleEditChannel : handleCreateChannel}
+                    onClick={
+                      editingChannel ? handleEditChannel : handleCreateChannel
+                    }
                     disabled={!channelName.trim()}
                   >
                     {editingChannel ? "Save Changes" : "Create Channel"}
@@ -565,7 +575,8 @@ export const Channels = () => {
               filteredChannels.map((channel) => {
                 const IconComponent = channel.icon;
                 const isSelected = channel.id === selectedChannelId;
-                const lastMessage = channel.messages[channel.messages.length - 1];
+                const lastMessage =
+                  channel.messages[channel.messages.length - 1];
                 return (
                   <div
                     key={channel.id}
@@ -689,7 +700,9 @@ export const Channels = () => {
                     return (
                       <div
                         className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: `${selectedChannel.color}20` }}
+                        style={{
+                          backgroundColor: `${selectedChannel.color}20`,
+                        }}
                       >
                         <IconComponent
                           className="h-5 w-5"
@@ -813,7 +826,9 @@ export const Channels = () => {
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <Hash className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No channel selected</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                No channel selected
+              </h3>
               <p className="text-muted-foreground">
                 Select a channel from the sidebar to start chatting
               </p>
@@ -840,7 +855,9 @@ export const Channels = () => {
                 const channel = channels.find(
                   (c) => c.id === showAddMemberDialog
                 );
-                const isMember = channel?.members.some((m) => m.id === member.id);
+                const isMember = channel?.members.some(
+                  (m) => m.id === member.id
+                );
                 return (
                   <div
                     key={member.id}
@@ -849,7 +866,9 @@ export const Channels = () => {
                     <div className="flex items-center gap-3">
                       <Avatar>
                         <AvatarImage src={member.avatar} />
-                        <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
+                        <AvatarFallback>
+                          {getInitials(member.name)}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium">{member.name}</p>

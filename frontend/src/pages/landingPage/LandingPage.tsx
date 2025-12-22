@@ -6,7 +6,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   ArrowRight,
@@ -227,7 +233,8 @@ export const LandingPage = () => {
                     <div className="flex justify-end">
                       <div className="bg-primary/10 text-foreground px-4 py-3 rounded-2xl max-w-[80%]">
                         <p className="text-sm font-medium">
-                          How much profit did I make on TikTok Shop yesterday vs. Shopify?
+                          How much profit did I make on TikTok Shop yesterday
+                          vs. Shopify?
                         </p>
                       </div>
                     </div>
@@ -265,7 +272,9 @@ export const LandingPage = () => {
                           <span className="font-medium text-foreground dark:text-white">
                             Difference
                           </span>
-                          <span className="font-bold text-green-400 text-xl">+£920</span>
+                          <span className="font-bold text-green-400 text-xl">
+                            +£920
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -344,7 +353,6 @@ export const LandingPage = () => {
           </div>
         </div>
       </section>
-
 
       {/* Partner Integrations / Compliance Hub Section */}
       <section id="platforms" className="py-20 bg-muted/10">
@@ -486,7 +494,9 @@ export const LandingPage = () => {
                     1. Break Down Data Silos
                   </h3>
                   <p className="text-lg text-muted-foreground">
-                    Stop logging into five different dashboards. We centralize your Amazon Seller Central, TikTok Shop, and Shopify data into one single source of truth.
+                    Stop logging into five different dashboards. We centralize
+                    your Amazon Seller Central, TikTok Shop, and Shopify data
+                    into one single source of truth.
                   </p>
                 </div>
                 <div className="relative bg-card border-2 border-border rounded-lg p-8 flex items-center justify-center">
@@ -510,7 +520,10 @@ export const LandingPage = () => {
                       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
                     </div>
                     <div className="w-16 h-16 bg-primary/20 rounded-lg flex items-center justify-center">
-                      <FontAwesomeIcon icon={faMixer} className="text-3xl text-primary" />
+                      <FontAwesomeIcon
+                        icon={faMixer}
+                        className="text-3xl text-primary"
+                      />
                     </div>
                   </div>
                 </div>
@@ -522,33 +535,71 @@ export const LandingPage = () => {
                   <div className="space-y-4">
                     <div className="bg-muted/50 p-4 rounded border border-border">
                       <div className="grid grid-cols-4 gap-1 text-[10px] font-mono">
-                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">£12,450</div>
-                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">#REF!</div>
-                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">£8,320</div>
-                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">£15,680</div>
-                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">£9,210</div>
-                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">£7,890</div>
-                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">#VALUE!</div>
-                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">£11,230</div>
-                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">£6,540</div>
-                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">£13,780</div>
-                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">£4,920</div>
-                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">£18,450</div>
-                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">#NAME?</div>
-                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">£10,670</div>
-                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">£5,380</div>
-                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">£14,290</div>
+                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">
+                          £12,450
+                        </div>
+                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">
+                          #REF!
+                        </div>
+                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">
+                          £8,320
+                        </div>
+                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">
+                          £15,680
+                        </div>
+                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">
+                          £9,210
+                        </div>
+                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">
+                          £7,890
+                        </div>
+                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">
+                          #VALUE!
+                        </div>
+                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">
+                          £11,230
+                        </div>
+                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">
+                          £6,540
+                        </div>
+                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">
+                          £13,780
+                        </div>
+                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">
+                          £4,920
+                        </div>
+                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">
+                          £18,450
+                        </div>
+                        <div className="p-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800">
+                          #NAME?
+                        </div>
+                        <div className="p-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800">
+                          £10,670
+                        </div>
+                        <div className="p-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">
+                          £5,380
+                        </div>
+                        <div className="p-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800">
+                          £14,290
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw className="w-5 h-5 text-primary animate-spin" />
-                      <span className="text-sm text-muted-foreground">Processing...</span>
+                      <span className="text-sm text-muted-foreground">
+                        Processing...
+                      </span>
                     </div>
                     <div className="bg-primary/10 p-4 rounded border border-primary/30">
                       <div className="h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded flex items-center justify-center">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-primary">✓ Synced</div>
-                          <div className="text-xs text-muted-foreground mt-1">All data reconciled</div>
+                          <div className="text-2xl font-bold text-primary">
+                            ✓ Synced
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            All data reconciled
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -559,7 +610,9 @@ export const LandingPage = () => {
                     2. Automate the Grunt Work
                   </h3>
                   <p className="text-lg text-muted-foreground">
-                    Cazza automates the heavy lifting of reconciliation. We map every penny of revenue and expense to Xero, ensuring your books are tax-ready 24/7.
+                    Cazza automates the heavy lifting of reconciliation. We map
+                    every penny of revenue and expense to Xero, ensuring your
+                    books are tax-ready 24/7.
                   </p>
                 </div>
               </div>
@@ -571,21 +624,27 @@ export const LandingPage = () => {
                     3. Your 24/7 AI CFO
                   </h3>
                   <p className="text-lg text-muted-foreground">
-                    Don't wait days for your accountant to reply to an email. Your AI assistant is always awake, trained on UK tax laws and e-commerce nuance, ready to answer complex queries.
+                    Don't wait days for your accountant to reply to an email.
+                    Your AI assistant is always awake, trained on UK tax laws
+                    and e-commerce nuance, ready to answer complex queries.
                   </p>
                 </div>
                 <Card className="border-2 animate-slide-in-left">
                   {/* Chat Header */}
                   <div className="border-b border-border px-4 py-2 flex items-center justify-center gap-2">
                     <Bot className="w-5 h-5 text-primary" />
-                    <h3 className="text-base font-semibold text-foreground">Ask Cazza</h3>
+                    <h3 className="text-base font-semibold text-foreground">
+                      Ask Cazza
+                    </h3>
                   </div>
                   <CardContent className="p-4 flex flex-col h-full">
                     <div className="space-y-4 flex-1 overflow-y-auto mb-4">
                       {/* User Message */}
                       <div className="flex justify-end">
                         <div className="relative max-w-xs lg:max-w-md px-4 py-3 rounded-lg bg-primary text-primary-foreground">
-                          <span className="text-sm">What is my TikTok avg sales?</span>
+                          <span className="text-sm">
+                            What is my TikTok avg sales?
+                          </span>
                         </div>
                       </div>
 
@@ -594,18 +653,28 @@ export const LandingPage = () => {
                         <div className="relative max-w-xs lg:max-w-md px-4 py-3 rounded-lg bg-card border border-border shadow-sm text-foreground">
                           <div className="text-sm space-y-2">
                             <p className="text-foreground">
-                              Your TikTok Shop average sales are <strong>£125,000</strong> per year.
+                              Your TikTok Shop average sales are{" "}
+                              <strong>£125,000</strong> per year.
                             </p>
                             <p className="text-foreground">
-                              Here's a breakdown of your recent monthly averages:
+                              Here's a breakdown of your recent monthly
+                              averages:
                             </p>
                             <ul className="list-disc ml-4 space-y-1 text-foreground">
-                              <li><strong>April:</strong> £12,500</li>
-                              <li><strong>May:</strong> £10,800</li>
-                              <li><strong>June:</strong> £11,200</li>
+                              <li>
+                                <strong>April:</strong> £12,500
+                              </li>
+                              <li>
+                                <strong>May:</strong> £10,800
+                              </li>
+                              <li>
+                                <strong>June:</strong> £11,200
+                              </li>
                             </ul>
                             <p className="text-foreground">
-                              Your average monthly sales are around <strong>£11,500</strong>, showing consistent performance across these months.
+                              Your average monthly sales are around{" "}
+                              <strong>£11,500</strong>, showing consistent
+                              performance across these months.
                             </p>
                           </div>
                         </div>
@@ -642,19 +711,25 @@ export const LandingPage = () => {
                     <div className="mb-4 flex justify-center gap-6">
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded bg-[#96BF47]"></div>
-                        <span className="text-sm font-medium text-foreground">TikTok</span>
+                        <span className="text-sm font-medium text-foreground">
+                          TikTok
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded bg-[#4A90E2]"></div>
-                        <span className="text-sm font-medium text-foreground">Shopify</span>
+                        <span className="text-sm font-medium text-foreground">
+                          Shopify
+                        </span>
                       </div>
                     </div>
                     <ResponsiveContainer width="100%" height={300}>
-                      <AreaChart data={tempRevenueData.map(item => ({ 
-                        month: item.month, 
-                        tiktok: item.revenue, 
-                        shopify: item.expenses 
-                      }))}>
+                      <AreaChart
+                        data={tempRevenueData.map((item) => ({
+                          month: item.month,
+                          tiktok: item.revenue,
+                          shopify: item.expenses,
+                        }))}
+                      >
                         <defs>
                           <linearGradient
                             id="tiktokGradient"
@@ -663,7 +738,11 @@ export const LandingPage = () => {
                             x2="0"
                             y2="1"
                           >
-                            <stop offset="5%" stopColor="#96BF47" stopOpacity={0.3} />
+                            <stop
+                              offset="5%"
+                              stopColor="#96BF47"
+                              stopOpacity={0.3}
+                            />
                             <stop
                               offset="95%"
                               stopColor="#96BF47"
@@ -677,7 +756,11 @@ export const LandingPage = () => {
                             x2="0"
                             y2="1"
                           >
-                            <stop offset="5%" stopColor="#4A90E2" stopOpacity={0.3} />
+                            <stop
+                              offset="5%"
+                              stopColor="#4A90E2"
+                              stopOpacity={0.3}
+                            />
                             <stop
                               offset="95%"
                               stopColor="#4A90E2"
@@ -695,7 +778,9 @@ export const LandingPage = () => {
                           fontSize={12}
                         />
                         <YAxis
-                          tickFormatter={(value) => `£${value.toLocaleString()}`}
+                          tickFormatter={(value) =>
+                            `£${value.toLocaleString()}`
+                          }
                           stroke="var(--muted-foreground)"
                           fontSize={12}
                         />
@@ -736,7 +821,9 @@ export const LandingPage = () => {
                     4. Scale With Confidence
                   </h3>
                   <p className="text-lg text-muted-foreground">
-                    Understand your true unit economics. Spot unprofitable SKUs instantly and double down on winners with financial visibility previously reserved for 7-figure sellers.
+                    Understand your true unit economics. Spot unprofitable SKUs
+                    instantly and double down on winners with financial
+                    visibility previously reserved for 7-figure sellers.
                   </p>
                 </div>
               </div>
@@ -813,7 +900,8 @@ export const LandingPage = () => {
                 Why to use Cazza
               </h2>
               <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-                See the difference Cazza makes in managing your eCommerce finances
+                See the difference Cazza makes in managing your eCommerce
+                finances
               </p>
             </div>
 
@@ -825,14 +913,15 @@ export const LandingPage = () => {
                     Before Cazza
                   </h3>
                   <div className="border-2 border-border rounded-lg overflow-hidden bg-background">
-                    <img 
-                      src="/beofre.png" 
+                    <img
+                      src="/beofre.png"
                       alt="Before using Cazza - Complex financial management"
                       className="w-full h-auto object-contain"
                     />
                   </div>
                   <p className="text-sm text-muted-foreground text-center">
-                    Manual data entry, spreadsheets, and time-consuming reconciliation
+                    Manual data entry, spreadsheets, and time-consuming
+                    reconciliation
                   </p>
                 </div>
               </div>
@@ -844,14 +933,15 @@ export const LandingPage = () => {
                     After Cazza
                   </h3>
                   <div className="border-2 border-primary/30 rounded-lg overflow-hidden bg-background">
-                    <img 
-                      src="/after.png" 
+                    <img
+                      src="/after.png"
                       alt="After using Cazza - Instant financial insights"
                       className="w-full h-auto object-contain"
                     />
                   </div>
                   <p className="text-sm text-muted-foreground text-center">
-                    Instant answers, automated insights, and real-time financial clarity
+                    Instant answers, automated insights, and real-time financial
+                    clarity
                   </p>
                 </div>
               </div>
@@ -887,7 +977,7 @@ export const LandingPage = () => {
                     Link your platforms in seconds
                   </p>
                 </div>
-                
+
                 {/* Toggle Switch UI Mockup */}
                 <div className="border-2 border-border rounded-lg p-6 bg-card">
                   <div className="space-y-4">
@@ -897,15 +987,21 @@ export const LandingPage = () => {
                           <span className="text-lg">🎵</span>
                         </div>
                         <div>
-                          <p className="font-semibold text-foreground">TikTok Shop</p>
-                          <p className="text-xs text-muted-foreground">Connected</p>
+                          <p className="font-semibold text-foreground">
+                            TikTok Shop
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Connected
+                          </p>
                         </div>
                       </div>
                       {/* Toggle Switch */}
                       <div className="relative inline-flex items-center">
                         <div className="w-14 h-7 bg-primary rounded-full relative cursor-pointer">
                           <div className="absolute top-0.5 right-1 w-6 h-6 bg-white rounded-full shadow-sm transition-transform"></div>
-                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-primary-foreground">ON</span>
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-primary-foreground">
+                            ON
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -932,7 +1028,7 @@ export const LandingPage = () => {
                     Get instant answers to your questions
                   </p>
                 </div>
-                
+
                 {/* Chat Bar UI Mockup */}
                 <div className="border-2 border-border rounded-lg p-6 bg-card">
                   <div className="space-y-4">
@@ -942,7 +1038,7 @@ export const LandingPage = () => {
                       </div>
                       <Logo size="sm" />
                     </div>
-                    
+
                     {/* Chat Input Mockup */}
                     <div className="relative">
                       <div className="border-2 border-primary/30 rounded-lg bg-background p-4">
@@ -960,7 +1056,7 @@ export const LandingPage = () => {
                       </div>
                       <div className="absolute -bottom-1 left-4 w-2 h-2 bg-primary rotate-45 border-l border-b border-primary/30"></div>
                     </div>
-                    
+
                     <div className="text-xs text-muted-foreground text-center pt-2">
                       Type your question and get instant insights
                     </div>
@@ -981,7 +1077,7 @@ export const LandingPage = () => {
                     Export, share, and take action
                   </p>
                 </div>
-                
+
                 {/* Action Buttons UI Mockup */}
                 <div className="border-2 border-border rounded-lg p-6 bg-card">
                   <div className="space-y-4">
@@ -992,34 +1088,56 @@ export const LandingPage = () => {
                       <div className="p-3 bg-muted/50 rounded-lg border border-border">
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Total Sales</span>
-                            <span className="font-semibold text-foreground">£12,450</span>
+                            <span className="text-muted-foreground">
+                              Total Sales
+                            </span>
+                            <span className="font-semibold text-foreground">
+                              £12,450
+                            </span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Net Profit</span>
-                            <span className="font-semibold text-green-500">£8,330</span>
+                            <span className="text-muted-foreground">
+                              Net Profit
+                            </span>
+                            <span className="font-semibold text-green-500">
+                              £8,330
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Action Buttons */}
                     <div className="space-y-2 pt-2">
-                      <Button 
+                      <Button
                         className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                         variant="default"
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
                         </svg>
                         Download PDF Report
                       </Button>
-                      <Button 
+                      <Button
                         className="w-full bg-[#4A154B] hover:bg-[#4A154B]/90 text-white"
                         variant="default"
                       >
-                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52-2.523c0-1.393 1.128-2.527 2.52-2.527h.075c.281-2.28 2.186-4.068 4.56-4.068 1.29 0 2.462.592 3.223 1.527a2.547 2.547 0 0 1 2.523-1.758c1.394 0 2.527 1.13 2.527 2.523v.075c2.28.28 4.068 2.186 4.068 4.56 0 1.29-.592 2.462-1.527 3.223a2.547 2.547 0 0 1 1.758 2.523c0 1.394-1.13 2.527-2.523 2.527h-.075a4.068 4.068 0 0 1-4.068 4.068c-1.29 0-2.462-.592-3.223-1.527a2.547 2.547 0 0 1-2.523 1.758c-1.394 0-2.527-1.13-2.527-2.523v-.075a4.068 4.068 0 0 1-4.068-4.068zm1.896-3.688h-.075c-.7 0-1.27.57-1.27 1.27s.57 1.27 1.27 1.27H6.938c.7 0 1.27-.57 1.27-1.27s-.57-1.27-1.27-1.27zm11.125 0c-.7 0-1.27.57-1.27 1.27s.57 1.27 1.27 1.27h.075c.7 0 1.27-.57 1.27-1.27s-.57-1.27-1.27-1.27zm-11.2 7.523h.075c.7 0 1.27.57 1.27 1.27s-.57 1.27-1.27 1.27h-.075c-.7 0-1.27-.57-1.27-1.27s.57-1.27 1.27-1.27zm11.125 0c.7 0 1.27.57 1.27 1.27s-.57 1.27-1.27 1.27h-.075c-.7 0-1.27-.57-1.27-1.27s.57-1.27 1.27-1.27z"/>
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52-2.523c0-1.393 1.128-2.527 2.52-2.527h.075c.281-2.28 2.186-4.068 4.56-4.068 1.29 0 2.462.592 3.223 1.527a2.547 2.547 0 0 1 2.523-1.758c1.394 0 2.527 1.13 2.527 2.523v.075c2.28.28 4.068 2.186 4.068 4.56 0 1.29-.592 2.462-1.527 3.223a2.547 2.547 0 0 1 1.758 2.523c0 1.394-1.13 2.527-2.523 2.527h-.075a4.068 4.068 0 0 1-4.068 4.068c-1.29 0-2.462-.592-3.223-1.527a2.547 2.547 0 0 1-2.523 1.758c-1.394 0-2.527-1.13-2.527-2.523v-.075a4.068 4.068 0 0 1-4.068-4.068zm1.896-3.688h-.075c-.7 0-1.27.57-1.27 1.27s.57 1.27 1.27 1.27H6.938c.7 0 1.27-.57 1.27-1.27s-.57-1.27-1.27-1.27zm11.125 0c-.7 0-1.27.57-1.27 1.27s.57 1.27 1.27 1.27h.075c.7 0 1.27-.57 1.27-1.27s-.57-1.27-1.27-1.27zm-11.2 7.523h.075c.7 0 1.27.57 1.27 1.27s-.57 1.27-1.27 1.27h-.075c-.7 0-1.27-.57-1.27-1.27s.57-1.27 1.27-1.27zm11.125 0c.7 0 1.27.57 1.27 1.27s-.57 1.27-1.27 1.27h-.075c-.7 0-1.27-.57-1.27-1.27s.57-1.27 1.27-1.27z" />
                         </svg>
                         Share to Slack
                       </Button>
@@ -1059,7 +1177,8 @@ export const LandingPage = () => {
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground pt-2">
-                      Perfect for founders who want instant clarity without the jargon.
+                      Perfect for founders who want instant clarity without the
+                      jargon.
                     </p>
                   </div>
 
@@ -1160,9 +1279,7 @@ export const LandingPage = () => {
                             className="flex items-start gap-2 text-sm"
                           >
                             <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                            <span className="text-foreground">
-                              {feature}
-                            </span>
+                            <span className="text-foreground">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -1251,32 +1368,38 @@ export const LandingPage = () => {
               Start Free Trial
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            
+
             {/* Compliance Logos */}
             <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
               <div className="flex flex-col items-center gap-1">
-                <img 
-                  src="/ISO.png" 
-                  alt="ISO 27001" 
+                <img
+                  src="/ISO.png"
+                  alt="ISO 27001"
                   className="w-16 h-16 object-contain"
                 />
-                <span className="text-xs text-background/70">ISO 27001 Compliant</span>
+                <span className="text-xs text-background/70">
+                  ISO 27001 Compliant
+                </span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <img 
-                  src="/AES.png" 
-                  alt="AES-256 Encryption" 
+                <img
+                  src="/AES.png"
+                  alt="AES-256 Encryption"
                   className="w-16 h-16 object-contain"
                 />
-                <span className="text-xs text-background/70">Bank-Level AES-256 Encryption</span>
+                <span className="text-xs text-background/70">
+                  Bank-Level AES-256 Encryption
+                </span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <img 
-                  src="/GDPR.png" 
-                  alt="GDPR Compliant" 
+                <img
+                  src="/GDPR.png"
+                  alt="GDPR Compliant"
                   className="w-16 h-16 object-contain"
                 />
-                <span className="text-xs text-background/70">GDPR Compliant</span>
+                <span className="text-xs text-background/70">
+                  GDPR Compliant
+                </span>
               </div>
             </div>
           </div>

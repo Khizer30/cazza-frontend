@@ -93,8 +93,12 @@ export const TeamSettings = () => {
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [cancelInviteId, setCancelInviteId] = useState<string | null>(null);
   const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
-  const [memberIntervals, setMemberIntervals] = useState<Record<string, "monthly" | "yearly">>({});
-  const [payingForMemberId, setPayingForMemberId] = useState<string | null>(null);
+  const [memberIntervals, setMemberIntervals] = useState<
+    Record<string, "monthly" | "yearly">
+  >({});
+  const [payingForMemberId, setPayingForMemberId] = useState<string | null>(
+    null
+  );
   const hasProcessedMessage = useRef(false);
 
   // Check for payment success/failure message in URL
@@ -102,18 +106,21 @@ export const TeamSettings = () => {
     const message = searchParams.get("message");
     if (message && !hasProcessedMessage.current) {
       hasProcessedMessage.current = true;
-      
+
       // Show toast first
       if (message === "success") {
-        showToast("Payment successful! Team member subscription is now active.", "success");
+        showToast(
+          "Payment successful! Team member subscription is now active.",
+          "success"
+        );
       } else {
         showToast("Payment failed. Please try again.", "error");
       }
-      
+
       // Remove query parameter from URL
       const newUrl = window.location.pathname;
       window.history.replaceState({}, "", newUrl);
-      
+
       // Refresh team data to get updated subscription status
       fetchAllTeamData();
     }
@@ -156,25 +163,28 @@ export const TeamSettings = () => {
     setRemoveMemberId(memberId);
   }, []);
 
-  const handlePayForMember = useCallback(async (member: any) => {
-    const userId = member.id;
-    
-    if (!userId) {
-      showToast("Member ID not found. Please contact support.", "error");
-      return;
-    }
-    
-    const interval = memberIntervals[member.id] || "monthly";
-    setPayingForMemberId(member.id);
-    try {
-      await payForTeamMember(userId, interval);
-    } catch (error) {
-      console.error("Error paying for team member:", error);
-      // Error is already handled in payForTeamMember hook
-    } finally {
-      setPayingForMemberId(null);
-    }
-  }, [memberIntervals, payForTeamMember, showToast]);
+  const handlePayForMember = useCallback(
+    async (member: any) => {
+      const userId = member.id;
+
+      if (!userId) {
+        showToast("Member ID not found. Please contact support.", "error");
+        return;
+      }
+
+      const interval = memberIntervals[member.id] || "monthly";
+      setPayingForMemberId(member.id);
+      try {
+        await payForTeamMember(userId, interval);
+      } catch (error) {
+        console.error("Error paying for team member:", error);
+        // Error is already handled in payForTeamMember hook
+      } finally {
+        setPayingForMemberId(null);
+      }
+    },
+    [memberIntervals, payForTeamMember, showToast]
+  );
 
   const confirmRemoveMember = useCallback(async () => {
     if (removeMemberId) {
@@ -209,7 +219,9 @@ export const TeamSettings = () => {
   };
 
   // Helper function to get member's current subscription interval (normalized)
-  const getMemberSubscriptionInterval = (member: any): "monthly" | "yearly" | null => {
+  const getMemberSubscriptionInterval = (
+    member: any
+  ): "monthly" | "yearly" | null => {
     if (!member.subscription || member.subscription.status !== "ACTIVE") {
       return null;
     }
@@ -227,12 +239,15 @@ export const TeamSettings = () => {
   const isPayButtonDisabled = (member: any): boolean => {
     const selectedInterval = memberIntervals[member.id] || "monthly";
     const currentSubscriptionInterval = getMemberSubscriptionInterval(member);
-    
+
     // If member has an active subscription with the same interval, disable the button
-    if (currentSubscriptionInterval && currentSubscriptionInterval === selectedInterval) {
+    if (
+      currentSubscriptionInterval &&
+      currentSubscriptionInterval === selectedInterval
+    ) {
       return true;
     }
-    
+
     return false;
   };
 
@@ -244,15 +259,15 @@ export const TeamSettings = () => {
 
     const subscription = member.subscription;
     const status = subscription.status;
-    
+
     if (status === "ACTIVE") {
       const planName = subscription.name || "Active Plan";
       const interval = subscription.interval || "";
       const price = subscription.price ? `£${subscription.price}` : "";
-      const expiryDate = subscription.expiryDate 
-        ? new Date(subscription.expiryDate).toLocaleDateString() 
+      const expiryDate = subscription.expiryDate
+        ? new Date(subscription.expiryDate).toLocaleDateString()
         : "";
-      
+
       let display = `${planName}`;
       if (price) {
         display += ` • ${price}/${interval}`;
@@ -262,23 +277,24 @@ export const TeamSettings = () => {
       }
       return display;
     } else if (status === "TRIAL") {
-      const expiryDate = subscription.expiryDate 
-        ? new Date(subscription.expiryDate).toLocaleDateString() 
+      const expiryDate = subscription.expiryDate
+        ? new Date(subscription.expiryDate).toLocaleDateString()
         : "";
       return `Trial • ${expiryDate ? `Expires ${expiryDate}` : "Active"}`;
     } else if (status === "CANCELED") {
-      const expiryDate = subscription.expiryDate 
-        ? new Date(subscription.expiryDate).toLocaleDateString() 
+      const expiryDate = subscription.expiryDate
+        ? new Date(subscription.expiryDate).toLocaleDateString()
         : "";
       return `Canceled${expiryDate ? ` • Expires ${expiryDate}` : ""}`;
     }
-    
+
     return null;
   };
 
   // Filter out current user from members list
   const filteredMembers = members.filter(
-    (member) => member.userId !== currentUser?.id && member.user_id !== currentUser?.id
+    (member) =>
+      member.userId !== currentUser?.id && member.user_id !== currentUser?.id
   );
 
   if (isLoading && !analytics) {
@@ -294,386 +310,437 @@ export const TeamSettings = () => {
       <SettingsSidebar />
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
-      {/* Team overview  */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="px-6 py-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Users className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">Team Members</h3>
-            </div>
-            <p className="text-3xl font-bold">
-              {analytics?.totalTeamMembers ?? filteredMembers.length}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {filteredMembers.length} active
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="px-6 py-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Mail className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">Pending Invites</h3>
-            </div>
-            <p className="text-3xl font-bold">
-              {analytics?.pendingInvitations ?? invitations.length}
-            </p>
-            <p className="text-sm text-muted-foreground">Awaiting response</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="px-6 py-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">Admins</h3>
-            </div>
-            <p className="text-3xl font-bold">
-              {analytics?.adminCount ?? filteredMembers.filter((m) => m.role?.toLowerCase() === "admin").length}
-            </p>
-            <p className="text-sm text-muted-foreground">Admin privileges</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Team Members and Invitations */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Team Members</CardTitle>
-              <CardDescription>
-                Manage your team members and their access permissions
-              </CardDescription>
-            </div>
-
-            {canManageTeam && (
-              <Button className="gap-2" onClick={handleInvite}>
-                Invite Member
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {/* Pending Members Section */}
-            {invitations.length > 0 && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Pending Members</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Invitations that are awaiting acceptance
-                  </p>
+          {/* Team overview  */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="px-6 py-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold">Team Members</h3>
                 </div>
-                {invitations.map((invitation) => {
-                  const expiresAt = invitation.expiresAt 
-                    ? new Date(invitation.expiresAt) 
-                    : null;
-                  const isExpired = expiresAt ? expiresAt < new Date() : false;
-                  
-                  return (
-                    <div
-                      key={invitation.id}
-                      className="flex items-center justify-between p-4 border rounded-lg bg-muted/30"
-                    >
-                      <div className="flex items-center gap-4">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback>
-                            {invitation.email?.[0]?.toUpperCase() ?? "?"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold">{invitation.email}</h3>
-                            <Badge variant="outline" className="capitalize text-xs">
-                              {invitation.role?.toLowerCase() || "member"}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Pending invitation
-                          </p>
-                          {expiresAt && (
-                            <p className={`text-xs mt-1 ${isExpired ? "text-destructive font-medium" : "text-muted-foreground"}`}>
-                              {isExpired 
-                                ? "Expired" 
-                                : `Expires ${expiresAt.toLocaleDateString()} at ${expiresAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {canManageTeam && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleCancelInvitation(invitation.id)}
-                            className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
-                            disabled={isLoading}
-                          >
-                            <X className="h-4 w-4 mr-1" />
-                            Cancel
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Team Members Section */}
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Team Members</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Active team members in your organization
+                <p className="text-3xl font-bold">
+                  {analytics?.totalTeamMembers ?? filteredMembers.length}
                 </p>
+                <p className="text-sm text-muted-foreground">
+                  {filteredMembers.length} active
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="px-6 py-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Mail className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold">Pending Invites</h3>
+                </div>
+                <p className="text-3xl font-bold">
+                  {analytics?.pendingInvitations ?? invitations.length}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Awaiting response
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="px-6 py-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold">Admins</h3>
+                </div>
+                <p className="text-3xl font-bold">
+                  {analytics?.adminCount ??
+                    filteredMembers.filter(
+                      (m) => m.role?.toLowerCase() === "admin"
+                    ).length}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Admin privileges
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Team Members and Invitations */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Team Members</CardTitle>
+                  <CardDescription>
+                    Manage your team members and their access permissions
+                  </CardDescription>
+                </div>
+
+                {canManageTeam && (
+                  <Button className="gap-2" onClick={handleInvite}>
+                    Invite Member
+                  </Button>
+                )}
               </div>
-              {filteredMembers.length > 0 ? (
-                filteredMembers.map((member) => (
-                  <div
-                    key={member.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback>{getInitials(member)}</AvatarFallback>
-                      </Avatar>
-
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">
-                            {getDisplayName(member)}
-                          </h3>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {getMemberEmail(member)}
-                        </p>
-                        {getSubscriptionDisplay(member) && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {getSubscriptionDisplay(member)}
-                          </p>
-                        )}
-                        {member.joined_at && (
-                          <p className="text-xs text-muted-foreground">
-                            Joined {new Date(member.joined_at).toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Pending Members Section */}
+                {invitations.length > 0 && (
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">
+                        Pending Members
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Invitations that are awaiting acceptance
+                      </p>
                     </div>
+                    {invitations.map((invitation) => {
+                      const expiresAt = invitation.expiresAt
+                        ? new Date(invitation.expiresAt)
+                        : null;
+                      const isExpired = expiresAt
+                        ? expiresAt < new Date()
+                        : false;
 
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="capitalize">
-                        {member.role?.toLowerCase()}
-                      </Badge>
-                      {canManageTeam && (
-                        <>
-                          {/* Subscription checkout for team members */}
-                          {member.role?.toUpperCase() !== "OWNER" && (
-                            <div className="flex items-center gap-2">
-                              <Select
-                                value={memberIntervals[member.id] || "monthly"}
-                                onValueChange={(value: "monthly" | "yearly") => {
-                                  setMemberIntervals(prev => ({
-                                    ...prev,
-                                    [member.id]: value
-                                  }));
-                                }}
-                              >
-                                <SelectTrigger className="w-[120px]">
-                                  <SelectValue placeholder="Interval" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="monthly">Monthly</SelectItem>
-                                  <SelectItem value="yearly">Yearly</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handlePayForMember(member)}
-                                disabled={isLoading || payingForMemberId === member.id || isPayButtonDisabled(member)}
-                                className="gap-2"
-                              >
-                                {payingForMemberId === member.id ? (
-                                  <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Processing...
-                                  </>
-                                ) : (
-                                  <>
-                                    <CreditCard className="h-4 w-4" />
-                                    Pay for him
-                                  </>
-                                )}
-                              </Button>
+                      return (
+                        <div
+                          key={invitation.id}
+                          className="flex items-center justify-between p-4 border rounded-lg bg-muted/30"
+                        >
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-10 w-10">
+                              <AvatarFallback>
+                                {invitation.email?.[0]?.toUpperCase() ?? "?"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-semibold">
+                                  {invitation.email}
+                                </h3>
+                                <Badge
+                                  variant="outline"
+                                  className="capitalize text-xs"
+                                >
+                                  {invitation.role?.toLowerCase() || "member"}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                Pending invitation
+                              </p>
+                              {expiresAt && (
+                                <p
+                                  className={`text-xs mt-1 ${isExpired ? "text-destructive font-medium" : "text-muted-foreground"}`}
+                                >
+                                  {isExpired
+                                    ? "Expired"
+                                    : `Expires ${expiresAt.toLocaleDateString()} at ${expiresAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
+                                </p>
+                              )}
                             </div>
-                          )}
-                          {/* Only show role toggle for members (not OWNER) */}
-                          {member.role?.toUpperCase() !== "OWNER" && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={async () => {
-                                try {
-                                  // The API expects the team member's ID (member.id) in the URL
-                                  // Based on endpoint: /team/member/{{userID}}/role where userID is the team member ID
-                                  const teamMemberId = member.id;
-                                  
-                                  if (teamMemberId) {
-                                    await updateTeamMemberRole(teamMemberId, member.role || "MEMBER");
-                                  } else {
-                                    console.error("Team member ID not found:", member);
-                                  }
-                                } catch (error) {
-                                  console.error("Error updating team member role:", error);
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {canManageTeam && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleCancelInvitation(invitation.id)
                                 }
-                              }}
-                              disabled={isLoading}
-                            >
-                              {member.role?.toUpperCase() === "ADMIN" ? "Make Member" : "Make Admin"}
-                            </Button>
+                                className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
+                                disabled={isLoading}
+                              >
+                                <X className="h-4 w-4 mr-1" />
+                                Cancel
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Team Members Section */}
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Team Members</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Active team members in your organization
+                    </p>
+                  </div>
+                  {filteredMembers.length > 0 ? (
+                    filteredMembers.map((member) => (
+                      <div
+                        key={member.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-10 w-10">
+                            <AvatarFallback>
+                              {getInitials(member)}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold">
+                                {getDisplayName(member)}
+                              </h3>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {getMemberEmail(member)}
+                            </p>
+                            {getSubscriptionDisplay(member) && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {getSubscriptionDisplay(member)}
+                              </p>
+                            )}
+                            {member.joined_at && (
+                              <p className="text-xs text-muted-foreground">
+                                Joined{" "}
+                                {new Date(
+                                  member.joined_at
+                                ).toLocaleDateString()}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline" className="capitalize">
+                            {member.role?.toLowerCase()}
+                          </Badge>
+                          {canManageTeam && (
+                            <>
+                              {/* Subscription checkout for team members */}
+                              {member.role?.toUpperCase() !== "OWNER" && (
+                                <div className="flex items-center gap-2">
+                                  <Select
+                                    value={
+                                      memberIntervals[member.id] || "monthly"
+                                    }
+                                    onValueChange={(
+                                      value: "monthly" | "yearly"
+                                    ) => {
+                                      setMemberIntervals((prev) => ({
+                                        ...prev,
+                                        [member.id]: value,
+                                      }));
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-[120px]">
+                                      <SelectValue placeholder="Interval" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="monthly">
+                                        Monthly
+                                      </SelectItem>
+                                      <SelectItem value="yearly">
+                                        Yearly
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePayForMember(member)}
+                                    disabled={
+                                      isLoading ||
+                                      payingForMemberId === member.id ||
+                                      isPayButtonDisabled(member)
+                                    }
+                                    className="gap-2"
+                                  >
+                                    {payingForMemberId === member.id ? (
+                                      <>
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Processing...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <CreditCard className="h-4 w-4" />
+                                        Pay for him
+                                      </>
+                                    )}
+                                  </Button>
+                                </div>
+                              )}
+                              {/* Only show role toggle for members (not OWNER) */}
+                              {member.role?.toUpperCase() !== "OWNER" && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={async () => {
+                                    try {
+                                      // The API expects the team member's ID (member.id) in the URL
+                                      // Based on endpoint: /team/member/{{userID}}/role where userID is the team member ID
+                                      const teamMemberId = member.id;
+
+                                      if (teamMemberId) {
+                                        await updateTeamMemberRole(
+                                          teamMemberId,
+                                          member.role || "MEMBER"
+                                        );
+                                      } else {
+                                        console.error(
+                                          "Team member ID not found:",
+                                          member
+                                        );
+                                      }
+                                    } catch (error) {
+                                      console.error(
+                                        "Error updating team member role:",
+                                        error
+                                      );
+                                    }
+                                  }}
+                                  disabled={isLoading}
+                                >
+                                  {member.role?.toUpperCase() === "ADMIN"
+                                    ? "Make Member"
+                                    : "Make Admin"}
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoveMember(member.id)}
+                                className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
+                                disabled={isLoading}
+                              >
+                                Remove
+                              </Button>
+                            </>
                           )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveMember(member.id)}
-                            className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
-                            disabled={isLoading}
-                          >
-                            Remove
-                          </Button>
-                        </>
-                      )}
+                        </div>
+                      </div>
+                    ))
+                  ) : invitations.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No team members yet. Invite your first member to get
+                      started!
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No team members yet.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Role Permissions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Role Permissions</CardTitle>
+              <CardDescription>
+                Overview of what each role can do in your organization
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {roles.map((role) => (
+                  <div key={role.name} className="p-4 border rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      {role.icon}
+                      <h3 className="font-semibold">{role.name}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {role.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {role.permissions.map((permission) => (
+                        <Badge
+                          key={permission}
+                          variant="outline"
+                          className="text-xs"
+                        >
+                          {permission}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                ))
-              ) : invitations.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No team members yet. Invite your first member to get started!
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  No team members yet.
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Role Permissions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Role Permissions</CardTitle>
-          <CardDescription>
-            Overview of what each role can do in your organization
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {roles.map((role) => (
-              <div key={role.name} className="p-4 border rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  {role.icon}
-                  <h3 className="font-semibold">{role.name}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {role.description}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {role.permissions.map((permission) => (
-                    <Badge
-                      key={permission}
-                      variant="outline"
-                      className="text-xs"
-                    >
-                      {permission}
-                    </Badge>
-                  ))}
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
 
-      {/* Invite Team Member Dialog */}
-      <TeamInviteDialog
-        open={isInviteDialogOpen}
-        onOpenChange={setIsInviteDialogOpen}
-        onInviteSuccess={handleInviteSuccess}
-      />
+          {/* Invite Team Member Dialog */}
+          <TeamInviteDialog
+            open={isInviteDialogOpen}
+            onOpenChange={setIsInviteDialogOpen}
+            onInviteSuccess={handleInviteSuccess}
+          />
 
-      {/* Cancel Invitation Confirmation Dialog */}
-      <AlertDialog
-        open={cancelInviteId !== null}
-        onOpenChange={(open) => !open && setCancelInviteId(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Cancel Invitation</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to cancel this invitation? The person will no longer be able to accept it.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setCancelInviteId(null)}>
-              Keep Invitation
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmCancelInvitation}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Cancelling...
-                </>
-              ) : (
-                "Cancel Invitation"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          {/* Cancel Invitation Confirmation Dialog */}
+          <AlertDialog
+            open={cancelInviteId !== null}
+            onOpenChange={(open) => !open && setCancelInviteId(null)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancel Invitation</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to cancel this invitation? The person
+                  will no longer be able to accept it.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setCancelInviteId(null)}>
+                  Keep Invitation
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={confirmCancelInvitation}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    "Cancel Invitation"
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
-      {/* Remove Member Confirmation Dialog */}
-      <AlertDialog
-        open={removeMemberId !== null}
-        onOpenChange={(open) => !open && setRemoveMemberId(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to remove this team member? They will lose access to the workspace immediately.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setRemoveMemberId(null)}>
-              Keep Member
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmRemoveMember}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Removing...
-                </>
-              ) : (
-                "Remove Member"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          {/* Remove Member Confirmation Dialog */}
+          <AlertDialog
+            open={removeMemberId !== null}
+            onOpenChange={(open) => !open && setRemoveMemberId(null)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to remove this team member? They will
+                  lose access to the workspace immediately.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setRemoveMemberId(null)}>
+                  Keep Member
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={confirmRemoveMember}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Removing...
+                    </>
+                  ) : (
+                    "Remove Member"
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>

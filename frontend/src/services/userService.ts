@@ -1,9 +1,9 @@
 import apiInvoker from "@/lib/apiInvoker";
 import axiosInstance from "@/lib/axiosInstance";
 import { END_POINT } from "@/lib/url";
-import type { 
-  ONBOARDING_PAYLOAD, 
-  ONBOARDING_RESPONSE, 
+import type {
+  ONBOARDING_PAYLOAD,
+  ONBOARDING_RESPONSE,
   USER_PROFILE_RESPONSE,
   UPDATE_USER_PAYLOAD,
   UPDATE_USER_RESPONSE,
@@ -12,7 +12,7 @@ import type {
   DELETE_USER_RESPONSE,
   START_SUBSCRIPTION_PAYLOAD,
   START_SUBSCRIPTION_RESPONSE,
-  UNSUBSCRIBE_RESPONSE
+  UNSUBSCRIBE_RESPONSE,
 } from "@/types/auth";
 
 export const getUserProfileService = () => {
@@ -20,12 +20,16 @@ export const getUserProfileService = () => {
 };
 
 export const onboardingService = (payload: ONBOARDING_PAYLOAD) => {
-  return apiInvoker<ONBOARDING_RESPONSE>(END_POINT.user.onboarding, "POST", payload);
+  return apiInvoker<ONBOARDING_RESPONSE>(
+    END_POINT.user.onboarding,
+    "POST",
+    payload
+  );
 };
 
 export const updateUserService = async (payload: UPDATE_USER_PAYLOAD) => {
   const formData = new FormData();
-  
+
   if (payload.firstName !== undefined) {
     formData.append("firstName", payload.firstName);
   }
@@ -38,7 +42,7 @@ export const updateUserService = async (payload: UPDATE_USER_PAYLOAD) => {
   if (payload.profileImage instanceof File) {
     formData.append("profileImage", payload.profileImage);
   }
-  
+
   const response = await axiosInstance({
     url: END_POINT.user.profile,
     method: "PUT",
@@ -47,23 +51,34 @@ export const updateUserService = async (payload: UPDATE_USER_PAYLOAD) => {
       "Content-Type": "multipart/form-data",
     },
   });
-  
+
   return response.data as UPDATE_USER_RESPONSE;
 };
 
-export const updateBusinessProfileService = (payload: UPDATE_BUSINESS_PROFILE_PAYLOAD) => {
-  return apiInvoker<UPDATE_BUSINESS_PROFILE_RESPONSE>(END_POINT.user.businessProfile, "PUT", payload);
+export const updateBusinessProfileService = (
+  payload: UPDATE_BUSINESS_PROFILE_PAYLOAD
+) => {
+  return apiInvoker<UPDATE_BUSINESS_PROFILE_RESPONSE>(
+    END_POINT.user.businessProfile,
+    "PUT",
+    payload
+  );
 };
 
 export const deleteUserService = () => {
   return apiInvoker<DELETE_USER_RESPONSE>(END_POINT.user.profile, "DELETE");
 };
 
-export const startSubscriptionService = (payload: START_SUBSCRIPTION_PAYLOAD) => {
-  return apiInvoker<START_SUBSCRIPTION_RESPONSE>(END_POINT.user.subscription, "POST", payload);
+export const startSubscriptionService = (
+  payload: START_SUBSCRIPTION_PAYLOAD
+) => {
+  return apiInvoker<START_SUBSCRIPTION_RESPONSE>(
+    END_POINT.user.subscription,
+    "POST",
+    payload
+  );
 };
 
 export const unsubscribeService = () => {
   return apiInvoker<UNSUBSCRIBE_RESPONSE>(END_POINT.user.unsubscribe, "POST");
 };
-

@@ -23,14 +23,15 @@ const plans: { name: string; price?: number; type: "rookie" | "master" }[] = [
 ];
 
 export const BillingSettings = () => {
-  const { startSubscription, unsubscribe, isLoading, fetchUserProfile } = useUser();
+  const { startSubscription, unsubscribe, isLoading, fetchUserProfile } =
+    useUser();
   const { user } = useUserStore();
   const { showToast } = useToast();
   const [searchParams] = useSearchParams();
   const hasProcessedMessage = useRef(false);
-  
+
   const subscription = user?.subscription || null;
-  
+
   useEffect(() => {
     if (!user) {
       fetchUserProfile();
@@ -42,55 +43,60 @@ export const BillingSettings = () => {
     const message = searchParams.get("message");
     if (message && !hasProcessedMessage.current) {
       hasProcessedMessage.current = true;
-      
+
       // Show toast first
       if (message === "success") {
-        showToast("Payment successful! Your subscription is now active.", "success");
+        showToast(
+          "Payment successful! Your subscription is now active.",
+          "success"
+        );
       } else {
         showToast("Payment failed. Please try again.", "error");
       }
-      
+
       // Remove query parameter from URL
       const newUrl = window.location.pathname;
       window.history.replaceState({}, "", newUrl);
-      
+
       // Refresh user profile to get updated subscription status
       fetchUserProfile();
     }
   }, [searchParams, showToast, fetchUserProfile]);
-  
+
   // Helper function to get plan name from subscription
   const getPlanName = (sub: Subscription | null) => {
     if (!sub) return null;
-    
+
     // First check if planType is explicitly set
     if (sub.planType) {
       return sub.planType === "master" ? "Master" : "Rookie";
     }
-    
+
     // Fallback to interval: monthly = Rookie, yearly = Master
     if (sub.interval) {
       return sub.interval === "yearly" ? "Master" : "Rookie";
     }
-    
+
     // Default to Rookie if neither is available
     return "Rookie";
   };
-  
+
   // Helper function to check if subscription is active
   const isSubscriptionActive = (sub: Subscription | null) => {
     if (!sub) return false;
     return sub.status === "ACTIVE" || sub.status === "TRIAL";
   };
-  
+
   // Helper function to check if subscription is in trial
   const isTrial = (sub: Subscription | null) => {
     if (!sub) return false;
-    return sub.status === "TRIAL" && 
-           sub.expiryDate && 
-           new Date(sub.expiryDate) > new Date();
+    return (
+      sub.status === "TRIAL" &&
+      sub.expiryDate &&
+      new Date(sub.expiryDate) > new Date()
+    );
   };
-  
+
   // Handlers (placeholders) - replace with real API integration
   const handleManageSubscription = async () => {
     try {
@@ -99,7 +105,6 @@ export const BillingSettings = () => {
       console.error(err);
     }
   };
-
 
   const handleStartTrial = async (planType: "rookie" | "master" = "rookie") => {
     try {
@@ -119,157 +124,175 @@ export const BillingSettings = () => {
       <SettingsSidebar />
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
-      {/* Current Plan - Only show if plan is active */}
-      {subscription && isActive && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Current Plan</CardTitle>
-              <div className="ml-4">
-                <Badge>{planName || "No Plan"}</Badge>
-              </div>
-            </div>
-            <CardDescription>
-              Your subscription status and details
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between p-4 bg-accent rounded-lg">
-              <div>
-                <h3 className="font-semibold text-lg text-accent-foreground">
-                  {planName || "No Active Plan"}
-                </h3>
-                {isTrialActive ? (
-                  <p className="text-accent-foreground/70">
-                    Free trial active • Ends:{" "}
-                    {subscription.expiryDate && new Date(subscription.expiryDate).toLocaleDateString()}
-                  </p>
-                ) : subscription.status === "ACTIVE" ? (
-                  <p className="text-accent-foreground/70">
-                    {subscription.customAmount
-                      ? `£${(subscription.customAmount / 100).toFixed(2)}/${subscription.interval || "month"} • `
-                      : ""}
-                    {subscription.expiryDate
-                      ? `Next billing: ${new Date(subscription.expiryDate).toLocaleDateString()}`
-                      : "Active subscription"}
-                    {subscription.autoRenew ? " • Auto-renew enabled" : " • Auto-renew disabled"}
-                  </p>
-                ) : subscription.status === "CANCELED" ? (
-                  <p className="text-accent-foreground/70">
-                    Subscription canceled
-                    {subscription.expiryDate && ` • Expires: ${new Date(subscription.expiryDate).toLocaleDateString()}`}
-                  </p>
-                ) : (
-                  <p className="text-accent-foreground/70">
-                    No active subscription
-                  </p>
-                )}
-              </div>
-              <Badge
-                variant={
-                  subscription.status === "ACTIVE"
-                    ? "default"
-                    : subscription.status === "TRIAL"
-                    ? "secondary"
-                    : "outline"
-                }
-              >
-                {subscription.status === "ACTIVE"
-                  ? "Active"
-                  : subscription.status === "TRIAL"
-                  ? "Trial"
-                  : subscription.status === "CANCELED"
-                  ? "Canceled"
-                  : "No Plan"}
-              </Badge>
-            </div>
-            <div className="mt-4 flex gap-2">
-              {subscription.status === "ACTIVE" && (
-                <>
-                  <Button
-                    onClick={handleManageSubscription}
-                    disabled={isLoading}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Manage Subscription
-                  </Button>
-                  <Button
-                    onClick={unsubscribe}
-                    disabled={isLoading}
-                    variant="destructive"
-                    className="flex-1"
-                  >
-                    Unsubscribe
-                  </Button>
-                </>
-              )}
-              {subscription.status === "CANCELED" && (
-                <Button
-                  disabled={true}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Subscription Canceled
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Available Plans */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Available Plans</CardTitle>
-          <CardDescription>
-            Choose the plan that best fits your needs
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PlanCards
-            currentPlan={isActive ? planName || null : null}
-            loading={isLoading}
-            showActions={false}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            {plans.map((plan) => {
-              const isCurrentPlan = planName === plan.name;
-              const isPlanActive = isCurrentPlan && isActive;
-              
-              return (
-                <div key={plan.name}>
-                  <div className="space-y-2">
-                    {isTrialActive && subscription?.planType === plan.type ? (
-                      <Button variant="secondary" className="w-full" disabled>
-                        Trial Active • Ends:{" "}
-                        {subscription.expiryDate && new Date(subscription.expiryDate).toLocaleDateString()}
-                      </Button>
-                    ) : isPlanActive && subscription ? (
-                      // Show subscription status for active paid subscriptions
-                      <Button variant="secondary" className="w-full" disabled>
-                        {subscription.customAmount
-                          ? `Active • £${(subscription.customAmount / 100).toFixed(2)}/${subscription.interval || "month"}`
-                          : subscription.status === "ACTIVE"
-                          ? "Active Subscription"
-                          : "Trial Active"}
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full"
-                        onClick={() => handleStartTrial(plan.type)}
-                        disabled={isLoading}
-                      >
-                        Subscribe now
-                      </Button>
-                    )}
+          {/* Current Plan - Only show if plan is active */}
+          {subscription && isActive && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Current Plan</CardTitle>
+                  <div className="ml-4">
+                    <Badge>{planName || "No Plan"}</Badge>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                <CardDescription>
+                  Your subscription status and details
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-accent rounded-lg">
+                  <div>
+                    <h3 className="font-semibold text-lg text-accent-foreground">
+                      {planName || "No Active Plan"}
+                    </h3>
+                    {isTrialActive ? (
+                      <p className="text-accent-foreground/70">
+                        Free trial active • Ends:{" "}
+                        {subscription.expiryDate &&
+                          new Date(
+                            subscription.expiryDate
+                          ).toLocaleDateString()}
+                      </p>
+                    ) : subscription.status === "ACTIVE" ? (
+                      <p className="text-accent-foreground/70">
+                        {subscription.customAmount
+                          ? `£${(subscription.customAmount / 100).toFixed(2)}/${subscription.interval || "month"} • `
+                          : ""}
+                        {subscription.expiryDate
+                          ? `Next billing: ${new Date(subscription.expiryDate).toLocaleDateString()}`
+                          : "Active subscription"}
+                        {subscription.autoRenew
+                          ? " • Auto-renew enabled"
+                          : " • Auto-renew disabled"}
+                      </p>
+                    ) : subscription.status === "CANCELED" ? (
+                      <p className="text-accent-foreground/70">
+                        Subscription canceled
+                        {subscription.expiryDate &&
+                          ` • Expires: ${new Date(subscription.expiryDate).toLocaleDateString()}`}
+                      </p>
+                    ) : (
+                      <p className="text-accent-foreground/70">
+                        No active subscription
+                      </p>
+                    )}
+                  </div>
+                  <Badge
+                    variant={
+                      subscription.status === "ACTIVE"
+                        ? "default"
+                        : subscription.status === "TRIAL"
+                          ? "secondary"
+                          : "outline"
+                    }
+                  >
+                    {subscription.status === "ACTIVE"
+                      ? "Active"
+                      : subscription.status === "TRIAL"
+                        ? "Trial"
+                        : subscription.status === "CANCELED"
+                          ? "Canceled"
+                          : "No Plan"}
+                  </Badge>
+                </div>
+                <div className="mt-4 flex gap-2">
+                  {subscription.status === "ACTIVE" && (
+                    <>
+                      <Button
+                        onClick={handleManageSubscription}
+                        disabled={isLoading}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        Manage Subscription
+                      </Button>
+                      <Button
+                        onClick={unsubscribe}
+                        disabled={isLoading}
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        Unsubscribe
+                      </Button>
+                    </>
+                  )}
+                  {subscription.status === "CANCELED" && (
+                    <Button
+                      disabled={true}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Subscription Canceled
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Available Plans */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Available Plans</CardTitle>
+              <CardDescription>
+                Choose the plan that best fits your needs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PlanCards
+                currentPlan={isActive ? planName || null : null}
+                loading={isLoading}
+                showActions={false}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                {plans.map((plan) => {
+                  const isCurrentPlan = planName === plan.name;
+                  const isPlanActive = isCurrentPlan && isActive;
+
+                  return (
+                    <div key={plan.name}>
+                      <div className="space-y-2">
+                        {isTrialActive &&
+                        subscription?.planType === plan.type ? (
+                          <Button
+                            variant="secondary"
+                            className="w-full"
+                            disabled
+                          >
+                            Trial Active • Ends:{" "}
+                            {subscription.expiryDate &&
+                              new Date(
+                                subscription.expiryDate
+                              ).toLocaleDateString()}
+                          </Button>
+                        ) : isPlanActive && subscription ? (
+                          // Show subscription status for active paid subscriptions
+                          <Button
+                            variant="secondary"
+                            className="w-full"
+                            disabled
+                          >
+                            {subscription.customAmount
+                              ? `Active • £${(subscription.customAmount / 100).toFixed(2)}/${subscription.interval || "month"}`
+                              : subscription.status === "ACTIVE"
+                                ? "Active Subscription"
+                                : "Trial Active"}
+                          </Button>
+                        ) : (
+                          <Button
+                            className="w-full"
+                            onClick={() => handleStartTrial(plan.type)}
+                            disabled={isLoading}
+                          >
+                            Subscribe now
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

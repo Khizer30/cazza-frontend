@@ -15,21 +15,23 @@ export const useUserStore = create<UserState>((set, get) => ({
   user: null,
   isLoading: false,
   isOnboardingComplete: false,
-  
+
   setUser: (user) => {
-    set({ 
+    set({
       user,
-      isOnboardingComplete: user?.businessProfile !== null && user?.businessProfile !== undefined
+      isOnboardingComplete:
+        user?.businessProfile !== null && user?.businessProfile !== undefined,
     });
   },
-  
+
   setLoading: (loading) => set({ isLoading: loading }),
-  
+
   checkOnboardingStatus: () => {
     const { user } = get();
-    return user?.businessProfile !== null && user?.businessProfile !== undefined;
+    return (
+      user?.businessProfile !== null && user?.businessProfile !== undefined
+    );
   },
-  
+
   clearUser: () => set({ user: null, isOnboardingComplete: false }),
 }));
-

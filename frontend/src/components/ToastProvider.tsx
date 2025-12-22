@@ -1,6 +1,12 @@
 // ToastProvider.tsx
 import * as Toast from "@radix-ui/react-toast";
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { X } from "lucide-react";
 
 type ToastType = "success" | "error" | "info";
@@ -21,21 +27,20 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const showToast = useCallback((
-    title: string,
-    type: ToastType = "info",
-    description?: string
-  ) => {
-    const id = Math.random().toString(36).substring(2, 9);
-    const newToast: ToastData = { id, title, description, type };
-    
-    setToasts((prev) => [...prev, newToast]);
+  const showToast = useCallback(
+    (title: string, type: ToastType = "info", description?: string) => {
+      const id = Math.random().toString(36).substring(2, 9);
+      const newToast: ToastData = { id, title, description, type };
 
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, 5000);
-  }, []);
+      setToasts((prev) => [...prev, newToast]);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+      }, 5000);
+    },
+    []
+  );
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
@@ -57,8 +62,8 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
               toast.type === "success"
                 ? "bg-green-600 text-white border-green-700"
                 : toast.type === "error"
-                ? "bg-red-600 text-white border-red-700"
-                : "bg-gray-800 text-white border-gray-700"
+                  ? "bg-red-600 text-white border-red-700"
+                  : "bg-gray-800 text-white border-gray-700"
             }`}
           >
             <div className="grid gap-1">

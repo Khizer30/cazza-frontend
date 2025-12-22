@@ -111,15 +111,17 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
           </Button>
         )}
 
-
         {/* User Avatar Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage 
-                  src={user?.profileImage || undefined} 
-                  alt={`${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "User avatar"} 
+                <AvatarImage
+                  src={user?.profileImage || undefined}
+                  alt={
+                    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+                    "User avatar"
+                  }
                 />
                 <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                   {getUserInitials()}
@@ -199,7 +201,9 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    Are you sure you want to sign out?
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
                     You will need to sign in again to access your account.
                   </AlertDialogDescription>

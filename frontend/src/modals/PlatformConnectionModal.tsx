@@ -30,7 +30,7 @@ export const PlatformConnectionModal = ({
   // onConnect,
   onConnectionSuccess,
 }: PlatformConnectionModalProps) => {
-  const [isLoading, ] = useState(false);
+  const [isLoading] = useState(false);
 
   const handleSubmit = async () => {};
 

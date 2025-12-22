@@ -14,7 +14,10 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { setNewPasswordSchema, type SetNewPasswordData } from "@/validators/auth-validator";
+import {
+  setNewPasswordSchema,
+  type SetNewPasswordData,
+} from "@/validators/auth-validator";
 import { useauth } from "@/hooks/useauth";
 import type { SETNEWPASSWORD_PAYLOAD } from "@/types/auth";
 
@@ -83,7 +86,9 @@ export const SetNewPassword = () => {
           {!token && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>Invalid or missing reset token. Please check your email link.</AlertDescription>
+              <AlertDescription>
+                Invalid or missing reset token. Please check your email link.
+              </AlertDescription>
             </Alert>
           )}
 
@@ -114,7 +119,9 @@ export const SetNewPassword = () => {
                 </button>
               </div>
               {errors.newPassword && (
-                <p className="text-sm text-destructive">{errors.newPassword.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.newPassword.message}
+                </p>
               )}
             </div>
 
@@ -144,11 +151,17 @@ export const SetNewPassword = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading || !token}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading || !token}
+            >
               {loading ? "Updating Password..." : "Update Password"}
             </Button>
           </form>

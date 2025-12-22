@@ -16,7 +16,7 @@ import type {
   SETNEWPASSWORD_PAYLOAD,
   SIGNUP_PAYLOAD,
 } from "@/types/auth";
-import { setToken, setRefreshToken,  removeToken } from "@/utils/localStorage";
+import { setToken, setRefreshToken, removeToken } from "@/utils/localStorage";
 import { AxiosError } from "axios";
 
 export const useauth = () => {
@@ -44,7 +44,7 @@ export const useauth = () => {
         // Handle new response structure with data object
         if (res.data) {
           const { accessToken, refreshToken, user } = res.data;
-          
+
           // Store tokens
           if (accessToken) {
             setToken(accessToken);
@@ -52,11 +52,11 @@ export const useauth = () => {
           if (refreshToken) {
             setRefreshToken(refreshToken);
           }
-          
+
           // Always fetch fresh user profile to ensure we have the latest data
           // This ensures we check businessProfile status correctly
           const userData = await fetchUserProfile();
-          
+
           // If fetchUserProfile returns null, try to use user from response as fallback
           if (!userData && user) {
             setUser(user);
@@ -70,7 +70,7 @@ export const useauth = () => {
             await fetchUserProfile();
           }
         }
-        
+
         showToast(res.message || "Successfully signed in", "success");
         return res;
       } else if (res && !res.success) {
@@ -80,8 +80,11 @@ export const useauth = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred during sign in";
-        showToast(errorMessage, "error",);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "An error occurred during sign in";
+        showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
       } else {
@@ -95,12 +98,19 @@ export const useauth = () => {
     try {
       const res = await signUpService(paylaod);
       if (res && res.success) {
-        showToast(res.message || "Verification email has been sent to your email address.", "success");
+        showToast(
+          res.message ||
+            "Verification email has been sent to your email address.",
+          "success"
+        );
         return res;
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        showToast(error.response?.data?.message || "An error occurred during signup", "error");
+        showToast(
+          error.response?.data?.message || "An error occurred during signup",
+          "error"
+        );
       } else {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
@@ -111,7 +121,10 @@ export const useauth = () => {
     try {
       const res = await forgotPasswordService(paylaod);
       if (res && res.success) {
-        showToast(res.message || "Password reset email has been sent.", "success");
+        showToast(
+          res.message || "Password reset email has been sent.",
+          "success"
+        );
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to send reset email", "error");
@@ -119,7 +132,10 @@ export const useauth = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "An error occurred";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -133,7 +149,10 @@ export const useauth = () => {
     try {
       const res = await setNewPasswordService(paylaod);
       if (res && res.success) {
-        showToast(res.message || "Password has been reset successfully", "success");
+        showToast(
+          res.message || "Password has been reset successfully",
+          "success"
+        );
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to reset password", "error");
@@ -141,7 +160,10 @@ export const useauth = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "An error occurred";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -162,7 +184,10 @@ export const useauth = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "An error occurred";
         showToast(errorMessage, "error");
       } else {
         showToast("An unexpected error occurred. Please try again.", "error");
@@ -173,14 +198,13 @@ export const useauth = () => {
 
   const handleGoogleCallback = async (code: string) => {
     try {
-      
       const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
       const res = await googleCallbackService(payload);
       if (res && res.success) {
         // Handle response similar to regular login
         if (res.data) {
           const { accessToken, refreshToken, user } = res.data;
-          
+
           // Store tokens
           if (accessToken) {
             setToken(accessToken);
@@ -188,17 +212,19 @@ export const useauth = () => {
           if (refreshToken) {
             setRefreshToken(refreshToken);
           }
-          
-        
+
           const userData = await fetchUserProfile();
-          
+
           // If fetchUserProfile returns null, try to use user from response as fallback
           if (!userData && user) {
             setUser(user);
           }
         }
-        
-        showToast(res.message || "Successfully signed in with Google", "success");
+
+        showToast(
+          res.message || "Successfully signed in with Google",
+          "success"
+        );
         return res;
       } else if (res && !res.success) {
         // Display the actual API error message
@@ -210,7 +236,10 @@ export const useauth = () => {
       if (error instanceof AxiosError) {
         const responseData = error.response?.data;
         // Display the actual API error message
-        const errorMessage = responseData?.message || responseData?.error || "An error occurred during Google authentication";
+        const errorMessage =
+          responseData?.message ||
+          responseData?.error ||
+          "An error occurred during Google authentication";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -219,7 +248,6 @@ export const useauth = () => {
       }
       return null;
     }
-    
   };
 
   const logout = () => {
@@ -235,5 +263,14 @@ export const useauth = () => {
     }
   };
 
-  return { signIn, signUp, forgotPassword, setNewPassword, getGoogleAuthUrl, handleGoogleCallback, logout, fetchUserProfile };
+  return {
+    signIn,
+    signUp,
+    forgotPassword,
+    setNewPassword,
+    getGoogleAuthUrl,
+    handleGoogleCallback,
+    logout,
+    fetchUserProfile,
+  };
 };
