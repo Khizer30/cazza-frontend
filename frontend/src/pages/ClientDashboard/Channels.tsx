@@ -164,39 +164,25 @@ const dummyTeamMembers: TeamMember[] = [
 
 
 export const Channels = () => {
-  const { getUserChatGroups } = useChat();
+  const { getUserChatGroups, createChatGroup } = useChat();
   const [channels, setChannels] = useState<Channel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   
   const convertChatGroupToChannel = useCallback((chatGroup: ChatGroup): Channel => {
-    if (!chatGroup || !chatGroup.id || !chatGroup.name) {
-      const fallbackIcon = { name: "Hash", icon: Hash, color: "hsl(var(--primary))" };
-      return {
-        id: chatGroup?.id || `temp-${Date.now()}`,
-        name: chatGroup?.name || "Unknown",
-        description: "",
-        icon: fallbackIcon.icon,
-        iconName: fallbackIcon.name,
-        color: fallbackIcon.color,
-        members: [],
-        createdAt: chatGroup?.createdAt || new Date().toISOString(),
-        messages: [],
-      };
-    }
-    
-    const defaultIcon = availableIcons[0] || { name: "Hash", icon: Hash, color: "hsl(var(--primary))" };
+    const defaultIcon = availableIcons[0];
     const icon = availableIcons.find((i) => i.name === "Hash") || defaultIcon;
     
     return {
       id: chatGroup.id,
-      name: chatGroup.name || "",
+      name: chatGroup.name,
       description: "",
-      icon: icon?.icon || Hash,
-      iconName: icon?.name || "Hash",
-      color: icon?.color || "hsl(var(--primary))",
+      icon: icon.icon,
+      iconName: icon.name,
+      color: icon.color,
       members: [],
-      createdAt: chatGroup.createdAt || new Date().toISOString(),
+      createdAt: chatGroup.createdAt,
       messages: [],
     };
   }, []);
@@ -270,27 +256,32 @@ export const Channels = () => {
       channel.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCreateChannel = () => {
-    if (!channelName.trim()) return;
+  const handleCreateChannel = async () => {
+    if (!channelName.trim() || isCreating) return;
 
-    const newChannel: Channel = {
-      id: Date.now().toString(),
-      name: channelName,
-      description: channelDescription,
-      icon: selectedIcon.icon,
-      iconName: selectedIcon.name,
-      color: selectedIcon.color,
-      members: [],
-      createdAt: new Date().toISOString(),
-      messages: [],
-    };
+    try {
+      setIsCreating(true);
+      const createdGroup = await createChatGroup({ name: channelName });
+      
+      if (createdGroup) {
+        const newChannel = convertChatGroupToChannel(createdGroup);
+        newChannel.description = channelDescription;
+        newChannel.icon = selectedIcon.icon;
+        newChannel.iconName = selectedIcon.name;
+        newChannel.color = selectedIcon.color;
 
-    setChannels([...channels, newChannel]);
-    setChannelName("");
-    setChannelDescription("");
-    setSelectedIcon(availableIcons[0]);
-    setShowCreateDialog(false);
-    setSelectedChannelId(newChannel.id);
+        setChannels([newChannel, ...channels]);
+        setChannelName("");
+        setChannelDescription("");
+        setSelectedIcon(availableIcons[0]);
+        setShowCreateDialog(false);
+        setSelectedChannelId(newChannel.id);
+      }
+    } catch (error) {
+      console.error("Failed to create channel:", error);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleEditChannel = () => {
@@ -537,9 +528,18 @@ export const Channels = () => {
                     onClick={
                       editingChannel ? handleEditChannel : handleCreateChannel
                     }
-                    disabled={!channelName.trim()}
+                    disabled={!channelName.trim() || isCreating}
                   >
-                    {editingChannel ? "Save Changes" : "Create Channel"}
+                    {isCreating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating...
+                      </>
+                    ) : editingChannel ? (
+                      "Save Changes"
+                    ) : (
+                      "Create Channel"
+                    )}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -594,7 +594,7 @@ export const Channels = () => {
                       <IconComponent
                         className="h-5 w-5"
                         style={{
-                          color: isSelected ? "white" : channel.color,
+                          color: isSelected ? "black" : channel.color,
                         }}
                       />
                     </div>

@@ -35,13 +35,18 @@ export interface FirebaseTokenResponse {
 
 export interface ChatGroupResponse {
   success: boolean;
-  data?: ChatGroup | ChatGroup[];
+  data?: {
+    group?: ChatGroup;
+    groups?: ChatGroup[];
+  };
   message?: string;
 }
 
 export interface ChatGroupDetailResponse {
   success: boolean;
-  data?: ChatGroupDetail;
+  data?: {
+    group?: ChatGroupDetail;
+  };
   message?: string;
 }
 

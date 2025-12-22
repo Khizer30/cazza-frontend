@@ -21,9 +21,9 @@ export const useChat = () => {
   const createChatGroup = async (payload: CreateChatGroupPayload) => {
     try {
       const res = await createChatGroupService(payload);
-      if (res && res.success && res.data) {
+      if (res && res.success && res.data?.group) {
         showToast(res.message || "Chat group created successfully", "success");
-        return res.data as ChatGroup;
+        return res.data.group;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to create chat group", "error");
         throw new Error(res.message || "Failed to create chat group");
@@ -45,8 +45,8 @@ export const useChat = () => {
   const getUserChatGroups = async () => {
     try {
       const res = await getUserChatGroupsService();
-      if (res && res.success && res.data) {
-        return Array.isArray(res.data) ? res.data : [res.data];
+      if (res && res.success && res.data?.groups) {
+        return Array.isArray(res.data.groups) ? res.data.groups : [];
       }
       return [];
     } catch (error: unknown) {
@@ -62,8 +62,8 @@ export const useChat = () => {
   const getChatGroupById = async (groupId: string) => {
     try {
       const res = await getChatGroupByIdService(groupId);
-      if (res && res.success && res.data) {
-        return res.data as ChatGroupDetail;
+      if (res && res.success && res.data?.group) {
+        return res.data.group;
       }
       return null;
     } catch (error: unknown) {
