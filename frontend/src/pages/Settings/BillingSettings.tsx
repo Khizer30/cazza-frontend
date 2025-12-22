@@ -94,9 +94,6 @@ export const BillingSettings = () => {
   // Handlers (placeholders) - replace with real API integration
   const handleManageSubscription = async () => {
     try {
-      // TODO: call backend to create/open Stripe customer portal
-      console.log("Open customer portal (TODO: implement)");
-      // placeholder: simulate async
       await new Promise((res) => setTimeout(res, 500));
     } catch (err) {
       console.error(err);

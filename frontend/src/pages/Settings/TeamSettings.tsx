@@ -157,22 +157,16 @@ export const TeamSettings = () => {
   }, []);
 
   const handlePayForMember = useCallback(async (member: any) => {
-    console.log("handlePayForMember called with member:", member);
-    // userId is the id of the member
     const userId = member.id;
-    console.log("Using member.id as userId:", userId);
     
     if (!userId) {
-      console.error("Member ID not found for member:", member);
       showToast("Member ID not found. Please contact support.", "error");
       return;
     }
     
     const interval = memberIntervals[member.id] || "monthly";
-    console.log("Using interval:", interval, "for member:", member.id);
     setPayingForMemberId(member.id);
     try {
-      console.log("Calling payForTeamMember with:", { userId, interval });
       await payForTeamMember(userId, interval);
     } catch (error) {
       console.error("Error paying for team member:", error);

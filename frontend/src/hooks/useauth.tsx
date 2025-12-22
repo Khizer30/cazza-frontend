@@ -79,7 +79,6 @@ export const useauth = () => {
         throw new Error(res.message || "Login failed");
       }
     } catch (error: unknown) {
-      console.log(error);
       if (error instanceof AxiosError) {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred during sign in";
         showToast(errorMessage, "error",);
@@ -100,7 +99,6 @@ export const useauth = () => {
         return res;
       }
     } catch (error: unknown) {
-      console.log(error);
       if (error instanceof AxiosError) {
         showToast(error.response?.data?.message || "An error occurred during signup", "error");
       } else {
@@ -120,7 +118,6 @@ export const useauth = () => {
         throw new Error(res.message || "Failed to send reset email");
       }
     } catch (error: unknown) {
-      console.log(error);
       if (error instanceof AxiosError) {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
@@ -143,7 +140,6 @@ export const useauth = () => {
         throw new Error(res.message || "Failed to reset password");
       }
     } catch (error: unknown) {
-      console.log(error);
       if (error instanceof AxiosError) {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
@@ -165,7 +161,6 @@ export const useauth = () => {
         showToast("Failed to initiate Google authentication", "error");
       }
     } catch (error: unknown) {
-      console.log(error);
       if (error instanceof AxiosError) {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
@@ -178,8 +173,7 @@ export const useauth = () => {
 
   const handleGoogleCallback = async (code: string) => {
     try {
-      // Send the OAuth authorization code as 'token' field (as per API spec)
-      // Note: OAuth codes are single-use and expire quickly (usually 1-10 minutes)
+      
       const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
       const res = await googleCallbackService(payload);
       if (res && res.success) {
@@ -195,8 +189,7 @@ export const useauth = () => {
             setRefreshToken(refreshToken);
           }
           
-          // Always fetch fresh user profile to ensure we have the latest data
-          // This ensures we check businessProfile status correctly
+        
           const userData = await fetchUserProfile();
           
           // If fetchUserProfile returns null, try to use user from response as fallback
@@ -214,7 +207,6 @@ export const useauth = () => {
         throw new Error(errorMsg);
       }
     } catch (error: unknown) {
-      console.log("Google callback error:", error);
       if (error instanceof AxiosError) {
         const responseData = error.response?.data;
         // Display the actual API error message

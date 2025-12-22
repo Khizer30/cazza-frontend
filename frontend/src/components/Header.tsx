@@ -111,13 +111,6 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
           </Button>
         )}
 
-        {/* Notification Bell */}
-        {/* <NotificationBell
-          onNotificationClick={(notification) => {
-            // Navigate to the specific channel and message
-            console.log("Navigate to notification:", notification);
-          }}
-        /> */}
 
         {/* User Avatar Dropdown */}
         <DropdownMenu>

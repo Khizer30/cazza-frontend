@@ -176,7 +176,6 @@ export const useTeam = () => {
       setLoading(true);
       // Toggle role: if MEMBER, send ADMIN; if ADMIN, send MEMBER
       const newRole: "ADMIN" | "MEMBER" = currentRole?.toUpperCase() === "ADMIN" ? "MEMBER" : "ADMIN";
-      console.log("Updating team member role:", { teamMemberId, currentRole, newRole });
       const res = await updateTeamMemberRoleService(teamMemberId, { role: newRole });
       if (res && res.success) {
         showToast(res.message || "Team member role updated successfully", "success");
