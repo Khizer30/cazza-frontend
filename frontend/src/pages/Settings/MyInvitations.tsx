@@ -158,7 +158,9 @@ export const MyInvitations = () => {
                           ) : (
                             <Button
                               onClick={() => handleAccept(invitation.id)}
-                              disabled={isLoading || acceptingId === invitation.id}
+                              disabled={
+                                isLoading || acceptingId === invitation.id
+                              }
                               className="gap-2"
                             >
                               {acceptingId === invitation.id ? (
@@ -187,4 +189,3 @@ export const MyInvitations = () => {
     </div>
   );
 };
-

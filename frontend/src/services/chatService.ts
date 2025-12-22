@@ -51,7 +51,11 @@ export interface ChatGroupDetailResponse {
 }
 
 export const createChatGroupService = (payload: CreateChatGroupPayload) => {
-  return apiInvoker<ChatGroupResponse>(END_POINT.chat.createGroup, "POST", payload);
+  return apiInvoker<ChatGroupResponse>(
+    END_POINT.chat.createGroup,
+    "POST",
+    payload
+  );
 };
 
 export const getUserChatGroupsService = () => {
@@ -65,7 +69,10 @@ export const getChatGroupByIdService = (groupId: string) => {
   );
 };
 
-export const updateChatGroupService = (groupId: string, payload: { name: string }) => {
+export const updateChatGroupService = (
+  groupId: string,
+  payload: { name: string }
+) => {
   return apiInvoker<ChatGroupResponse>(
     `${END_POINT.chat.updateGroup}/${groupId}`,
     "PUT",
@@ -119,4 +126,3 @@ export const updateMemberRoleService = (
     payload
   );
 };
-

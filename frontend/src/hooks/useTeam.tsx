@@ -269,10 +269,7 @@ export const useTeam = () => {
       setLoading(true);
       const res = await acceptInvitationService(invitationId);
       if (res && res.success) {
-        showToast(
-          res.message || "Invitation accepted successfully",
-          "success"
-        );
+        showToast(res.message || "Invitation accepted successfully", "success");
         await fetchAllTeamData();
         return res;
       } else if (res && !res.success) {
