@@ -198,6 +198,12 @@ export const TeamSettings = () => {
   }, [removeMemberId, removeTeamMember]);
 
   const getInitials = (m: any) => {
+    if (m.firstName && m.lastName) {
+      return `${m.firstName[0]}${m.lastName[0]}`.toUpperCase();
+    }
+    if (m.firstName) {
+      return m.firstName[0].toUpperCase();
+    }
     if (m.name) {
       return m.name
         .split(" ")
@@ -211,7 +217,16 @@ export const TeamSettings = () => {
   };
 
   const getDisplayName = (m: any) => {
-    return m.name || m.email || m.profiles?.email || "Unknown";
+    if (m.firstName && m.lastName) {
+      return `${m.firstName} ${m.lastName}`;
+    }
+    if (m.firstName) {
+      return m.firstName;
+    }
+    if (m.name) {
+      return m.name;
+    }
+    return "Unknown";
   };
 
   const getMemberEmail = (m: any) => {

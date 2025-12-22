@@ -18,6 +18,7 @@ export const END_POINT = {
   team: {
     invite: "/team/invite",
     invitations: "/team/invitations?status=PENDING",
+    myInvitations: "/team/invitations/me",
     invitation: "/team/invitation",
     members: "/team/members",
     member: "/team/member",

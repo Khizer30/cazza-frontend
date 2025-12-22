@@ -1,12 +1,15 @@
+import { useCallback } from "react";
 import { useToast } from "@/components/ToastProvider";
 import {
   getTeamInvitationsService,
+  getMyInvitationsService,
   getTeamMembersService,
   getTeamAnalyticsService,
   cancelInvitationService,
   removeTeamMemberService,
   updateTeamMemberRoleService,
   teamMemberSubscriptionService,
+  acceptInvitationService,
 } from "@/services/teamService";
 import { useTeamStore } from "@/store/teamStore";
 import { AxiosError } from "axios";
@@ -232,6 +235,69 @@ export const useTeam = () => {
     }
   };
 
+  const getMyInvitations = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await getMyInvitationsService();
+      if (res && res.success) {
+        return res.data || [];
+      } else {
+        showToast(res.message || "Failed to fetch invitations", "error");
+        return [];
+      }
+    } catch (error: unknown) {
+      console.error("Get my invitations error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch invitations";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]);
+
+  const acceptInvitation = async (invitationId: string) => {
+    try {
+      setLoading(true);
+      const res = await acceptInvitationService(invitationId);
+      if (res && res.success) {
+        showToast(
+          res.message || "Invitation accepted successfully",
+          "success"
+        );
+        await fetchAllTeamData();
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to accept invitation", "error");
+        throw new Error(res.message || "Accept invitation failed");
+      }
+    } catch (error: unknown) {
+      console.error("Accept invitation error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to accept invitation";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const payForTeamMember = async (
     userId: string,
     interval: "monthly" | "yearly"
@@ -282,10 +348,12 @@ export const useTeam = () => {
     analytics,
     isLoading,
     fetchTeamInvitations,
+    getMyInvitations,
     fetchTeamMembers,
     fetchTeamAnalytics,
     fetchAllTeamData,
     cancelInvitation,
+    acceptInvitation,
     removeTeamMember,
     updateTeamMemberRole,
     payForTeamMember,

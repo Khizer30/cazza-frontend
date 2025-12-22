@@ -14,6 +14,7 @@ import type {
   UPDATE_TEAM_MEMBER_ROLE_RESPONSE,
   TEAM_MEMBER_SUBSCRIPTION_PAYLOAD,
   TEAM_MEMBER_SUBSCRIPTION_RESPONSE,
+  ACCEPT_INVITATION_RESPONSE,
 } from "@/types/auth";
 
 export const inviteTeamMemberService = (payload: TEAM_INVITE_PAYLOAD) => {
@@ -27,6 +28,13 @@ export const inviteTeamMemberService = (payload: TEAM_INVITE_PAYLOAD) => {
 export const getTeamInvitationsService = () => {
   return apiInvoker<TEAM_INVITATIONS_RESPONSE>(
     END_POINT.team.invitations,
+    "GET"
+  );
+};
+
+export const getMyInvitationsService = () => {
+  return apiInvoker<TEAM_INVITATIONS_RESPONSE>(
+    END_POINT.team.myInvitations,
     "GET"
   );
 };
@@ -57,6 +65,13 @@ export const getInvitationService = (invitationId: string) => {
   return apiInvoker<GET_INVITATION_RESPONSE>(
     `${END_POINT.team.invitation}/${invitationId}`,
     "GET"
+  );
+};
+
+export const acceptInvitationService = (invitationId: string) => {
+  return apiInvoker<ACCEPT_INVITATION_RESPONSE>(
+    `${END_POINT.team.invitation}/${invitationId}/accept`,
+    "PATCH"
   );
 };
 

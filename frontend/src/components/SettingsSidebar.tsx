@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Settings, CreditCard, HelpCircle, Users, Menu, X } from "lucide-react";
+import { Settings, CreditCard, HelpCircle, Users, Menu, X, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -32,6 +32,11 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
       title: "Teams",
       path: "/client/teams",
       icon: Users,
+    },
+    {
+      title: "My Invitations",
+      path: "/client/invitations",
+      icon: Mail,
     },
   ];
 

@@ -127,8 +127,10 @@ export const useChat = () => {
   const getFirebaseToken = async (groupId: string) => {
     try {
       const res = await getFirebaseTokenService(groupId);
+      
       if (res && res.success && res.data?.token) {
-        return res.data.token;
+        const token = res.data.token;
+        return token;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to get Firebase token", "error");
         throw new Error(res.message || "Failed to get Firebase token");
