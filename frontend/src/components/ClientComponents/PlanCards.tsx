@@ -2,7 +2,6 @@ import { Check } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 
-
 export const plans = [
   {
     name: "Rookie",
@@ -74,8 +73,8 @@ export const PlanCards = ({
             currentPlan === plan.name
               ? "border-primary bg-primary/5"
               : selectedPlan === plan.type
-              ? "border-primary bg-primary/5"
-              : "border-border"
+                ? "border-primary bg-primary/5"
+                : "border-border"
           }`}
         >
           {currentPlan === plan.name && (
@@ -138,7 +137,6 @@ export const PlanCards = ({
             ))}
           </ul>
 
-
           {showActions && onSelectPlan && (
             <Button
               className="w-full"
@@ -149,8 +147,8 @@ export const PlanCards = ({
               {currentPlan === plan.name
                 ? "Current Plan"
                 : plan.type === "master"
-                ? "Book call"
-                : "Subscribe now"}
+                  ? "Book call"
+                  : "Subscribe now"}
             </Button>
           )}
         </div>

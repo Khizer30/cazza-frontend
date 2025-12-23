@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -30,10 +30,17 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Plus,
   Hash,
   Users,
-    MoreVertical,
+  MoreVertical,
   Edit,
   Trash2,
   UserPlus,
@@ -65,8 +72,32 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useChat } from "@/hooks/useChat";
+import { useTeam } from "@/hooks/useTeam";
+import { useUserStore } from "@/store/userStore";
+import { Loader2 } from "lucide-react";
+import type { ChatGroup } from "@/services/chatService";
+import type { TeamMember as TeamMemberType } from "@/types/auth";
+import {
+  signInWithCustomToken,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
+import {
+  collection,
+  query,
+  onSnapshot,
+  addDoc,
+  serverTimestamp,
+  limit,
+  Timestamp,
+  doc,
+  setDoc,
+  deleteDoc,
+  where,
+} from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
-// Types
 interface TeamMember {
   id: string;
   name: string;
@@ -94,9 +125,10 @@ interface Channel {
   members: TeamMember[];
   createdAt: string;
   messages: ChannelMessage[];
+  userRole?: "ADMIN" | "MEMBER";
+  createdBy?: string;
 }
 
-// Available icons for channels
 const availableIcons: { name: string; icon: LucideIcon; color: string }[] = [
   { name: "Hash", icon: Hash, color: "hsl(var(--primary))" },
   { name: "MessageSquare", icon: MessageSquare, color: "hsl(var(--chart-1))" },
@@ -124,137 +156,80 @@ const availableIcons: { name: string; icon: LucideIcon; color: string }[] = [
   { name: "Palette", icon: Palette, color: "hsl(var(--chart-4))" },
 ];
 
-// Dummy team members
-const dummyTeamMembers: TeamMember[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: "ADMIN",
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    role: "MEMBER",
-  },
-  {
-    id: "3",
-    name: "Mike Johnson",
-    email: "mike.johnson@example.com",
-    role: "MEMBER",
-  },
-  {
-    id: "4",
-    name: "Sarah Williams",
-    email: "sarah.williams@example.com",
-    role: "MEMBER",
-  },
-  {
-    id: "5",
-    name: "David Brown",
-    email: "david.brown@example.com",
-    role: "MEMBER",
-  },
-];
-
-// Dummy messages
-const dummyMessages: ChannelMessage[] = [
-  {
-    id: "1",
-    channelId: "1",
-    senderId: "1",
-    senderName: "John Doe",
-    content: "Hey team! Welcome to the General channel. Let's keep everyone updated here.",
-    timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
-  },
-  {
-    id: "2",
-    channelId: "1",
-    senderId: "2",
-    senderName: "Jane Smith",
-    content: "Thanks John! Excited to be part of the team.",
-    timestamp: new Date(Date.now() - 86400000 * 2 + 3600000), // 2 days ago + 1 hour
-  },
-  {
-    id: "3",
-    channelId: "2",
-    senderId: "1",
-    senderName: "John Doe",
-    content: "Great work on the sales numbers this quarter!",
-    timestamp: new Date(Date.now() - 86400000), // 1 day ago
-  },
-  {
-    id: "4",
-    channelId: "2",
-    senderId: "3",
-    senderName: "Mike Johnson",
-    content: "Thank you! The team really pulled together on this one.",
-    timestamp: new Date(Date.now() - 86400000 + 1800000), // 1 day ago + 30 min
-  },
-  {
-    id: "5",
-    channelId: "3",
-    senderId: "1",
-    senderName: "John Doe",
-    content: "Let's discuss the new marketing campaign strategy.",
-    timestamp: new Date(Date.now() - 3600000), // 1 hour ago
-  },
-];
-
-// Initial dummy channels with messages
-const initialChannels: Channel[] = [
-  {
-    id: "1",
-    name: "General",
-    description: "General discussions and announcements",
-    icon: Hash,
-    iconName: "Hash",
-    color: "hsl(var(--primary))",
-    members: [dummyTeamMembers[0], dummyTeamMembers[1]],
-    createdAt: new Date().toISOString(),
-    messages: dummyMessages.filter((m) => m.channelId === "1"),
-  },
-  {
-    id: "2",
-    name: "Sales Team",
-    description: "Sales updates and strategies",
-    icon: TrendingUp,
-    iconName: "TrendingUp",
-    color: "hsl(var(--chart-3))",
-    members: [dummyTeamMembers[0], dummyTeamMembers[2], dummyTeamMembers[3]],
-    createdAt: new Date().toISOString(),
-    messages: dummyMessages.filter((m) => m.channelId === "2"),
-  },
-  {
-    id: "3",
-    name: "Marketing",
-    description: "Marketing campaigns and content",
-    icon: Target,
-    iconName: "Target",
-    color: "hsl(var(--chart-5))",
-    members: [dummyTeamMembers[1], dummyTeamMembers[4]],
-    createdAt: new Date().toISOString(),
-    messages: dummyMessages.filter((m) => m.channelId === "3"),
-  },
-];
-
 export const Channels = () => {
-  const [channels, setChannels] = useState<Channel[]>(initialChannels);
+  const {
+    getUserChatGroups,
+    createChatGroup,
+    updateChatGroup,
+    deleteChatGroup,
+    getChatGroupById,
+    addMemberToGroup,
+    removeMemberFromGroup,
+    updateMemberRole,
+    getFirebaseToken,
+  } = useChat();
+  const { fetchTeamMembers } = useTeam();
+  const { user: loggedInUser } = useUserStore();
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(
-    channels[0]?.id || null
+    null
+  );
+  const [teamMembers, setTeamMembers] = useState<TeamMemberType[]>([]);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+  const [addingMemberId, setAddingMemberId] = useState<string | null>(null);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
+  const [changingRoleMemberId, setChangingRoleMemberId] = useState<
+    string | null
+  >(null);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isLoadingChannelDetails, setIsLoadingChannelDetails] = useState(false);
+
+  const convertChatGroupToChannel = useCallback(
+    (chatGroup: ChatGroup & { createdBy?: string }): Channel => {
+      const defaultIcon = availableIcons[0];
+      const icon = availableIcons.find((i) => i.name === "Hash") || defaultIcon;
+
+      return {
+        id: chatGroup.id,
+        name: chatGroup.name,
+        description: "",
+        icon: icon.icon,
+        iconName: icon.name,
+        color: icon.color,
+        members: [],
+        createdAt: chatGroup.createdAt,
+        messages: [],
+        userRole: chatGroup.role,
+        createdBy: (chatGroup as any).createdBy,
+      };
+    },
+    []
   );
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showAddMemberDialog, setShowAddMemberDialog] = useState<string | null>(
     null
   );
+  const [showRemoveMemberDialog, setShowRemoveMemberDialog] = useState<
+    string | null
+  >(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const currentUser = dummyTeamMembers[0]; // Current user is John Doe
+  const unsubscribeRef = useRef<(() => void) | null>(null);
+  const typingUnsubscribeRef = useRef<(() => void) | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInitializingRef = useRef(false);
+  const addMemberDialogChannelIdRef = useRef<string | null>(null);
+  const [typingUsers, setTypingUsers] = useState<
+    Array<{ userId: string; userName: string }>
+  >([]);
 
-  // Form state for create/edit
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
   const [selectedIcon, setSelectedIcon] = useState<{
@@ -265,117 +240,753 @@ export const Channels = () => {
 
   const selectedChannel = channels.find((c) => c.id === selectedChannelId);
 
-  // Auto-scroll to bottom on new messages
+  const getCurrentUserRole = (
+    channel: Channel | undefined
+  ): "ADMIN" | "MEMBER" | null => {
+    if (!channel || !loggedInUser) return null;
+
+    if (channel.userRole) {
+      return channel.userRole;
+    }
+
+    const userMember = channel.members.find(
+      (m) =>
+        m.id === loggedInUser.id || String(m.id) === String(loggedInUser.id)
+    );
+
+    if (userMember) {
+      return userMember.role;
+    }
+
+    return null;
+  };
+
+  const isCreatorOrAdmin = (channel: Channel | undefined): boolean => {
+    if (!channel || !loggedInUser) return false;
+
+    if (
+      channel.createdBy &&
+      (channel.createdBy === loggedInUser.id ||
+        String(channel.createdBy) === String(loggedInUser.id))
+    ) {
+      return true;
+    }
+
+    return getCurrentUserRole(channel) === "ADMIN";
+  };
+
+  const processMemberFromAPI = (member: any, creatorId: string | null) => {
+    if (!member.user) {
+      return {
+        id: member.userId,
+        name: "User",
+        email: "",
+        avatar: null,
+        role: member.role,
+        isCreator: false,
+      };
+    }
+
+    const userData = member.user;
+    const isCreator =
+      creatorId &&
+      (member.userId === creatorId ||
+        String(member.userId) === String(creatorId) ||
+        userData.id === creatorId ||
+        String(userData.id) === String(creatorId));
+
+    const getDisplayName = () => {
+      if (userData.firstName && userData.lastName) {
+        return `${userData.firstName} ${userData.lastName}`;
+      }
+      if (userData.firstName) {
+        return userData.firstName;
+      }
+      return userData.email || "User";
+    };
+
+    return {
+      id: member.userId,
+      name: getDisplayName(),
+      email: userData.email || "",
+      avatar: userData.profileImage || null,
+      role: member.role,
+      isCreator: !!isCreator,
+    };
+  };
+
+  useEffect(() => {
+    const loadChatGroups = async () => {
+      try {
+        setIsLoading(true);
+        const chatGroups = await getUserChatGroups();
+
+        if (chatGroups && Array.isArray(chatGroups) && chatGroups.length > 0) {
+          const convertedChannels = chatGroups
+            .filter((group) => group && group.id && group.name)
+            .map(convertChatGroupToChannel);
+
+          if (convertedChannels.length > 0) {
+            setChannels(convertedChannels);
+
+            setSelectedChannelId((prev) => {
+              if (!prev) {
+                return convertedChannels[0].id;
+              }
+              return prev;
+            });
+          } else {
+            setChannels([]);
+          }
+        } else {
+          setChannels([]);
+        }
+      } catch (error) {
+        setChannels([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadChatGroups();
+  }, []);
+
+  useEffect(() => {
+    const loadTeamMembers = async () => {
+      try {
+        setIsLoadingMembers(true);
+        const members = await fetchTeamMembers();
+        if (members && members.length > 0) {
+          setTeamMembers(members);
+        }
+      } catch (error) {
+      } finally {
+        setIsLoadingMembers(false);
+      }
+    };
+
+    loadTeamMembers();
+  }, []);
+
+  const updateTypingStatus = useCallback(
+    async (isTyping: boolean) => {
+      if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
+
+      try {
+        const typingRef = doc(
+          db,
+          "chat_groups",
+          selectedChannelId,
+          "typing",
+          loggedInUser.id
+        );
+
+        if (isTyping) {
+          const senderName =
+            loggedInUser.firstName && loggedInUser.lastName
+              ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+              : loggedInUser.firstName || loggedInUser.email || "User";
+
+          await setDoc(
+            typingRef,
+            {
+              isTyping: true,
+              updatedAt: serverTimestamp(),
+              createdAt: serverTimestamp(),
+              createdBy: loggedInUser.id,
+              name: senderName,
+            },
+            { merge: true }
+          );
+        } else {
+          await deleteDoc(typingRef);
+        }
+      } catch (error) {}
+    },
+    [selectedChannelId, loggedInUser]
+  );
+
+  const handleTyping = useCallback(() => {
+    if (!selectedChannelId || !loggedInUser) return;
+
+    updateTypingStatus(true);
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      updateTypingStatus(false);
+    }, 3000);
+  }, [selectedChannelId, loggedInUser, updateTypingStatus]);
+
+  useEffect(() => {
+    if (!selectedChannelId) {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+      if (typingUnsubscribeRef.current) {
+        typingUnsubscribeRef.current();
+        typingUnsubscribeRef.current = null;
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      setTypingUsers([]);
+      isInitializingRef.current = false;
+      return;
+    }
+
+    if (isInitializingRef.current) {
+      return;
+    }
+
+    const initializeFirebaseAndLoadMessages = async () => {
+      isInitializingRef.current = true;
+      setIsLoadingMessages(true);
+
+      try {
+        const customToken = await getFirebaseToken(selectedChannelId);
+
+        if (
+          !customToken ||
+          typeof customToken !== "string" ||
+          customToken.trim() === ""
+        ) {
+          isInitializingRef.current = false;
+          setIsLoadingMessages(false);
+          return;
+        }
+
+        try {
+          if (auth.currentUser) {
+            await signOut(auth);
+          }
+
+          await signInWithCustomToken(auth, customToken);
+
+          await new Promise<void>((resolve, reject) => {
+            const unsubscribe = onAuthStateChanged(
+              auth,
+              (user) => {
+                if (user) {
+                  unsubscribe();
+                  resolve();
+                }
+              },
+              (error) => {
+                unsubscribe();
+                reject(error);
+              }
+            );
+
+            setTimeout(() => {
+              unsubscribe();
+              reject(new Error("Auth state change timeout"));
+            }, 5000);
+          });
+
+          if (!auth.currentUser) {
+            isInitializingRef.current = false;
+            setIsLoadingMessages(false);
+            return;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          const messagesRef = collection(
+            db,
+            "chat_groups",
+            selectedChannelId,
+            "messages"
+          );
+
+          const messagesQuery = query(messagesRef, limit(100));
+
+          const unsubscribe = onSnapshot(
+            messagesQuery,
+            (snapshot) => {
+              const firebaseMessages: ChannelMessage[] = snapshot.docs
+                .map((doc) => {
+                  const data = doc.data();
+                  const timestamp = data.timestamp as Timestamp;
+                  return {
+                    id: doc.id,
+                    channelId: selectedChannelId,
+                    senderId: data.senderId || "",
+                    senderName: data.senderName || "",
+                    content: data.content || "",
+                    timestamp: timestamp ? timestamp.toDate() : new Date(),
+                  };
+                })
+                .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+              setChannels((prevChannels) =>
+                prevChannels.map((channel) =>
+                  channel.id === selectedChannelId
+                    ? { ...channel, messages: firebaseMessages }
+                    : channel
+                )
+              );
+              setIsLoadingMessages(false);
+            },
+            (error: any) => {
+              if (error?.code === "permission-denied") {
+                isInitializingRef.current = false;
+                setIsLoadingMessages(false);
+              }
+            }
+          );
+
+          unsubscribeRef.current = unsubscribe;
+
+          const typingRef = collection(
+            db,
+            "chat_groups",
+            selectedChannelId,
+            "typing"
+          );
+          const typingQuery = query(typingRef, where("isTyping", "==", true));
+
+          const typingUnsubscribe = onSnapshot(
+            typingQuery,
+            (snapshot) => {
+              const typingUsersList: Array<{
+                userId: string;
+                userName: string;
+              }> = [];
+
+              snapshot.forEach((docSnapshot) => {
+                const data = docSnapshot.data();
+                const userId = docSnapshot.id;
+                if (
+                  data.isTyping &&
+                  loggedInUser &&
+                  userId !== loggedInUser.id &&
+                  String(userId) !== String(loggedInUser.id)
+                ) {
+                  typingUsersList.push({
+                    userId: userId,
+                    userName: data.name || "User",
+                  });
+                }
+              });
+
+              setTypingUsers(typingUsersList);
+            },
+            () => {}
+          );
+
+          typingUnsubscribeRef.current = typingUnsubscribe;
+          isInitializingRef.current = false;
+        } catch (authError: any) {
+          isInitializingRef.current = false;
+          setIsLoadingMessages(false);
+        }
+      } catch (error) {
+        isInitializingRef.current = false;
+        setIsLoadingMessages(false);
+      }
+    };
+
+    initializeFirebaseAndLoadMessages();
+
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+      if (typingUnsubscribeRef.current) {
+        typingUnsubscribeRef.current();
+        typingUnsubscribeRef.current = null;
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      if (selectedChannelId && loggedInUser && auth.currentUser) {
+        const typingRef = doc(
+          db,
+          "chat_groups",
+          selectedChannelId,
+          "typing",
+          loggedInUser.id
+        );
+        deleteDoc(typingRef).catch(() => {});
+      }
+      setTypingUsers([]);
+      isInitializingRef.current = false;
+      setIsLoadingMessages(false);
+    };
+  }, [selectedChannelId, loggedInUser]);
+
+  useEffect(() => {
+    if (!selectedChannelId) {
+      setIsLoadingChannelDetails(false);
+      return;
+    }
+
+    const loadChannelDetails = async () => {
+      try {
+        setIsLoadingChannelDetails(true);
+        const channelDetails = await getChatGroupById(selectedChannelId);
+        if (channelDetails) {
+          const creatorId = (channelDetails as any).createdBy;
+
+          const processedMembers =
+            channelDetails.members
+              ?.map((member: any) => processMemberFromAPI(member, creatorId))
+              .sort((a: any, b: any) => {
+                if (a.isCreator) return -1;
+                if (b.isCreator) return 1;
+                return 0;
+              }) || [];
+
+          const finalMembers: TeamMember[] = processedMembers.map(
+            (member: any) => ({
+              id: member.id,
+              name: member.name,
+              email: member.email,
+              avatar: member.avatar,
+              role: member.role,
+            })
+          );
+
+          setChannels((prevChannels) =>
+            prevChannels.map((channel) =>
+              channel.id === selectedChannelId
+                ? {
+                    ...channel,
+                    members: finalMembers,
+                    userRole:
+                      (channelDetails as any).userRole ||
+                      (channelDetails as any).role,
+                    createdBy: creatorId || channel.createdBy,
+                  }
+                : channel
+            )
+          );
+        }
+      } catch (error) {
+      } finally {
+        setIsLoadingChannelDetails(false);
+      }
+    };
+
+    loadChannelDetails();
+  }, [selectedChannelId, teamMembers, loggedInUser]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [selectedChannel?.messages]);
 
-  // Filter channels based on search
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      if (selectedChannelId && loggedInUser && auth.currentUser) {
+        const typingRef = doc(
+          db,
+          "chat_groups",
+          selectedChannelId,
+          "typing",
+          loggedInUser.id
+        );
+        deleteDoc(typingRef).catch(() => {});
+      }
+    };
+  }, [selectedChannelId, loggedInUser]);
+
   const filteredChannels = channels.filter(
     (channel) =>
-      channel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      channel.description.toLowerCase().includes(searchQuery.toLowerCase())
+      channel.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      channel.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCreateChannel = () => {
-    if (!channelName.trim()) return;
+  const handleCreateChannel = async () => {
+    if (!channelName.trim() || isCreating) return;
 
-    const newChannel: Channel = {
-      id: Date.now().toString(),
-      name: channelName,
-      description: channelDescription,
-      icon: selectedIcon.icon,
-      iconName: selectedIcon.name,
-      color: selectedIcon.color,
-      members: [],
-      createdAt: new Date().toISOString(),
-      messages: [],
-    };
+    try {
+      setIsCreating(true);
+      const createdGroup = await createChatGroup({ name: channelName.trim() });
 
-    setChannels([...channels, newChannel]);
-    setChannelName("");
-    setChannelDescription("");
-    setSelectedIcon(availableIcons[0]);
-    setShowCreateDialog(false);
-    setSelectedChannelId(newChannel.id);
-  };
+      if (createdGroup) {
+        const newChannel = convertChatGroupToChannel({
+          ...createdGroup,
+          createdBy: (createdGroup as any).createdBy,
+        });
+        setChannels([newChannel, ...channels]);
+        setSelectedChannelId(newChannel.id);
+      }
 
-  const handleEditChannel = () => {
-    if (!editingChannel || !channelName.trim()) return;
-
-    setChannels(
-      channels.map((channel) =>
-        channel.id === editingChannel.id
-          ? {
-              ...channel,
-              name: channelName,
-              description: channelDescription,
-              icon: selectedIcon.icon,
-              iconName: selectedIcon.name,
-              color: selectedIcon.color,
-            }
-          : channel
-      )
-    );
-
-    setEditingChannel(null);
-    setChannelName("");
-    setChannelDescription("");
-    setSelectedIcon(availableIcons[0]);
-  };
-
-  const handleDeleteChannel = (channelId: string) => {
-    setChannels(channels.filter((channel) => channel.id !== channelId));
-    if (selectedChannelId === channelId) {
-      setSelectedChannelId(channels.find((c) => c.id !== channelId)?.id || null);
+      setChannelName("");
+      setChannelDescription("");
+      setSelectedIcon(availableIcons[0]);
+      setShowCreateDialog(false);
+    } catch (error) {
+    } finally {
+      setIsCreating(false);
     }
   };
 
-  const handleAddMember = (channelId: string, memberId: string) => {
-    const member = dummyTeamMembers.find((m) => m.id === memberId);
-    if (!member) return;
+  const handleEditChannel = async () => {
+    if (!editingChannel || !channelName.trim() || isUpdating) return;
 
-    setChannels(
-      channels.map((channel) =>
-        channel.id === channelId
-          ? {
-              ...channel,
-              members: channel.members.some((m) => m.id === memberId)
-                ? channel.members
-                : [...channel.members, member],
-            }
-          : channel
-      )
-    );
-    setShowAddMemberDialog(null);
+    try {
+      setIsUpdating(true);
+      await updateChatGroup(editingChannel.id, channelName.trim());
+
+      setChannels(
+        channels.map((channel) =>
+          channel.id === editingChannel.id
+            ? {
+                ...channel,
+                name: channelName.trim(),
+                description: channelDescription.trim(),
+                icon: selectedIcon.icon,
+                iconName: selectedIcon.name,
+                color: selectedIcon.color,
+              }
+            : channel
+        )
+      );
+
+      setEditingChannel(null);
+      setChannelName("");
+      setChannelDescription("");
+      setSelectedIcon(availableIcons[0]);
+      setShowCreateDialog(false);
+    } catch (error) {
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  
+  const handleDeleteChannel = async (channelId: string) => {
+    if (isDeleting === channelId) return;
 
-  const handleSendMessage = () => {
-    if (!messageInput.trim() || !selectedChannelId) return;
+    try {
+      setIsDeleting(channelId);
+      await deleteChatGroup(channelId);
 
-    const newMessage: ChannelMessage = {
-      id: Date.now().toString(),
-      channelId: selectedChannelId,
-      senderId: currentUser.id,
-      senderName: currentUser.name,
-      content: messageInput.trim(),
-      timestamp: new Date(),
-    };
+      const updatedChannels = channels.filter(
+        (channel) => channel.id !== channelId
+      );
+      setChannels(updatedChannels);
 
-    setChannels(
-      channels.map((channel) =>
-        channel.id === selectedChannelId
-          ? {
-              ...channel,
-              messages: [...channel.messages, newMessage],
-            }
-          : channel
-      )
-    );
+      if (selectedChannelId === channelId) {
+        setSelectedChannelId(updatedChannels[0]?.id || null);
+      }
+    } catch (error) {
+    } finally {
+      setIsDeleting(null);
+    }
+  };
 
-    setMessageInput("");
+  const handleAddMember = async (channelId: string, memberId: string) => {
+    try {
+      setAddingMemberId(memberId);
+      await addMemberToGroup(channelId, memberId, "MEMBER");
+
+      setShowAddMemberDialog(null);
+
+      const channelDetails = await getChatGroupById(channelId);
+      if (channelDetails) {
+        const creatorId = (channelDetails as any).createdBy;
+
+        const processedMembers =
+          channelDetails.members
+            ?.map((member: any) => processMemberFromAPI(member, creatorId))
+            .sort((a: any, b: any) => {
+              if (a.isCreator) return -1;
+              if (b.isCreator) return 1;
+              return 0;
+            }) || [];
+
+        const finalMembers: TeamMember[] = processedMembers.map(
+          (member: any) => ({
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            avatar: member.avatar,
+            role: member.role,
+          })
+        );
+
+        setChannels((prevChannels) =>
+          prevChannels.map((channel) =>
+            channel.id === channelId
+              ? {
+                  ...channel,
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
+                }
+              : channel
+          )
+        );
+      }
+    } catch (error) {
+    } finally {
+      setAddingMemberId(null);
+    }
+  };
+
+  const handleRemoveMember = async (channelId: string, userId: string) => {
+    try {
+      setRemovingMemberId(userId);
+      await removeMemberFromGroup(channelId, userId);
+
+      setShowRemoveMemberDialog(null);
+
+      const channelDetails = await getChatGroupById(channelId);
+      if (channelDetails) {
+        const creatorId = (channelDetails as any).createdBy;
+
+        const processedMembers =
+          channelDetails.members
+            ?.map((member: any) => processMemberFromAPI(member, creatorId))
+            .sort((a: any, b: any) => {
+              if (a.isCreator) return -1;
+              if (b.isCreator) return 1;
+              return 0;
+            }) || [];
+
+        const finalMembers: TeamMember[] = processedMembers.map(
+          (member: any) => ({
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            avatar: member.avatar,
+            role: member.role,
+          })
+        );
+
+        setChannels((prevChannels) =>
+          prevChannels.map((channel) =>
+            channel.id === channelId
+              ? {
+                  ...channel,
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
+                }
+              : channel
+          )
+        );
+      }
+    } catch (error) {
+    } finally {
+      setRemovingMemberId(null);
+    }
+  };
+
+  const handleChangeMemberRole = async (
+    channelId: string,
+    userId: string,
+    newRole: "ADMIN" | "MEMBER"
+  ) => {
+    try {
+      setChangingRoleMemberId(userId);
+      await updateMemberRole(channelId, userId, newRole);
+
+      const channelDetails = await getChatGroupById(channelId);
+      if (channelDetails) {
+        const creatorId = (channelDetails as any).createdBy;
+
+        const processedMembers =
+          channelDetails.members
+            ?.map((member: any) => processMemberFromAPI(member, creatorId))
+            .sort((a: any, b: any) => {
+              if (a.isCreator) return -1;
+              if (b.isCreator) return 1;
+              return 0;
+            }) || [];
+
+        const finalMembers: TeamMember[] = processedMembers.map(
+          (member: any) => ({
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            avatar: member.avatar,
+            role: member.role,
+          })
+        );
+
+        setChannels((prevChannels) =>
+          prevChannels.map((channel) =>
+            channel.id === channelId
+              ? {
+                  ...channel,
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
+                }
+              : channel
+          )
+        );
+      }
+    } catch (error) {
+    } finally {
+      setChangingRoleMemberId(null);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (
+      !messageInput.trim() ||
+      !selectedChannelId ||
+      !loggedInUser ||
+      isSendingMessage
+    )
+      return;
+
+    try {
+      setIsSendingMessage(true);
+      if (!auth.currentUser) {
+        return;
+      }
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+
+      if (selectedChannelId && loggedInUser) {
+        const typingRef = doc(
+          db,
+          "chat_groups",
+          selectedChannelId,
+          "typing",
+          loggedInUser.id
+        );
+        await deleteDoc(typingRef).catch(() => {});
+      }
+
+      const messagesRef = collection(
+        db,
+        "chat_groups",
+        selectedChannelId,
+        "messages"
+      );
+      const senderName =
+        loggedInUser.firstName && loggedInUser.lastName
+          ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+          : loggedInUser.firstName || loggedInUser.email || "User";
+
+      await addDoc(messagesRef, {
+        senderId: loggedInUser.id,
+        senderName: senderName,
+        content: messageInput.trim(),
+        timestamp: serverTimestamp(),
+      });
+
+      setMessageInput("");
+    } catch (error: any) {
+    } finally {
+      setIsSendingMessage(false);
+    }
   };
 
   const openEditDialog = (channel: Channel) => {
@@ -404,8 +1015,56 @@ export const Channels = () => {
       .slice(0, 2);
   };
 
-  const getSender = (senderId: string) => {
-    return dummyTeamMembers.find((m) => m.id === senderId) || dummyTeamMembers[0];
+  const getSender = (senderId: string, message?: ChannelMessage) => {
+    const channel = channels.find((c) => c.id === selectedChannelId);
+
+    if (channel) {
+      const channelMember = channel.members.find(
+        (m) => m.id === senderId || String(m.id) === String(senderId)
+      );
+
+      if (channelMember) {
+        return {
+          id: channelMember.id,
+          name: channelMember.name,
+          email: channelMember.email || "",
+          avatar: channelMember.avatar ?? undefined,
+          role: channelMember.role,
+        };
+      }
+    }
+
+    if (
+      loggedInUser &&
+      (loggedInUser.id === senderId ||
+        String(loggedInUser.id) === String(senderId))
+    ) {
+      const getDisplayName = () => {
+        if (loggedInUser.firstName && loggedInUser.lastName) {
+          return `${loggedInUser.firstName} ${loggedInUser.lastName}`;
+        }
+        if (loggedInUser.firstName) {
+          return loggedInUser.firstName;
+        }
+        return loggedInUser.email || "User";
+      };
+
+      return {
+        id: loggedInUser.id,
+        name: getDisplayName(),
+        email: loggedInUser.email || "",
+        avatar: loggedInUser.profileImage,
+        role: "MEMBER" as const,
+      };
+    }
+
+    return {
+      id: senderId,
+      name: message?.senderName || "User",
+      email: "",
+      avatar: undefined,
+      role: "MEMBER" as const,
+    };
   };
 
   const formatMessageTime = (date: Date) => {
@@ -414,25 +1073,26 @@ export const Channels = () => {
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
-      {/* Left Sidebar - Channels List */}
       <div className="w-80 border-r border-border bg-card flex flex-col">
-        {/* Sidebar Header */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Channels</h2>
-            <Dialog open={showCreateDialog} onOpenChange={(open) => {
-              if (!open) {
-                closeDialog();
-              } else {
-                if (!editingChannel) {
-                  setEditingChannel(null);
-                  setChannelName("");
-                  setChannelDescription("");
-                  setSelectedIcon(availableIcons[0]);
+            <Dialog
+              open={showCreateDialog}
+              onOpenChange={(open) => {
+                if (!open) {
+                  closeDialog();
+                } else {
+                  if (!editingChannel) {
+                    setEditingChannel(null);
+                    setChannelName("");
+                    setChannelDescription("");
+                    setSelectedIcon(availableIcons[0]);
+                  }
+                  setShowCreateDialog(true);
                 }
-                setShowCreateDialog(true);
-              }
-            }}>
+              }}
+            >
               <DialogTrigger asChild>
                 <Button
                   size="icon"
@@ -520,7 +1180,9 @@ export const Channels = () => {
                                   className="h-6 w-6 mb-1"
                                   style={{ color: iconOption.color }}
                                 />
-                                <span className="text-xs">{iconOption.name}</span>
+                                <span className="text-xs">
+                                  {iconOption.name}
+                                </span>
                               </button>
                             );
                           })}
@@ -534,10 +1196,31 @@ export const Channels = () => {
                     Cancel
                   </Button>
                   <Button
-                    onClick={editingChannel ? handleEditChannel : handleCreateChannel}
-                    disabled={!channelName.trim()}
+                    onClick={
+                      editingChannel ? handleEditChannel : handleCreateChannel
+                    }
+                    disabled={
+                      !channelName.trim() ||
+                      (editingChannel ? isUpdating : isCreating)
+                    }
                   >
-                    {editingChannel ? "Save Changes" : "Create Channel"}
+                    {editingChannel ? (
+                      isUpdating ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Changes"
+                      )
+                    ) : isCreating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      "Create Channel"
+                    )}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -554,10 +1237,13 @@ export const Channels = () => {
           </div>
         </div>
 
-        {/* Channels List */}
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {filteredChannels.length === 0 ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : filteredChannels.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 No channels found
               </div>
@@ -565,7 +1251,8 @@ export const Channels = () => {
               filteredChannels.map((channel) => {
                 const IconComponent = channel.icon;
                 const isSelected = channel.id === selectedChannelId;
-                const lastMessage = channel.messages[channel.messages.length - 1];
+                const lastMessage =
+                  channel.messages[channel.messages.length - 1];
                 return (
                   <div
                     key={channel.id}
@@ -587,7 +1274,7 @@ export const Channels = () => {
                       <IconComponent
                         className="h-5 w-5"
                         style={{
-                          color: isSelected ? "white" : channel.color,
+                          color: isSelected ? "black" : channel.color,
                         }}
                       />
                     </div>
@@ -600,49 +1287,63 @@ export const Channels = () => {
                         >
                           {channel.name}
                         </p>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 opacity-0 group-hover:opacity-100 flex-shrink-0"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openEditDialog(channel);
-                              }}
-                            >
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit Channel
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setShowAddMemberDialog(channel.id);
-                              }}
-                            >
-                              <UserPlus className="mr-2 h-4 w-4" />
-                              Add Members
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteChannel(channel.id);
-                              }}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete Channel
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {isCreatorOrAdmin(channel) && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openEditDialog(channel);
+                                }}
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit Channel
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addMemberDialogChannelIdRef.current =
+                                    channel.id;
+                                  setShowAddMemberDialog(channel.id);
+                                }}
+                              >
+                                <UserPlus className="mr-2 h-4 w-4" />
+                                Add Members
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteChannel(channel.id);
+                                }}
+                                className="text-destructive"
+                                disabled={isDeleting === channel.id}
+                              >
+                                {isDeleting === channel.id ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Channel
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </div>
                       {channel.description && (
                         <p
@@ -676,11 +1377,9 @@ export const Channels = () => {
         </ScrollArea>
       </div>
 
-      {/* Right Side - Chat Interface */}
       <div className="flex-1 flex flex-col bg-background">
         {selectedChannel ? (
           <>
-            {/* Chat Header */}
             <div className="p-4 border-b border-border bg-card">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -689,7 +1388,9 @@ export const Channels = () => {
                     return (
                       <div
                         className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: `${selectedChannel.color}20` }}
+                        style={{
+                          backgroundColor: `${selectedChannel.color}20`,
+                        }}
                       >
                         <IconComponent
                           className="h-5 w-5"
@@ -708,23 +1409,71 @@ export const Channels = () => {
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="gap-1">
                     <Users className="h-3 w-3" />
-                    {selectedChannel.members.length}
+                    {isLoadingChannelDetails ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      selectedChannel.members.length
+                    )}
                   </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowAddMemberDialog(selectedChannel.id)}
-                  >
-                    <UserPlus className="h-4 w-4" />
-                  </Button>
+                  {isCreatorOrAdmin(selectedChannel) && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={isLoadingChannelDetails}
+                        onClick={() => {
+                          addMemberDialogChannelIdRef.current =
+                            selectedChannel.id;
+                          setShowAddMemberDialog(selectedChannel.id);
+                        }}
+                        title="Add Members"
+                      >
+                        <UserPlus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={
+                          isLoadingChannelDetails ||
+                          selectedChannel.members.length === 0
+                        }
+                        onClick={() =>
+                          setShowRemoveMemberDialog(selectedChannel.id)
+                        }
+                        title="Manage Members"
+                      >
+                        <Users className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                  {!isCreatorOrAdmin(selectedChannel) && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={
+                        isLoadingChannelDetails ||
+                        selectedChannel.members.length === 0
+                      }
+                      onClick={() =>
+                        setShowRemoveMemberDialog(selectedChannel.id)
+                      }
+                      title="View Members"
+                    >
+                      <Users className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Messages Area */}
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-4">
-                {selectedChannel.messages.length === 0 ? (
+                {isLoadingMessages ? (
+                  <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
+                    <Loader2 className="h-8 w-8 text-muted-foreground mb-4 animate-spin" />
+                    <p className="text-muted-foreground">Loading messages...</p>
+                  </div>
+                ) : selectedChannel.messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center py-12">
                     <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
@@ -736,8 +1485,11 @@ export const Channels = () => {
                   </div>
                 ) : (
                   selectedChannel.messages.map((message) => {
-                    const sender = getSender(message.senderId);
-                    const isCurrentUser = message.senderId === currentUser.id;
+                    const sender = getSender(message.senderId, message);
+                    const isCurrentUser =
+                      loggedInUser &&
+                      (message.senderId === loggedInUser.id ||
+                        String(message.senderId) === String(loggedInUser.id));
                     return (
                       <div
                         key={message.id}
@@ -746,17 +1498,21 @@ export const Channels = () => {
                         }`}
                       >
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={sender.avatar} />
+                          <AvatarImage src={sender.avatar || undefined} />
                           <AvatarFallback className="text-xs">
                             {getInitials(sender.name)}
                           </AvatarFallback>
                         </Avatar>
                         <div
-                          className={`flex-1 max-w-[70%] ${
-                            isCurrentUser ? "flex flex-col items-end" : ""
+                          className={`flex flex-col max-w-[70%] ${
+                            isCurrentUser ? "items-end" : "items-start"
                           }`}
                         >
-                          <div className="flex items-center gap-2 mb-1">
+                          <div
+                            className={`flex items-center gap-2 mb-1 ${
+                              isCurrentUser ? "flex-row-reverse" : ""
+                            }`}
+                          >
                             <span className="text-sm font-medium">
                               {sender.name}
                             </span>
@@ -765,7 +1521,7 @@ export const Channels = () => {
                             </span>
                           </div>
                           <div
-                            className={`rounded-lg px-4 py-2 ${
+                            className={`rounded-lg px-4 py-2 inline-block ${
                               isCurrentUser
                                 ? "bg-primary text-primary-foreground"
                                 : "bg-card border border-border"
@@ -780,17 +1536,51 @@ export const Channels = () => {
                     );
                   })
                 )}
+                {typingUsers.length > 0 && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground px-2 py-1">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                      <div
+                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      />
+                      <div
+                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                        style={{ animationDelay: "0.4s" }}
+                      />
+                    </div>
+                    <span>
+                      {typingUsers.length === 1
+                        ? `${typingUsers[0].userName} is typing...`
+                        : typingUsers.length === 2
+                          ? `${typingUsers[0].userName} and ${typingUsers[1].userName} are typing...`
+                          : `${typingUsers[0].userName} and ${typingUsers.length - 1} others are typing...`}
+                    </span>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
             </ScrollArea>
 
-            {/* Message Input */}
             <div className="p-4 border-t border-border bg-card">
               <div className="flex items-center gap-2">
                 <Input
                   placeholder={`Message #${selectedChannel.name.toLowerCase()}`}
                   value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
+                  onChange={(e) => {
+                    setMessageInput(e.target.value);
+                    if (e.target.value.trim()) {
+                      handleTyping();
+                    } else {
+                      if (typingTimeoutRef.current) {
+                        clearTimeout(typingTimeoutRef.current);
+                        typingTimeoutRef.current = null;
+                      }
+                      if (selectedChannelId && loggedInUser) {
+                        updateTypingStatus(false);
+                      }
+                    }
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -801,10 +1591,14 @@ export const Channels = () => {
                 />
                 <Button
                   onClick={handleSendMessage}
-                  disabled={!messageInput.trim()}
+                  disabled={!messageInput.trim() || isSendingMessage}
                   size="icon"
                 >
-                  <Send className="h-4 w-4" />
+                  {isSendingMessage ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -813,7 +1607,9 @@ export const Channels = () => {
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <Hash className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No channel selected</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                No channel selected
+              </h3>
               <p className="text-muted-foreground">
                 Select a channel from the sidebar to start chatting
               </p>
@@ -822,10 +1618,20 @@ export const Channels = () => {
         )}
       </div>
 
-      {/* Add Member Dialog */}
       <Dialog
         open={showAddMemberDialog !== null}
-        onOpenChange={(open) => !open && setShowAddMemberDialog(null)}
+        onOpenChange={(open) => {
+          if (open) {
+            if (showAddMemberDialog) {
+              addMemberDialogChannelIdRef.current = showAddMemberDialog;
+            }
+          } else {
+            setShowAddMemberDialog(null);
+            setTimeout(() => {
+              addMemberDialogChannelIdRef.current = null;
+            }, 200);
+          }
+        }}
       >
         <DialogContent>
           <DialogHeader>
@@ -836,51 +1642,280 @@ export const Channels = () => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
-              {dummyTeamMembers.map((member) => {
-                const channel = channels.find(
-                  (c) => c.id === showAddMemberDialog
-                );
-                const isMember = channel?.members.some((m) => m.id === member.id);
-                return (
-                  <div
-                    key={member.id}
-                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={member.avatar} />
-                        <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-medium">{member.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {member.email}
-                        </p>
+              {isLoadingMembers ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : teamMembers.length > 0 ? (
+                teamMembers.map((member) => {
+                  const channelId =
+                    showAddMemberDialog || addMemberDialogChannelIdRef.current;
+                  const channel = channels.find((c) => c.id === channelId);
+                  const isMember = channel?.members.some(
+                    (m) =>
+                      m.id === member.id ||
+                      m.id === member.userId ||
+                      m.id === member.user_id
+                  );
+                  return (
+                    <div
+                      key={member.id || member.userId || member.user_id}
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarImage
+                            src={member.profileImage || member.avatar}
+                          />
+                          <AvatarFallback>
+                            {getInitials(
+                              member.name || member.firstName || "User"
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {member.name ||
+                              `${member.firstName || ""} ${member.lastName || ""}`.trim() ||
+                              "User"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {member.email || member.profiles?.email || ""}
+                          </p>
+                        </div>
                       </div>
+                      {isMember ? (
+                        <Badge variant="secondary">Already Added</Badge>
+                      ) : (
+                        <Button
+                          size="sm"
+                          disabled={
+                            addingMemberId ===
+                              (member.id || member.userId || member.user_id) ||
+                            !!addingMemberId
+                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const channelId =
+                              showAddMemberDialog ||
+                              addMemberDialogChannelIdRef.current;
+                            if (
+                              channelId &&
+                              (member.id || member.userId || member.user_id)
+                            ) {
+                              handleAddMember(
+                                channelId,
+                                member.id ||
+                                  member.userId ||
+                                  member.user_id ||
+                                  ""
+                              );
+                            }
+                          }}
+                        >
+                          {addingMemberId ===
+                          (member.id || member.userId || member.user_id) ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Adding...
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus className="mr-2 h-4 w-4" />
+                              Add
+                            </>
+                          )}
+                        </Button>
+                      )}
                     </div>
-                    {isMember ? (
-                      <Badge variant="secondary">Already Added</Badge>
-                    ) : (
-                      <Button
-                        size="sm"
-                        onClick={() =>
-                          showAddMemberDialog &&
-                          handleAddMember(showAddMemberDialog, member.id)
-                        }
-                      >
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Add
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No team members available
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowAddMemberDialog(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAddMemberDialog(null);
+              }}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={showRemoveMemberDialog !== null}
+        onOpenChange={(open) => !open && setShowRemoveMemberDialog(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Channel Members</DialogTitle>
+            <DialogDescription>
+              Manage channel members and their roles
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              {showRemoveMemberDialog &&
+                channels
+                  .find((c) => c.id === showRemoveMemberDialog)
+                  ?.members.map((member) => {
+                    const channel = channels.find(
+                      (c) => c.id === showRemoveMemberDialog
+                    );
+                    const canManage = channel
+                      ? isCreatorOrAdmin(channel)
+                      : false;
+                    const isCreator =
+                      channel?.createdBy &&
+                      (channel.createdBy === member.id ||
+                        String(channel.createdBy) === String(member.id));
+                    const isCurrentUserCreator = !!(
+                      channel?.createdBy &&
+                      loggedInUser &&
+                      (channel.createdBy === loggedInUser.id ||
+                        String(channel.createdBy) === String(loggedInUser.id))
+                    );
+                    const adminMembers =
+                      channel?.members.filter((m) => m.role === "ADMIN") || [];
+                    const isLastAdmin =
+                      member.role === "ADMIN" && adminMembers.length === 1;
+                    const isCurrentUser =
+                      loggedInUser &&
+                      (member.id === loggedInUser.id ||
+                        String(member.id) === String(loggedInUser.id));
+                    const canChangeRoleOrRemove =
+                      !isCreator &&
+                      (isCurrentUserCreator || member.role !== "ADMIN");
+
+                    const displayName = member.name || "User";
+                    const displayEmail = member.email || "";
+
+                    return (
+                      <div
+                        key={member.id}
+                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <Avatar>
+                            <AvatarImage
+                              src={member.avatar ? member.avatar : undefined}
+                              alt={displayName}
+                            />
+                            <AvatarFallback>
+                              {getInitials(displayName)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{displayName}</p>
+                            {displayEmail && (
+                              <p className="text-xs text-muted-foreground">
+                                {displayEmail}
+                              </p>
+                            )}
+                            <div className="flex gap-1 mt-1">
+                              {isCreator && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Creator
+                                </Badge>
+                              )}
+                              {member.role === "ADMIN" && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Admin
+                                </Badge>
+                              )}
+                              {!isCreator && member.role === "MEMBER" && (
+                                <Badge variant="outline" className="text-xs">
+                                  Member
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        {canManage && (
+                          <div className="flex items-center gap-2">
+                            {canChangeRoleOrRemove && (
+                              <Select
+                                value={member.role}
+                                onValueChange={(value: "ADMIN" | "MEMBER") => {
+                                  if (
+                                    showRemoveMemberDialog &&
+                                    value !== member.role
+                                  ) {
+                                    handleChangeMemberRole(
+                                      showRemoveMemberDialog,
+                                      member.id,
+                                      value
+                                    );
+                                  }
+                                }}
+                                disabled={
+                                  !!isCurrentUser ||
+                                  changingRoleMemberId === member.id
+                                }
+                              >
+                                <SelectTrigger className="w-32 h-8">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="MEMBER">Member</SelectItem>
+                                  <SelectItem value="ADMIN">Admin</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                            {canChangeRoleOrRemove && !isLastAdmin && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={removingMemberId === member.id}
+                                onClick={() =>
+                                  showRemoveMemberDialog &&
+                                  handleRemoveMember(
+                                    showRemoveMemberDialog,
+                                    member.id
+                                  )
+                                }
+                              >
+                                {removingMemberId === member.id ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Removing...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Remove
+                                  </>
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+              {showRemoveMemberDialog &&
+                channels.find((c) => c.id === showRemoveMemberDialog)?.members
+                  .length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No members found
+                  </div>
+                )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowRemoveMemberDialog(null)}
             >
               Close
             </Button>

@@ -1,12 +1,15 @@
+import { useCallback } from "react";
 import { useToast } from "@/components/ToastProvider";
 import {
   getTeamInvitationsService,
+  getMyInvitationsService,
   getTeamMembersService,
   getTeamAnalyticsService,
   cancelInvitationService,
   removeTeamMemberService,
   updateTeamMemberRoleService,
   teamMemberSubscriptionService,
+  acceptInvitationService,
 } from "@/services/teamService";
 import { useTeamStore } from "@/store/teamStore";
 import { AxiosError } from "axios";
@@ -29,8 +32,13 @@ export const useTeam = () => {
       setLoading(true);
       const res = await getTeamInvitationsService();
       if (res && res.success) {
-        setInvitations(res.data || []);
-        return res.data || [];
+        const allInvitations = res.data || [];
+        const pendingInvitations = allInvitations.filter(
+          (invitation: any) =>
+            !invitation.status || invitation.status.toUpperCase() !== "ACCEPTED"
+        );
+        setInvitations(pendingInvitations);
+        return pendingInvitations;
       } else {
         showToast(res.message || "Failed to fetch invitations", "error");
         return [];
@@ -38,7 +46,14 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Fetch invitations error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to fetch invitations";
+        if (error.response?.status === 400) {
+          setInvitations([]);
+          return [];
+        }
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch invitations";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -65,7 +80,14 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Fetch team members error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to fetch team members";
+        if (error.response?.status === 400) {
+          setMembers([]);
+          return [];
+        }
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch team members";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -92,7 +114,14 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Fetch team analytics error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to fetch team analytics";
+        if (error.response?.status === 400) {
+          setAnalytics(null);
+          return null;
+        }
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch team analytics";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -118,7 +147,10 @@ export const useTeam = () => {
       setLoading(true);
       const res = await cancelInvitationService(invitationId);
       if (res && res.success) {
-        showToast(res.message || "Invitation cancelled successfully", "success");
+        showToast(
+          res.message || "Invitation cancelled successfully",
+          "success"
+        );
         // Refresh all team data to ensure consistency with server
         await fetchAllTeamData();
         return res;
@@ -129,7 +161,10 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Cancel invitation error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to cancel invitation";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to cancel invitation";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -158,7 +193,10 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Remove team member error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to remove team member";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to remove team member";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -171,15 +209,23 @@ export const useTeam = () => {
     }
   };
 
-  const updateTeamMemberRole = async (teamMemberId: string, currentRole: string) => {
+  const updateTeamMemberRole = async (
+    teamMemberId: string,
+    currentRole: string
+  ) => {
     try {
       setLoading(true);
       // Toggle role: if MEMBER, send ADMIN; if ADMIN, send MEMBER
-      const newRole: "ADMIN" | "MEMBER" = currentRole?.toUpperCase() === "ADMIN" ? "MEMBER" : "ADMIN";
-      console.log("Updating team member role:", { teamMemberId, currentRole, newRole });
-      const res = await updateTeamMemberRoleService(teamMemberId, { role: newRole });
+      const newRole: "ADMIN" | "MEMBER" =
+        currentRole?.toUpperCase() === "ADMIN" ? "MEMBER" : "ADMIN";
+      const res = await updateTeamMemberRoleService(teamMemberId, {
+        role: newRole,
+      });
       if (res && res.success) {
-        showToast(res.message || "Team member role updated successfully", "success");
+        showToast(
+          res.message || "Team member role updated successfully",
+          "success"
+        );
         // Refresh all team data to ensure consistency with server
         await fetchAllTeamData();
         return res;
@@ -190,7 +236,10 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Update team member role error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to update team member role";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to update team member role";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -203,7 +252,71 @@ export const useTeam = () => {
     }
   };
 
-  const payForTeamMember = async (userId: string, interval: "monthly" | "yearly") => {
+  const getMyInvitations = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await getMyInvitationsService();
+      if (res && res.success) {
+        return res.data || [];
+      } else {
+        showToast(res.message || "Failed to fetch invitations", "error");
+        return [];
+      }
+    } catch (error: unknown) {
+      console.error("Get my invitations error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch invitations";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]);
+
+  const acceptInvitation = async (invitationId: string) => {
+    try {
+      setLoading(true);
+      const res = await acceptInvitationService(invitationId);
+      if (res && res.success) {
+        const { removeInvitation } = useTeamStore.getState();
+        removeInvitation(invitationId);
+        await fetchAllTeamData();
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to accept invitation", "error");
+        throw new Error(res.message || "Accept invitation failed");
+      }
+    } catch (error: unknown) {
+      console.error("Accept invitation error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to accept invitation";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const payForTeamMember = async (
+    userId: string,
+    interval: "monthly" | "yearly"
+  ) => {
     try {
       setLoading(true);
       const res = await teamMemberSubscriptionService({ userId, interval });
@@ -213,16 +326,25 @@ export const useTeam = () => {
           window.location.href = res.data.checkoutUrl;
           return res;
         }
-        showToast(res.message || "Subscription checkout initiated successfully", "success");
+        showToast(
+          res.message || "Subscription checkout initiated successfully",
+          "success"
+        );
         return res;
       } else if (res && !res.success) {
-        showToast(res.message || "Failed to initiate subscription checkout", "error");
+        showToast(
+          res.message || "Failed to initiate subscription checkout",
+          "error"
+        );
         throw new Error(res.message || "Subscription checkout failed");
       }
     } catch (error: unknown) {
       console.error("Team member subscription error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to initiate subscription checkout";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to initiate subscription checkout";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -241,13 +363,14 @@ export const useTeam = () => {
     analytics,
     isLoading,
     fetchTeamInvitations,
+    getMyInvitations,
     fetchTeamMembers,
     fetchTeamAnalytics,
     fetchAllTeamData,
     cancelInvitation,
+    acceptInvitation,
     removeTeamMember,
     updateTeamMemberRole,
     payForTeamMember,
   };
 };
-

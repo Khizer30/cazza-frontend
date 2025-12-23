@@ -15,7 +15,8 @@ export const useChatbot = () => {
       if (res && res.success && res.data) {
         return res.data;
       } else if (res && !res.success) {
-        const errorMessage = res.errors || res.message || "Failed to process question";
+        const errorMessage =
+          res.errors || res.message || "Failed to process question";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       }
@@ -93,4 +94,3 @@ export const useChatbot = () => {
     deleteMessage,
   };
 };
-

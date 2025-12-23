@@ -79,9 +79,12 @@ export const SupportSettings = () => {
       };
 
       const response = await submitSupportTicketService(payload);
-      
+
       if (response && response.success) {
-        showToast(response.message || "Support ticket submitted successfully", "success");
+        showToast(
+          response.message || "Support ticket submitted successfully",
+          "success"
+        );
         // Reset form after successful submission
         setTicketForm({
           subject: "",
@@ -90,12 +93,18 @@ export const SupportSettings = () => {
           description: "",
         });
       } else {
-        showToast(response.message || "Failed to submit support ticket", "error");
+        showToast(
+          response.message || "Failed to submit support ticket",
+          "error"
+        );
       }
     } catch (error: unknown) {
       console.error("Submit support ticket error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to submit support ticket";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to submit support ticket";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -111,99 +120,105 @@ export const SupportSettings = () => {
       <SettingsSidebar />
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
-      {/* Create Support Ticket */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Support Ticket</CardTitle>
-          <CardDescription>
-            Submit a detailed support request for technical issues or questions
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="subject">Subject *</Label>
-              <Input
-                id="subject"
-                placeholder="Brief description of your issue"
-                value={ticketForm.subject}
-                onChange={(e) =>
-                  setTicketForm({ ...ticketForm, subject: e.target.value })
-                }
-              />
-            </div>
+          {/* Create Support Ticket */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Create Support Ticket</CardTitle>
+              <CardDescription>
+                Submit a detailed support request for technical issues or
+                questions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="subject">Subject *</Label>
+                  <Input
+                    id="subject"
+                    placeholder="Brief description of your issue"
+                    value={ticketForm.subject}
+                    onChange={(e) =>
+                      setTicketForm({ ...ticketForm, subject: e.target.value })
+                    }
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="priority">Priority *</Label>
-              <Select
-                value={ticketForm.priority}
-                onValueChange={(value) =>
-                  setTicketForm({ ...ticketForm, priority: value })
-                }
+                <div className="space-y-2">
+                  <Label htmlFor="priority">Priority *</Label>
+                  <Select
+                    value={ticketForm.priority}
+                    onValueChange={(value) =>
+                      setTicketForm({ ...ticketForm, priority: value })
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">Category *</Label>
+                <Select
+                  value={ticketForm.category}
+                  onValueChange={(value) =>
+                    setTicketForm({ ...ticketForm, category: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="technical">Technical Issue</SelectItem>
+                    <SelectItem value="billing">Billing Question</SelectItem>
+                    <SelectItem value="feature">Feature Request</SelectItem>
+                    <SelectItem value="integration">
+                      Integration Issue
+                    </SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description *</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Please provide detailed information about your issue..."
+                  rows={6}
+                  value={ticketForm.description}
+                  onChange={(e) =>
+                    setTicketForm({
+                      ...ticketForm,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <Button
+                onClick={handleSubmitTicket}
+                disabled={isSubmitting}
+                className="w-full md:w-auto"
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
-            <Select
-              value={ticketForm.category}
-              onValueChange={(value) =>
-                setTicketForm({ ...ticketForm, category: value })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="technical">Technical Issue</SelectItem>
-                <SelectItem value="billing">Billing Question</SelectItem>
-                <SelectItem value="feature">Feature Request</SelectItem>
-                <SelectItem value="integration">Integration Issue</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
-              placeholder="Please provide detailed information about your issue..."
-              rows={6}
-              value={ticketForm.description}
-              onChange={(e) =>
-                setTicketForm({ ...ticketForm, description: e.target.value })
-              }
-            />
-          </div>
-
-          <Button 
-            onClick={handleSubmitTicket} 
-            disabled={isSubmitting}
-            className="w-full md:w-auto"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              "Submit Ticket"
-            )}
-          </Button>
-        </CardContent>
-      </Card>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Ticket"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

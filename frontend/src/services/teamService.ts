@@ -1,8 +1,8 @@
 import apiInvoker from "@/lib/apiInvoker";
 import axiosInstance from "@/lib/axiosInstance";
 import { END_POINT } from "@/lib/url";
-import type { 
-  TEAM_INVITE_PAYLOAD, 
+import type {
+  TEAM_INVITE_PAYLOAD,
   TEAM_INVITE_RESPONSE,
   TEAM_INVITATIONS_RESPONSE,
   TEAM_MEMBERS_RESPONSE,
@@ -13,15 +13,30 @@ import type {
   UPDATE_TEAM_MEMBER_ROLE_PAYLOAD,
   UPDATE_TEAM_MEMBER_ROLE_RESPONSE,
   TEAM_MEMBER_SUBSCRIPTION_PAYLOAD,
-  TEAM_MEMBER_SUBSCRIPTION_RESPONSE
+  TEAM_MEMBER_SUBSCRIPTION_RESPONSE,
+  ACCEPT_INVITATION_RESPONSE,
 } from "@/types/auth";
 
 export const inviteTeamMemberService = (payload: TEAM_INVITE_PAYLOAD) => {
-  return apiInvoker<TEAM_INVITE_RESPONSE>(END_POINT.team.invite, "POST", payload);
+  return apiInvoker<TEAM_INVITE_RESPONSE>(
+    END_POINT.team.invite,
+    "POST",
+    payload
+  );
 };
 
 export const getTeamInvitationsService = () => {
-  return apiInvoker<TEAM_INVITATIONS_RESPONSE>(END_POINT.team.invitations, "GET");
+  return apiInvoker<TEAM_INVITATIONS_RESPONSE>(
+    END_POINT.team.invitations,
+    "GET"
+  );
+};
+
+export const getMyInvitationsService = () => {
+  return apiInvoker<TEAM_INVITATIONS_RESPONSE>(
+    END_POINT.team.myInvitations,
+    "GET"
+  );
 };
 
 export const cancelInvitationService = (invitationId: string) => {
@@ -53,11 +68,21 @@ export const getInvitationService = (invitationId: string) => {
   );
 };
 
-export const updateTeamMemberRoleService = async (teamMemberId: string, payload: UPDATE_TEAM_MEMBER_ROLE_PAYLOAD) => {
+export const acceptInvitationService = (invitationId: string) => {
+  return apiInvoker<ACCEPT_INVITATION_RESPONSE>(
+    `${END_POINT.team.invitation}/${invitationId}/accept`,
+    "PATCH"
+  );
+};
+
+export const updateTeamMemberRoleService = async (
+  teamMemberId: string,
+  payload: UPDATE_TEAM_MEMBER_ROLE_PAYLOAD
+) => {
   // Convert payload to URLSearchParams for x-www-form-urlencoded format
   const formData = new URLSearchParams();
   formData.append("role", payload.role);
-  
+
   const response = await axiosInstance({
     url: `${END_POINT.team.updateMemberRole}/${teamMemberId}/role`,
     method: "PATCH",
@@ -66,14 +91,19 @@ export const updateTeamMemberRoleService = async (teamMemberId: string, payload:
       "Content-Type": "application/x-www-form-urlencoded",
     },
   });
-  
+
   return response.data as UPDATE_TEAM_MEMBER_ROLE_RESPONSE;
 };
 
-export const teamMemberSubscriptionService = (payload: TEAM_MEMBER_SUBSCRIPTION_PAYLOAD) => {
+export const teamMemberSubscriptionService = (
+  payload: TEAM_MEMBER_SUBSCRIPTION_PAYLOAD
+) => {
   // Use the team member checkout endpoint
   const endpoint = "/billing/checkout-team-member";
-  
-  return apiInvoker<TEAM_MEMBER_SUBSCRIPTION_RESPONSE>(endpoint, "POST", payload);
-};
 
+  return apiInvoker<TEAM_MEMBER_SUBSCRIPTION_RESPONSE>(
+    endpoint,
+    "POST",
+    payload
+  );
+};
