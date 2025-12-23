@@ -126,11 +126,23 @@ export const TeamSettings = () => {
     }
   }, [searchParams, showToast, fetchAllTeamData]);
 
-  // Fetch team data on mount
+ 
   useEffect(() => {
     fetchAllTeamData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run on mount
+   
+  }, []); 
+
+  
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchAllTeamData();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [fetchAllTeamData]);
 
   const canManageTeam = true;
 
@@ -312,6 +324,13 @@ export const TeamSettings = () => {
       member.userId !== currentUser?.id && member.user_id !== currentUser?.id
   );
 
+  // Filter out accepted invitations - only show pending ones
+  const pendingInvitations = invitations.filter(
+    (invitation) =>
+      !invitation.status ||
+      invitation.status.toUpperCase() !== "ACCEPTED"
+  );
+
   if (isLoading && !analytics) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -349,7 +368,7 @@ export const TeamSettings = () => {
                   <h3 className="font-semibold">Pending Invites</h3>
                 </div>
                 <p className="text-3xl font-bold">
-                  {analytics?.pendingInvitations ?? invitations.length}
+                  {analytics?.pendingInvitations ?? pendingInvitations.length}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Awaiting response
@@ -397,7 +416,7 @@ export const TeamSettings = () => {
             <CardContent>
               <div className="space-y-6">
                 {/* Pending Members Section */}
-                {invitations.length > 0 && (
+                {pendingInvitations.length > 0 && (
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-lg font-semibold mb-2">
@@ -407,7 +426,7 @@ export const TeamSettings = () => {
                         Invitations that are awaiting acceptance
                       </p>
                     </div>
-                    {invitations.map((invitation) => {
+                    {pendingInvitations.map((invitation) => {
                       const expiresAt = invitation.expiresAt
                         ? new Date(invitation.expiresAt)
                         : null;

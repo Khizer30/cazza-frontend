@@ -56,8 +56,9 @@ export const MyInvitations = () => {
 
   const handleAccept = async (invitationId: string) => {
     setAcceptingId(invitationId);
+    let successResult = null;
     try {
-      await acceptInvitation(invitationId);
+      successResult = await acceptInvitation(invitationId);
       const res = await getMyInvitationsService();
       if (res && res.success) {
         setMyInvitations(res.data || []);
@@ -66,6 +67,12 @@ export const MyInvitations = () => {
       console.error("Failed to accept invitation:", error);
     } finally {
       setAcceptingId(null);
+      if (successResult && successResult.success) {
+        showToast(
+          successResult.message || "Invitation accepted successfully",
+          "success"
+        );
+      }
     }
   };
 

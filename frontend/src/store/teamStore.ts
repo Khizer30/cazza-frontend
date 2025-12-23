@@ -14,7 +14,7 @@ interface TeamState {
   isLoading: boolean;
   setMembers: (members: TeamMember[]) => void;
   setInvitations: (invitations: TeamInvitation[]) => void;
-  setAnalytics: (analytics: TeamAnalytics) => void;
+  setAnalytics: (analytics: TeamAnalytics | null) => void;
   setLoading: (loading: boolean) => void;
   addInvitation: (invitation: TeamInvitation) => void;
   removeInvitation: (invitationId: string) => void;

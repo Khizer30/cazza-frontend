@@ -32,8 +32,14 @@ export const useTeam = () => {
       setLoading(true);
       const res = await getTeamInvitationsService();
       if (res && res.success) {
-        setInvitations(res.data || []);
-        return res.data || [];
+        const allInvitations = res.data || [];
+        const pendingInvitations = allInvitations.filter(
+          (invitation: any) =>
+            !invitation.status ||
+            invitation.status.toUpperCase() !== "ACCEPTED"
+        );
+        setInvitations(pendingInvitations);
+        return pendingInvitations;
       } else {
         showToast(res.message || "Failed to fetch invitations", "error");
         return [];
@@ -41,6 +47,10 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Fetch invitations error:", error);
       if (error instanceof AxiosError) {
+        if (error.response?.status === 400) {
+          setInvitations([]);
+          return [];
+        }
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||
@@ -71,6 +81,10 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Fetch team members error:", error);
       if (error instanceof AxiosError) {
+        if (error.response?.status === 400) {
+          setMembers([]);
+          return [];
+        }
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||
@@ -101,6 +115,10 @@ export const useTeam = () => {
     } catch (error: unknown) {
       console.error("Fetch team analytics error:", error);
       if (error instanceof AxiosError) {
+        if (error.response?.status === 400) {
+          setAnalytics(null);
+          return null;
+        }
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||
@@ -269,7 +287,8 @@ export const useTeam = () => {
       setLoading(true);
       const res = await acceptInvitationService(invitationId);
       if (res && res.success) {
-        showToast(res.message || "Invitation accepted successfully", "success");
+        const { removeInvitation } = useTeamStore.getState();
+        removeInvitation(invitationId);
         await fetchAllTeamData();
         return res;
       } else if (res && !res.success) {
