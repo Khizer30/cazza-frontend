@@ -161,7 +161,7 @@ export const SignUp = () => {
               <Button
                 variant="outline"
                 onClick={handleGoogleSignIn}
-                disabled={loading}
+                disabled={loading || loadingInvitation}
                 className="w-full"
               >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -368,7 +368,14 @@ export const SignUp = () => {
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Create account"
+              )}
             </Button>
           </form>
 

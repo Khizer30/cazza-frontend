@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, ArrowLeft, Eye, EyeOff, Lock } from "lucide-react";
+import { AlertCircle, ArrowLeft, Eye, EyeOff, Lock, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -162,7 +162,14 @@ export const SetNewPassword = () => {
               className="w-full"
               disabled={loading || !token}
             >
-              {loading ? "Updating Password..." : "Update Password"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating Password...
+                </>
+              ) : (
+                "Update Password"
+              )}
             </Button>
           </form>
 

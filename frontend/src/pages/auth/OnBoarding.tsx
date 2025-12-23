@@ -124,6 +124,7 @@ export function Onboarding() {
                           businessName: e.target.value,
                         })
                       }
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -136,6 +137,7 @@ export function Onboarding() {
                       onValueChange={(v) =>
                         setFormData({ ...formData, businessEntityType: v })
                       }
+                      disabled={isLoading}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select entity type" />
@@ -164,6 +166,7 @@ export function Onboarding() {
                       onValueChange={(v) =>
                         setFormData({ ...formData, annualRevenueBand: v })
                       }
+                      disabled={isLoading}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select revenue band" />
@@ -214,6 +217,7 @@ export function Onboarding() {
                         onCheckedChange={() =>
                           handleCheckbox("marketplaces", item)
                         }
+                        disabled={isLoading}
                       />
                       <span>{item}</span>
                     </label>
@@ -245,6 +249,7 @@ export function Onboarding() {
                             onCheckedChange={() =>
                               handleCheckbox("tools", tool)
                             }
+                            disabled={isLoading}
                           />
                           <span>{tool}</span>
                         </label>
@@ -266,6 +271,7 @@ export function Onboarding() {
                             },
                           })
                         }
+                        disabled={isLoading}
                       />
                       <span>I use Xero</span>
                     </label>
@@ -282,6 +288,7 @@ export function Onboarding() {
                             },
                           })
                         }
+                        disabled={isLoading}
                       />
                       <span>I work with multiple currencies</span>
                     </label>
