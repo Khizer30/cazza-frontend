@@ -1,12 +1,15 @@
-import axiosInstance from './axiosInstance';
+import axiosInstance from "./axiosInstance";
 
-async function apiInvoker<T>(url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', data?: object ): Promise<T> {
+async function apiInvoker<T>(
+  url: string,
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
+  data?: object
+): Promise<T> {
   try {
     const response = await axiosInstance({
       url,
       method,
       data,
-      
     });
     return response.data;
   } catch (error) {

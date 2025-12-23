@@ -1,5 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { Settings, CreditCard, HelpCircle, Users, Menu, X } from "lucide-react";
+import {
+  Settings,
+  CreditCard,
+  HelpCircle,
+  Users,
+  Menu,
+  X,
+  Mail,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -33,6 +41,11 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
       path: "/client/teams",
       icon: Users,
     },
+    {
+      title: "My Invitations",
+      path: "/client/invitations",
+      icon: Mail,
+    },
   ];
 
   return (
@@ -45,7 +58,11 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           className="gap-2"
         >
-          {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {isMobileOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
           <span>Settings Menu</span>
         </Button>
       </div>
@@ -86,7 +103,7 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
+
             return (
               <Link
                 key={item.path}
@@ -109,4 +126,3 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
     </>
   );
 };
-

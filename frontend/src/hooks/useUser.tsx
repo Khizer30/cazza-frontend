@@ -1,22 +1,22 @@
 import { useToast } from "@/components/ToastProvider";
-import { 
-  getUserProfileService, 
+import {
+  getUserProfileService,
   onboardingService,
   updateUserService,
   updateBusinessProfileService,
   deleteUserService,
   startSubscriptionService,
-  unsubscribeService
+  unsubscribeService,
 } from "@/services/userService";
 import { inviteTeamMemberService } from "@/services/teamService";
 import { useUserStore } from "@/store/userStore";
 import { useTeamStore } from "@/store/teamStore";
-import type { 
+import type {
   ONBOARDING_PAYLOAD,
   UPDATE_USER_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
   TEAM_INVITE_PAYLOAD,
-  START_SUBSCRIPTION_PAYLOAD
+  START_SUBSCRIPTION_PAYLOAD,
 } from "@/types/auth";
 import { AxiosError } from "axios";
 
@@ -38,7 +38,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Fetch user profile error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to fetch user profile";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch user profile";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -58,7 +61,10 @@ export const useUser = () => {
       if (res && res.success) {
         // Fetch updated user profile after onboarding
         await fetchUserProfile();
-        showToast(res.message || "Onboarding completed successfully", "success");
+        showToast(
+          res.message || "Onboarding completed successfully",
+          "success"
+        );
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to complete onboarding", "error");
@@ -67,7 +73,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Onboarding error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to complete onboarding";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to complete onboarding";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -96,7 +105,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Update user error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to update profile";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to update profile";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -109,14 +121,19 @@ export const useUser = () => {
     }
   };
 
-  const updateBusinessProfile = async (payload: UPDATE_BUSINESS_PROFILE_PAYLOAD) => {
+  const updateBusinessProfile = async (
+    payload: UPDATE_BUSINESS_PROFILE_PAYLOAD
+  ) => {
     try {
       setLoading(true);
       const res = await updateBusinessProfileService(payload);
       if (res && res.success) {
         // Fetch updated user profile after update
         await fetchUserProfile();
-        showToast(res.message || "Business profile updated successfully", "success");
+        showToast(
+          res.message || "Business profile updated successfully",
+          "success"
+        );
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to update business profile", "error");
@@ -125,7 +142,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Update business profile error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to update business profile";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to update business profile";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -157,7 +177,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Invite team member error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to invite team member";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to invite team member";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -186,7 +209,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Delete user error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to delete account";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to delete account";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -211,7 +237,10 @@ export const useUser = () => {
         }
         // Otherwise, fetch updated user profile after subscription
         await fetchUserProfile();
-        showToast(res.message || "Subscription started successfully", "success");
+        showToast(
+          res.message || "Subscription started successfully",
+          "success"
+        );
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to start subscription", "error");
@@ -220,7 +249,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Start subscription error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to start subscription";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to start subscription";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -240,7 +272,10 @@ export const useUser = () => {
       if (res && res.success) {
         // Fetch updated user profile after unsubscribe
         await fetchUserProfile();
-        showToast(res.message || "Subscription canceled successfully", "success");
+        showToast(
+          res.message || "Subscription canceled successfully",
+          "success"
+        );
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to cancel subscription", "error");
@@ -249,7 +284,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Unsubscribe error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to cancel subscription";
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to cancel subscription";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -275,4 +313,3 @@ export const useUser = () => {
     unsubscribe,
   };
 };
-

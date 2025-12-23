@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useauth } from "@/hooks/useauth";
 import { useUserStore } from "@/store/userStore";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
 export const GoogleCallback = () => {
@@ -18,7 +24,11 @@ export const GoogleCallback = () => {
       const errorDescription = searchParams.get("error_description");
 
       if (oauthError) {
-        setError(errorDescription || oauthError || "Google authentication was cancelled or failed");
+        setError(
+          errorDescription ||
+            oauthError ||
+            "Google authentication was cancelled or failed"
+        );
         setTimeout(() => {
           navigate("/login");
         }, 3000);
@@ -40,12 +50,16 @@ export const GoogleCallback = () => {
       // OAuth codes are single-use and expire quickly, so we must use it immediately
       try {
         await handleGoogleCallback(code);
-        
+
         // After handleGoogleCallback, user profile is fetched and stored
         // Check the user from store to determine redirect
         const currentUser = useUserStore.getState().user;
         // Only OWNER role users need onboarding, skip for other roles
-        if (currentUser && !currentUser.businessProfile && currentUser.role === "OWNER") {
+        if (
+          currentUser &&
+          !currentUser.businessProfile &&
+          currentUser.role === "OWNER"
+        ) {
           // Redirect to onboarding if business profile is missing and user is OWNER
           navigate("/onboarding");
         } else {
@@ -55,9 +69,10 @@ export const GoogleCallback = () => {
       } catch (err) {
         console.error("Google callback error:", err);
         // Display the actual error message from the API
-        const errorMessage = err instanceof Error 
-          ? err.message 
-          : "Failed to complete Google authentication. Please try again.";
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Failed to complete Google authentication. Please try again.";
         setError(errorMessage);
         setTimeout(() => {
           navigate("/login");
@@ -100,4 +115,3 @@ export const GoogleCallback = () => {
     </main>
   );
 };
-
