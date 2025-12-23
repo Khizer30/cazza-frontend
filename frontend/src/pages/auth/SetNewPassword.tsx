@@ -9,7 +9,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, ArrowLeft, Eye, EyeOff, Lock, Loader2 } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Lock,
+  Loader2,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
