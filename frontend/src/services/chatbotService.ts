@@ -8,7 +8,11 @@ import type {
 } from "@/types/auth";
 
 export const askQuestionService = (payload: CHATBOT_ASK_PAYLOAD) => {
-  return apiInvoker<CHATBOT_ASK_RESPONSE>(END_POINT.chatbot.ask, "POST", payload);
+  return apiInvoker<CHATBOT_ASK_RESPONSE>(
+    END_POINT.chatbot.ask,
+    "POST",
+    payload
+  );
 };
 
 export const getChatHistoryService = () => {
@@ -21,4 +25,3 @@ export const deleteMessageService = (messageId: string) => {
     "DELETE"
   );
 };
-

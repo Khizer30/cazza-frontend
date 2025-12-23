@@ -68,7 +68,11 @@ export function Onboarding() {
 
   const handleFinish = async () => {
     // Validate required fields
-    if (!formData.businessName || !formData.businessEntityType || !formData.annualRevenueBand) {
+    if (
+      !formData.businessName ||
+      !formData.businessEntityType ||
+      !formData.annualRevenueBand
+    ) {
       return;
     }
 
@@ -120,6 +124,7 @@ export function Onboarding() {
                           businessName: e.target.value,
                         })
                       }
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -132,6 +137,7 @@ export function Onboarding() {
                       onValueChange={(v) =>
                         setFormData({ ...formData, businessEntityType: v })
                       }
+                      disabled={isLoading}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select entity type" />
@@ -160,6 +166,7 @@ export function Onboarding() {
                       onValueChange={(v) =>
                         setFormData({ ...formData, annualRevenueBand: v })
                       }
+                      disabled={isLoading}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select revenue band" />
@@ -210,6 +217,7 @@ export function Onboarding() {
                         onCheckedChange={() =>
                           handleCheckbox("marketplaces", item)
                         }
+                        disabled={isLoading}
                       />
                       <span>{item}</span>
                     </label>
@@ -232,12 +240,16 @@ export function Onboarding() {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {availableTools.map((tool) => (
-                        <label key={tool} className="flex items-center space-x-2">
+                        <label
+                          key={tool}
+                          className="flex items-center space-x-2"
+                        >
                           <Checkbox
                             checked={formData.tools.includes(tool)}
                             onCheckedChange={() =>
                               handleCheckbox("tools", tool)
                             }
+                            disabled={isLoading}
                           />
                           <span>{tool}</span>
                         </label>
@@ -246,9 +258,7 @@ export function Onboarding() {
                   </div>
 
                   <div className="pt-4 border-t">
-                    <p className="text-sm mb-3">
-                      Additional preferences:
-                    </p>
+                    <p className="text-sm mb-3">Additional preferences:</p>
                     <label className="flex items-center space-x-2 mb-2">
                       <Checkbox
                         checked={formData.techStack.useXero}
@@ -261,6 +271,7 @@ export function Onboarding() {
                             },
                           })
                         }
+                        disabled={isLoading}
                       />
                       <span>I use Xero</span>
                     </label>
@@ -277,6 +288,7 @@ export function Onboarding() {
                             },
                           })
                         }
+                        disabled={isLoading}
                       />
                       <span>I work with multiple currencies</span>
                     </label>
@@ -287,11 +299,17 @@ export function Onboarding() {
           </AnimatePresence>
 
           <div className="flex justify-between mt-8">
-            <Button variant="outline" onClick={back} disabled={step === 0 || isLoading}>
+            <Button
+              variant="outline"
+              onClick={back}
+              disabled={step === 0 || isLoading}
+            >
               Back
             </Button>
             {step < steps.length - 1 ? (
-              <Button onClick={next} disabled={isLoading}>Next</Button>
+              <Button onClick={next} disabled={isLoading}>
+                Next
+              </Button>
             ) : (
               <Button onClick={handleFinish} disabled={isLoading}>
                 {isLoading ? (

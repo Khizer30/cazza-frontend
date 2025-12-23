@@ -16,7 +16,7 @@ export const ShopifyConnectionForm = ({
   onConnectionSuccess?: () => void;
 }) => {
   const [shopUrl, setShopUrl] = useState("");
-  const [isConnecting, ] = useState(false);
+  const [isConnecting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

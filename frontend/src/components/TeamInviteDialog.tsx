@@ -43,7 +43,7 @@ export const TeamInviteDialog = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Reset errors
     setErrors({});
 
@@ -68,13 +68,13 @@ export const TeamInviteDialog = ({
         email: email.trim().toLowerCase(),
         role,
       });
-      
+
       // Reset form and close dialog on success
       setEmail("");
       setRole("MEMBER");
       setErrors({});
       onOpenChange(false);
-      
+
       // Call success callback if provided
       if (onInviteSuccess) {
         onInviteSuccess();
@@ -98,7 +98,8 @@ export const TeamInviteDialog = ({
         <DialogHeader>
           <DialogTitle>Invite Team Member</DialogTitle>
           <DialogDescription>
-            Send an invitation to add a new member to your team. They will receive an email with instructions to join.
+            Send an invitation to add a new member to your team. They will
+            receive an email with instructions to join.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -148,7 +149,8 @@ export const TeamInviteDialog = ({
                 <p className="text-sm text-destructive">{errors.role}</p>
               )}
               <p className="text-xs text-muted-foreground">
-                Members have standard access. Admins can manage team members and settings.
+                Members have standard access. Admins can manage team members and
+                settings.
               </p>
             </div>
           </div>
@@ -177,4 +179,3 @@ export const TeamInviteDialog = ({
     </Dialog>
   );
 };
-

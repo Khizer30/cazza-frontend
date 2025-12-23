@@ -39,7 +39,7 @@ export const SignUp = () => {
     register,
     handleSubmit,
     formState: { errors },
-      control,
+    control,
     setValue,
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
@@ -54,8 +54,6 @@ export const SignUp = () => {
     },
   });
 
-
-
   // Fetch invitation details if invitation ID is present
   useEffect(() => {
     const fetchInvitation = async () => {
@@ -67,7 +65,7 @@ export const SignUp = () => {
           // 1. Expected format: { success: true, data: { email: "..." } }
           // 2. Actual format: { email: "..." }
           let invitationEmail: string | undefined;
-          
+
           if (response && response.success && response.data) {
             // Standard response format
             invitationEmail = response.data.email;
@@ -75,7 +73,7 @@ export const SignUp = () => {
             // Direct email response format
             invitationEmail = (response as any).email;
           }
-          
+
           if (invitationEmail) {
             // Set email and invitationId in the form
             setValue("email", invitationEmail, { shouldValidate: false });
@@ -90,7 +88,10 @@ export const SignUp = () => {
         } catch (error: unknown) {
           console.error("Fetch invitation error:", error);
           if (error instanceof AxiosError) {
-            const errorMessage = error.response?.data?.message || error.response?.data?.error || "Invalid or expired invitation";
+            const errorMessage =
+              error.response?.data?.message ||
+              error.response?.data?.error ||
+              "Invalid or expired invitation";
             showToast(errorMessage, "error");
           } else if (error instanceof Error) {
             showToast(error.message, "error");
@@ -122,17 +123,19 @@ export const SignUp = () => {
     setLoading(true);
     try {
       // Extract form data (firstName, lastName, email, password)
-      const { confirmPassword, acceptedTerms, invitationId, ...formData } = data;
-      
+      const { confirmPassword, acceptedTerms, invitationId, ...formData } =
+        data;
+
       // Build signup payload with form data and invitationId (if exists)
       const payload: SIGNUP_PAYLOAD = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
-        ...(invitationId && invitationId.trim() && { invitationId: invitationId.trim() }),
+        ...(invitationId &&
+          invitationId.trim() && { invitationId: invitationId.trim() }),
       };
-      
+
       await signUp(payload);
       // Optionally navigate to login or show success message
       // navigate("/login");
@@ -158,7 +161,7 @@ export const SignUp = () => {
               <Button
                 variant="outline"
                 onClick={handleGoogleSignIn}
-                disabled={loading}
+                disabled={loading || loadingInvitation}
                 className="w-full"
               >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -199,7 +202,9 @@ export const SignUp = () => {
                 />
               </div>
               {errors.firstName && (
-                <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.firstName.message}
+                </p>
               )}
             </div>
 
@@ -217,7 +222,9 @@ export const SignUp = () => {
                 />
               </div>
               {errors.lastName && (
-                <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.lastName.message}
+                </p>
               )}
             </div>
 
@@ -228,7 +235,9 @@ export const SignUp = () => {
                 {loadingInvitation ? (
                   <div className="flex items-center pl-10 h-10 border border-input rounded-md bg-background">
                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />
-                    <span className="text-sm text-muted-foreground">Loading invitation...</span>
+                    <span className="text-sm text-muted-foreground">
+                      Loading invitation...
+                    </span>
                   </div>
                 ) : (
                   <Input
@@ -242,7 +251,9 @@ export const SignUp = () => {
                 )}
               </div>
               {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
               )}
               {isInvitedUser && !errors.email && (
                 <p className="text-xs text-muted-foreground">
@@ -277,7 +288,9 @@ export const SignUp = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -307,7 +320,9 @@ export const SignUp = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
 
@@ -347,15 +362,20 @@ export const SignUp = () => {
               </Label>
             </div>
             {errors.acceptedTerms && (
-              <p className="text-sm text-destructive">{errors.acceptedTerms.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.acceptedTerms.message}
+              </p>
             )}
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
-              {loading ? "Creating account..." : "Create account"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Create account"
+              )}
             </Button>
           </form>
 

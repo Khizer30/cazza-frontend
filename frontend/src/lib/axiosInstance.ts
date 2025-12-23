@@ -26,7 +26,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     if (error.response && error.response.status === 403) {
       // Don't redirect for auth endpoints - let components handle the error
-      const isAuthEndpoint = error.config?.url?.includes('/auth/');
+      const isAuthEndpoint = error.config?.url?.includes("/auth/");
       if (!isAuthEndpoint) {
         localStorage.clear();
         window.location.href = "/login";
