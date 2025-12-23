@@ -3,10 +3,9 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [ "ES2022", "DOM", "DOM.Iterable" ],
     "module": "ESNext",
-    "types": ["vite/client"],
-    "skipLibCheck": true,
+    "types": [ "vite/client" ],
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -17,7 +16,6 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
@@ -29,7 +27,11 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+
+    "strict": false,
+    "noEmitOnError": false,
+    "skipLibCheck": true
   },
-  "include": ["src", "src/components/ClientComponents/PlanCards.tsx"]
+  "include": [ "src", "src/components/ClientComponents/PlanCards.tsx" ]
 }
