@@ -323,6 +323,15 @@ export interface GET_INVITATION_RESPONSE {
   };
 }
 
+export interface ACCEPT_INVITATION_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    user?: User;
+    [key: string]: any;
+  };
+}
+
 export interface START_SUBSCRIPTION_PAYLOAD {
   interval: "monthly" | "yearly";
 }

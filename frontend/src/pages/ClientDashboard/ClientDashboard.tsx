@@ -232,9 +232,12 @@ export const ClientDashboard = () => {
                     fontSize={12}
                   />
                   <Tooltip
-                    formatter={(value: number, name: string) => [
-                      `£${value.toLocaleString()}`,
-                      name,
+                    formatter={(
+                      value: number | undefined,
+                      name: string | undefined
+                    ) => [
+                      value !== undefined ? `£${value.toLocaleString()}` : "£0",
+                      name || "",
                     ]}
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",

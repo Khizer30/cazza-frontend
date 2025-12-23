@@ -9,8 +9,6 @@ import {
   addMemberToGroupService,
   removeMemberFromGroupService,
   updateMemberRoleService,
-  type ChatGroup,
-  type ChatGroupDetail,
   type CreateChatGroupPayload,
 } from "@/services/chatService";
 import { AxiosError } from "axios";

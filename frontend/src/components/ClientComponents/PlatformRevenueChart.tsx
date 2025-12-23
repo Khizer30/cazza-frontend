@@ -295,8 +295,8 @@ export const PlatformRevenueChart = () => {
                   fontSize={12}
                 />
                 <Tooltip
-                  formatter={(value: number) => [
-                    `£${value.toLocaleString()}`,
+                  formatter={(value: number | undefined) => [
+                    value !== undefined ? `£${value.toLocaleString()}` : "£0",
                     chartView === "revenue"
                       ? "Revenue"
                       : chartView === "profit"
@@ -378,8 +378,10 @@ export const PlatformRevenueChart = () => {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number) =>
-                        `£${value.toLocaleString()}`
+                      formatter={(value: number | undefined) =>
+                        value !== undefined
+                          ? `£${value.toLocaleString()}`
+                          : "£0"
                       }
                     />
                   </PieChart>
