@@ -30,6 +30,13 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Plus,
   Hash,
   Users,
@@ -115,6 +122,7 @@ interface Channel {
   createdAt: string;
   messages: ChannelMessage[];
   userRole?: "ADMIN" | "MEMBER";
+  createdBy?: string;
 }
 
 const availableIcons: { name: string; icon: LucideIcon; color: string }[] = [
@@ -153,6 +161,7 @@ export const Channels = () => {
     getChatGroupById,
     addMemberToGroup,
     removeMemberFromGroup,
+    updateMemberRole,
     getFirebaseToken,
   } = useChat();
   const { fetchTeamMembers } = useTeam();
@@ -167,9 +176,15 @@ export const Channels = () => {
   );
   const [teamMembers, setTeamMembers] = useState<TeamMemberType[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+  const [addingMemberId, setAddingMemberId] = useState<string | null>(null);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
+  const [changingRoleMemberId, setChangingRoleMemberId] = useState<string | null>(null);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isLoadingChannelDetails, setIsLoadingChannelDetails] = useState(false);
 
   const convertChatGroupToChannel = useCallback(
-    (chatGroup: ChatGroup): Channel => {
+    (chatGroup: ChatGroup & { createdBy?: string }): Channel => {
       const defaultIcon = availableIcons[0];
       const icon = availableIcons.find((i) => i.name === "Hash") || defaultIcon;
 
@@ -184,6 +199,7 @@ export const Channels = () => {
         createdAt: chatGroup.createdAt,
         messages: [],
         userRole: chatGroup.role,
+        createdBy: (chatGroup as any).createdBy,
       };
     },
     []
@@ -201,6 +217,7 @@ export const Channels = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const isInitializingRef = useRef(false);
+  const addMemberDialogChannelIdRef = useRef<string | null>(null);
 
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
@@ -233,8 +250,59 @@ export const Channels = () => {
     return null;
   };
 
-  const currentUserRole = getCurrentUserRole(selectedChannel);
-  const isAdmin = currentUserRole === "ADMIN";
+  const isCreatorOrAdmin = (channel: Channel | undefined): boolean => {
+    if (!channel || !loggedInUser) return false;
+
+    if (channel.createdBy && 
+        (channel.createdBy === loggedInUser.id || 
+         String(channel.createdBy) === String(loggedInUser.id))) {
+      return true;
+    }
+
+    return getCurrentUserRole(channel) === "ADMIN";
+  };
+
+  const processMemberFromAPI = (member: any, creatorId: string | null) => {
+    if (!member.user) {
+      return {
+        id: member.userId,
+        name: "User",
+        email: "",
+        avatar: null,
+        role: member.role,
+        isCreator: false,
+      };
+    }
+
+    const userData = member.user;
+    const isCreator = creatorId && (
+      member.userId === creatorId ||
+      String(member.userId) === String(creatorId) ||
+      userData.id === creatorId ||
+      String(userData.id) === String(creatorId)
+    );
+
+    const getDisplayName = () => {
+      if (userData.firstName && userData.lastName) {
+        return `${userData.firstName} ${userData.lastName}`;
+      }
+      if (userData.firstName) {
+        return userData.firstName;
+      }
+      return userData.email || "User";
+    };
+
+    return {
+      id: member.userId,
+      name: getDisplayName(),
+      email: userData.email || "",
+      avatar: userData.profileImage || null,
+      role: member.role,
+      isCreator: !!isCreator,
+    };
+  };
+
+
 
   useEffect(() => {
     const loadChatGroups = async () => {
@@ -263,7 +331,6 @@ export const Channels = () => {
           setChannels([]);
         }
       } catch (error) {
-        console.error("Failed to load chat groups:", error);
         setChannels([]);
       } finally {
         setIsLoading(false);
@@ -282,7 +349,6 @@ export const Channels = () => {
           setTeamMembers(members);
         }
       } catch (error) {
-        console.error("Failed to load team members:", error);
       } finally {
         setIsLoadingMembers(false);
       }
@@ -307,6 +373,7 @@ export const Channels = () => {
 
     const initializeFirebaseAndLoadMessages = async () => {
       isInitializingRef.current = true;
+      setIsLoadingMessages(true);
 
       try {
         const customToken = await getFirebaseToken(selectedChannelId);
@@ -317,6 +384,7 @@ export const Channels = () => {
           customToken.trim() === ""
         ) {
           isInitializingRef.current = false;
+          setIsLoadingMessages(false);
           return;
         }
 
@@ -350,6 +418,7 @@ export const Channels = () => {
 
           if (!auth.currentUser) {
             isInitializingRef.current = false;
+            setIsLoadingMessages(false);
             return;
           }
 
@@ -389,11 +458,12 @@ export const Channels = () => {
                     : channel
                 )
               );
+              setIsLoadingMessages(false);
             },
             (error: any) => {
-              console.error("Firestore listener error:", error);
               if (error?.code === "permission-denied") {
                 isInitializingRef.current = false;
+                setIsLoadingMessages(false);
               }
             }
           );
@@ -401,12 +471,12 @@ export const Channels = () => {
           unsubscribeRef.current = unsubscribe;
           isInitializingRef.current = false;
         } catch (authError: any) {
-          console.error("Firebase authentication error:", authError);
           isInitializingRef.current = false;
+          setIsLoadingMessages(false);
         }
       } catch (error) {
-        console.error("Failed to initialize Firebase:", error);
         isInitializingRef.current = false;
+        setIsLoadingMessages(false);
       }
     };
 
@@ -418,156 +488,39 @@ export const Channels = () => {
         unsubscribeRef.current = null;
       }
       isInitializingRef.current = false;
+      setIsLoadingMessages(false);
     };
   }, [selectedChannelId]);
 
   useEffect(() => {
-    if (!selectedChannelId) return;
+    if (!selectedChannelId) {
+      setIsLoadingChannelDetails(false);
+      return;
+    }
 
     const loadChannelDetails = async () => {
       try {
+        setIsLoadingChannelDetails(true);
         const channelDetails = await getChatGroupById(selectedChannelId);
         if (channelDetails) {
           const creatorId = (channelDetails as any).createdBy;
-          let creatorMember = null;
-
-          if (creatorId) {
-            creatorMember = teamMembers.find(
-              (tm) =>
-                tm.id === creatorId ||
-                tm.userId === creatorId ||
-                tm.user_id === creatorId ||
-                String(tm.id) === String(creatorId) ||
-                String(tm.userId) === String(creatorId) ||
-                String(tm.user_id) === String(creatorId)
-            );
-
-            if (
-              !creatorMember &&
-              loggedInUser &&
-              (loggedInUser.id === creatorId ||
-                String(loggedInUser.id) === String(creatorId))
-            ) {
-              creatorMember = {
-                id: loggedInUser.id,
-                userId: loggedInUser.id,
-                firstName: loggedInUser.firstName,
-                lastName: loggedInUser.lastName,
-                name: `${loggedInUser.firstName} ${loggedInUser.lastName}`,
-                email: loggedInUser.email,
-                profileImage: loggedInUser.profileImage,
-                avatar: loggedInUser.profileImage,
-              } as any;
-            }
-          }
-
-          const getCreatorDisplayName = () => {
-            if (
-              creatorMember &&
-              "firstName" in creatorMember &&
-              creatorMember.firstName &&
-              "lastName" in creatorMember &&
-              creatorMember.lastName
-            ) {
-              return `${creatorMember.firstName} ${creatorMember.lastName}`;
-            }
-            if (
-              creatorMember &&
-              "firstName" in creatorMember &&
-              creatorMember.firstName
-            ) {
-              return creatorMember.firstName;
-            }
-            if (creatorMember?.firstName && creatorMember?.lastName) {
-              return `${creatorMember.firstName} ${creatorMember.lastName}`;
-            }
-            if (creatorMember?.firstName) {
-              return creatorMember.firstName;
-            }
-            if (creatorMember?.name) {
-              return creatorMember.name;
-            }
-            const email =
-              (creatorMember as any)?.email || creatorMember?.profiles?.email;
-            return email || "User";
-          };
 
           const processedMembers =
             channelDetails.members
-              ?.filter((member) => member.userId !== creatorId)
-              .map((member) => {
-                let teamMember = teamMembers.find(
-                  (tm) =>
-                    tm.id === member.userId ||
-                    tm.userId === member.userId ||
-                    tm.user_id === member.userId ||
-                    String(tm.id) === String(member.userId) ||
-                    String(tm.userId) === String(member.userId) ||
-                    String(tm.user_id) === String(member.userId)
-                );
-
-                if (
-                  !teamMember &&
-                  loggedInUser &&
-                  (loggedInUser.id === member.userId ||
-                    String(loggedInUser.id) === String(member.userId))
-                ) {
-                  teamMember = {
-                    id: loggedInUser.id,
-                    userId: loggedInUser.id,
-                    firstName: loggedInUser.firstName,
-                    lastName: loggedInUser.lastName,
-                    name: `${loggedInUser.firstName} ${loggedInUser.lastName}`,
-                    email: loggedInUser.email,
-                    profileImage: loggedInUser.profileImage,
-                    avatar: loggedInUser.profileImage,
-                  } as any;
-                }
-
-                const getDisplayName = () => {
-                  if (teamMember?.firstName && teamMember?.lastName) {
-                    return `${teamMember.firstName} ${teamMember.lastName}`;
-                  }
-                  if (teamMember?.firstName) {
-                    return teamMember.firstName;
-                  }
-                  if (teamMember?.name) {
-                    return teamMember.name;
-                  }
-                  return (
-                    teamMember?.email || teamMember?.profiles?.email || "User"
-                  );
-                };
-
-                return {
-                  id: member.userId,
-                  name: getDisplayName(),
-                  email: teamMember?.email || teamMember?.profiles?.email || "",
-                  avatar: teamMember?.profileImage || teamMember?.avatar,
-                  role: member.role,
-                };
+              ?.map((member: any) => processMemberFromAPI(member, creatorId))
+              .sort((a: any, b: any) => {
+                if (a.isCreator) return -1;
+                if (b.isCreator) return 1;
+                return 0;
               }) || [];
 
-          const finalMembers: TeamMember[] = [];
-          if (creatorId) {
-            const creatorEmail =
-              (creatorMember as any)?.email ||
-              creatorMember?.profiles?.email ||
-              "";
-            const creatorAvatar =
-              (creatorMember as any)?.profileImage ||
-              creatorMember?.avatar ||
-              creatorMember?.profileImage;
-
-            finalMembers.push({
-              id: creatorId,
-              name: getCreatorDisplayName(),
-              email: creatorEmail,
-              avatar: creatorAvatar,
-              role: "ADMIN" as const,
-            });
-          }
-          finalMembers.push(...processedMembers);
+          const finalMembers: TeamMember[] = processedMembers.map((member: any) => ({
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            avatar: member.avatar,
+            role: member.role,
+          }));
 
           setChannels((prevChannels) =>
             prevChannels.map((channel) =>
@@ -578,13 +531,15 @@ export const Channels = () => {
                     userRole:
                       (channelDetails as any).userRole ||
                       (channelDetails as any).role,
+                    createdBy: creatorId || channel.createdBy,
                   }
                 : channel
             )
           );
         }
       } catch (error) {
-        console.error("Failed to load channel details:", error);
+      } finally {
+        setIsLoadingChannelDetails(false);
       }
     };
 
@@ -609,7 +564,10 @@ export const Channels = () => {
       const createdGroup = await createChatGroup({ name: channelName.trim() });
 
       if (createdGroup) {
-        const newChannel = convertChatGroupToChannel(createdGroup);
+        const newChannel = convertChatGroupToChannel({
+          ...createdGroup,
+          createdBy: (createdGroup as any).createdBy,
+        });
         setChannels([newChannel, ...channels]);
         setSelectedChannelId(newChannel.id);
       }
@@ -619,7 +577,6 @@ export const Channels = () => {
       setSelectedIcon(availableIcons[0]);
       setShowCreateDialog(false);
     } catch (error) {
-      console.error("Failed to create channel:", error);
     } finally {
       setIsCreating(false);
     }
@@ -653,7 +610,6 @@ export const Channels = () => {
       setSelectedIcon(availableIcons[0]);
       setShowCreateDialog(false);
     } catch (error) {
-      console.error("Failed to update channel:", error);
     } finally {
       setIsUpdating(false);
     }
@@ -675,7 +631,6 @@ export const Channels = () => {
         setSelectedChannelId(updatedChannels[0]?.id || null);
       }
     } catch (error) {
-      console.error("Failed to delete channel:", error);
     } finally {
       setIsDeleting(null);
     }
@@ -683,126 +638,149 @@ export const Channels = () => {
 
   const handleAddMember = async (channelId: string, memberId: string) => {
     try {
+      setAddingMemberId(memberId);
       await addMemberToGroup(channelId, memberId, "MEMBER");
 
       setShowAddMemberDialog(null);
 
       const channelDetails = await getChatGroupById(channelId);
       if (channelDetails) {
+        const creatorId = (channelDetails as any).createdBy;
+
+        const processedMembers =
+          channelDetails.members
+            ?.map((member: any) => processMemberFromAPI(member, creatorId))
+            .sort((a: any, b: any) => {
+              if (a.isCreator) return -1;
+              if (b.isCreator) return 1;
+              return 0;
+            }) || [];
+
+        const finalMembers: TeamMember[] = processedMembers.map((member: any) => ({
+          id: member.id,
+          name: member.name,
+          email: member.email,
+          avatar: member.avatar,
+          role: member.role,
+        }));
+
         setChannels((prevChannels) =>
           prevChannels.map((channel) =>
             channel.id === channelId
               ? {
                   ...channel,
-                  members:
-                    channelDetails.members?.map((member) => {
-                      const teamMember = teamMembers.find(
-                        (tm) =>
-                          tm.id === member.userId ||
-                          tm.userId === member.userId ||
-                          tm.user_id === member.userId
-                      );
-                      const getDisplayName = () => {
-                        if (teamMember?.firstName && teamMember?.lastName) {
-                          return `${teamMember.firstName} ${teamMember.lastName}`;
-                        }
-                        if (teamMember?.firstName) {
-                          return teamMember.firstName;
-                        }
-                        if (teamMember?.name) {
-                          return teamMember.name;
-                        }
-                        return (
-                          teamMember?.email ||
-                          teamMember?.profiles?.email ||
-                          "User"
-                        );
-                      };
-
-                      return {
-                        id: member.userId,
-                        name: getDisplayName(),
-                        email:
-                          teamMember?.email ||
-                          teamMember?.profiles?.email ||
-                          "",
-                        avatar: teamMember?.profileImage || teamMember?.avatar,
-                        role: member.role,
-                      };
-                    }) || [],
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
                 }
               : channel
           )
         );
       }
     } catch (error) {
-      console.error("Failed to add member:", error);
+    } finally {
+      setAddingMemberId(null);
     }
   };
 
   const handleRemoveMember = async (channelId: string, userId: string) => {
     try {
+      setRemovingMemberId(userId);
       await removeMemberFromGroup(channelId, userId);
 
       setShowRemoveMemberDialog(null);
 
       const channelDetails = await getChatGroupById(channelId);
       if (channelDetails) {
+        const creatorId = (channelDetails as any).createdBy;
+
+        const processedMembers =
+          channelDetails.members
+            ?.map((member: any) => processMemberFromAPI(member, creatorId))
+            .sort((a: any, b: any) => {
+              if (a.isCreator) return -1;
+              if (b.isCreator) return 1;
+              return 0;
+            }) || [];
+
+        const finalMembers: TeamMember[] = processedMembers.map((member: any) => ({
+          id: member.id,
+          name: member.name,
+          email: member.email,
+          avatar: member.avatar,
+          role: member.role,
+        }));
+
         setChannels((prevChannels) =>
           prevChannels.map((channel) =>
             channel.id === channelId
               ? {
                   ...channel,
-                  members:
-                    channelDetails.members?.map((member) => {
-                      const teamMember = teamMembers.find(
-                        (tm) =>
-                          tm.id === member.userId ||
-                          tm.userId === member.userId ||
-                          tm.user_id === member.userId
-                      );
-                      const getDisplayName = () => {
-                        if (teamMember?.firstName && teamMember?.lastName) {
-                          return `${teamMember.firstName} ${teamMember.lastName}`;
-                        }
-                        if (teamMember?.firstName) {
-                          return teamMember.firstName;
-                        }
-                        if (teamMember?.name) {
-                          return teamMember.name;
-                        }
-                        return (
-                          teamMember?.email ||
-                          teamMember?.profiles?.email ||
-                          "User"
-                        );
-                      };
-
-                      return {
-                        id: member.userId,
-                        name: getDisplayName(),
-                        email:
-                          teamMember?.email ||
-                          teamMember?.profiles?.email ||
-                          "",
-                        avatar: teamMember?.profileImage || teamMember?.avatar,
-                        role: member.role,
-                      };
-                    }) || [],
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
                 }
               : channel
           )
         );
       }
     } catch (error) {
-      console.error("Failed to remove member:", error);
+    } finally {
+      setRemovingMemberId(null);
+    }
+  };
+
+  const handleChangeMemberRole = async (
+    channelId: string,
+    userId: string,
+    newRole: "ADMIN" | "MEMBER"
+  ) => {
+    try {
+      setChangingRoleMemberId(userId);
+      await updateMemberRole(channelId, userId, newRole);
+
+      const channelDetails = await getChatGroupById(channelId);
+      if (channelDetails) {
+        const creatorId = (channelDetails as any).createdBy;
+
+        const processedMembers =
+          channelDetails.members
+            ?.map((member: any) => processMemberFromAPI(member, creatorId))
+            .sort((a: any, b: any) => {
+              if (a.isCreator) return -1;
+              if (b.isCreator) return 1;
+              return 0;
+            }) || [];
+
+        const finalMembers: TeamMember[] = processedMembers.map((member: any) => ({
+          id: member.id,
+          name: member.name,
+          email: member.email,
+          avatar: member.avatar,
+          role: member.role,
+        }));
+
+        setChannels((prevChannels) =>
+          prevChannels.map((channel) =>
+            channel.id === channelId
+              ? {
+                  ...channel,
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
+                }
+              : channel
+          )
+        );
+      }
+    } catch (error) {
+    } finally {
+      setChangingRoleMemberId(null);
     }
   };
 
   const handleSendMessage = async () => {
-    if (!messageInput.trim() || !selectedChannelId || !loggedInUser) return;
+    if (!messageInput.trim() || !selectedChannelId || !loggedInUser || isSendingMessage) return;
 
     try {
+      setIsSendingMessage(true);
       if (!auth.currentUser) {
         return;
       }
@@ -827,7 +805,8 @@ export const Channels = () => {
 
       setMessageInput("");
     } catch (error: any) {
-      console.error("Failed to send message:", error);
+    } finally {
+      setIsSendingMessage(false);
     }
   };
 
@@ -857,32 +836,25 @@ export const Channels = () => {
       .slice(0, 2);
   };
 
-  const getSender = (senderId: string) => {
-    const teamMember = teamMembers.find(
-      (m) =>
-        m.id === senderId || m.userId === senderId || m.user_id === senderId
-    );
-    if (teamMember) {
-      const getDisplayName = () => {
-        if (teamMember.firstName && teamMember.lastName) {
-          return `${teamMember.firstName} ${teamMember.lastName}`;
-        }
-        if (teamMember.firstName) {
-          return teamMember.firstName;
-        }
-        if (teamMember.name) {
-          return teamMember.name;
-        }
-        return teamMember.email || teamMember.profiles?.email || "User";
-      };
-
-      return {
-        id: teamMember.id || teamMember.userId || teamMember.user_id || "",
-        name: getDisplayName(),
-        email: teamMember.email || teamMember.profiles?.email || "",
-        avatar: teamMember.profileImage || teamMember.avatar,
-        role: teamMember.role as "MEMBER" | "ADMIN",
-      };
+  const getSender = (senderId: string, message?: ChannelMessage) => {
+    const channel = channels.find((c) => c.id === selectedChannelId);
+    
+    if (channel) {
+      const channelMember = channel.members.find(
+        (m) =>
+          m.id === senderId ||
+          String(m.id) === String(senderId)
+      );
+      
+      if (channelMember) {
+        return {
+          id: channelMember.id,
+          name: channelMember.name,
+          email: channelMember.email || "",
+          avatar: channelMember.avatar ?? undefined,
+          role: channelMember.role,
+        };
+      }
     }
 
     if (
@@ -911,7 +883,7 @@ export const Channels = () => {
 
     return {
       id: senderId,
-      name: "User",
+      name: message?.senderName || "User",
       email: "",
       avatar: undefined,
       role: "MEMBER" as const,
@@ -1138,7 +1110,7 @@ export const Channels = () => {
                         >
                           {channel.name}
                         </p>
-                        {getCurrentUserRole(channel) === "ADMIN" && (
+                        {isCreatorOrAdmin(channel) && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -1163,6 +1135,7 @@ export const Channels = () => {
                               <DropdownMenuItem
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  addMemberDialogChannelIdRef.current = channel.id;
                                   setShowAddMemberDialog(channel.id);
                                 }}
                               >
@@ -1176,9 +1149,19 @@ export const Channels = () => {
                                   handleDeleteChannel(channel.id);
                                 }}
                                 className="text-destructive"
+                                disabled={isDeleting === channel.id}
                               >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete Channel
+                                {isDeleting === channel.id ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Channel
+                                  </>
+                                )}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -1248,33 +1231,51 @@ export const Channels = () => {
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="gap-1">
                     <Users className="h-3 w-3" />
-                    {selectedChannel.members.length}
+                    {isLoadingChannelDetails ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      selectedChannel.members.length
+                    )}
                   </Badge>
-                  {isAdmin && (
+                  {isCreatorOrAdmin(selectedChannel) && (
                     <>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() =>
-                          setShowAddMemberDialog(selectedChannel.id)
-                        }
+                        disabled={isLoadingChannelDetails}
+                        onClick={() => {
+                          addMemberDialogChannelIdRef.current = selectedChannel.id;
+                          setShowAddMemberDialog(selectedChannel.id);
+                        }}
                         title="Add Members"
                       >
                         <UserPlus className="h-4 w-4" />
                       </Button>
-                      {selectedChannel.members.length > 0 && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            setShowRemoveMemberDialog(selectedChannel.id)
-                          }
-                          title="Remove Members"
-                        >
-                          <Users className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={isLoadingChannelDetails || selectedChannel.members.length === 0}
+                        onClick={() =>
+                          setShowRemoveMemberDialog(selectedChannel.id)
+                        }
+                        title="Manage Members"
+                      >
+                        <Users className="h-4 w-4" />
+                      </Button>
                     </>
+                  )}
+                  {!isCreatorOrAdmin(selectedChannel) && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={isLoadingChannelDetails || selectedChannel.members.length === 0}
+                      onClick={() =>
+                        setShowRemoveMemberDialog(selectedChannel.id)
+                      }
+                      title="View Members"
+                    >
+                      <Users className="h-4 w-4" />
+                    </Button>
                   )}
                 </div>
               </div>
@@ -1282,7 +1283,12 @@ export const Channels = () => {
 
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-4">
-                {selectedChannel.messages.length === 0 ? (
+                {isLoadingMessages ? (
+                  <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
+                    <Loader2 className="h-8 w-8 text-muted-foreground mb-4 animate-spin" />
+                    <p className="text-muted-foreground">Loading messages...</p>
+                  </div>
+                ) : selectedChannel.messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center py-12">
                     <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
@@ -1294,7 +1300,7 @@ export const Channels = () => {
                   </div>
                 ) : (
                   selectedChannel.messages.map((message) => {
-                    const sender = getSender(message.senderId);
+                    const sender = getSender(message.senderId, message);
                     const isCurrentUser =
                       loggedInUser &&
                       (message.senderId === loggedInUser.id ||
@@ -1307,17 +1313,19 @@ export const Channels = () => {
                         }`}
                       >
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={sender.avatar} />
+                          <AvatarImage src={sender.avatar || undefined} />
                           <AvatarFallback className="text-xs">
                             {getInitials(sender.name)}
                           </AvatarFallback>
                         </Avatar>
                         <div
-                          className={`flex-1 max-w-[70%] ${
-                            isCurrentUser ? "flex flex-col items-end" : ""
+                          className={`flex flex-col max-w-[70%] ${
+                            isCurrentUser ? "items-end" : "items-start"
                           }`}
                         >
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className={`flex items-center gap-2 mb-1 ${
+                            isCurrentUser ? "flex-row-reverse" : ""
+                          }`}>
                             <span className="text-sm font-medium">
                               {sender.name}
                             </span>
@@ -1326,7 +1334,7 @@ export const Channels = () => {
                             </span>
                           </div>
                           <div
-                            className={`rounded-lg px-4 py-2 ${
+                            className={`rounded-lg px-4 py-2 inline-block ${
                               isCurrentUser
                                 ? "bg-primary text-primary-foreground"
                                 : "bg-card border border-border"
@@ -1361,10 +1369,14 @@ export const Channels = () => {
                 />
                 <Button
                   onClick={handleSendMessage}
-                  disabled={!messageInput.trim()}
+                  disabled={!messageInput.trim() || isSendingMessage}
                   size="icon"
                 >
-                  <Send className="h-4 w-4" />
+                  {isSendingMessage ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -1386,7 +1398,18 @@ export const Channels = () => {
 
       <Dialog
         open={showAddMemberDialog !== null}
-        onOpenChange={(open) => !open && setShowAddMemberDialog(null)}
+        onOpenChange={(open) => {
+          if (open) {
+            if (showAddMemberDialog) {
+              addMemberDialogChannelIdRef.current = showAddMemberDialog;
+            }
+          } else {
+            setShowAddMemberDialog(null);
+            setTimeout(() => {
+              addMemberDialogChannelIdRef.current = null;
+            }, 200);
+          }
+        }}
       >
         <DialogContent>
           <DialogHeader>
@@ -1403,8 +1426,9 @@ export const Channels = () => {
                 </div>
               ) : teamMembers.length > 0 ? (
                 teamMembers.map((member) => {
+                  const channelId = showAddMemberDialog || addMemberDialogChannelIdRef.current;
                   const channel = channels.find(
-                    (c) => c.id === showAddMemberDialog
+                    (c) => c.id === channelId
                   );
                   const isMember = channel?.members.some(
                     (m) =>
@@ -1416,6 +1440,7 @@ export const Channels = () => {
                     <div
                       key={member.id || member.userId || member.user_id}
                       className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center gap-3">
                         <Avatar>
@@ -1444,13 +1469,16 @@ export const Channels = () => {
                       ) : (
                         <Button
                           size="sm"
-                          onClick={() => {
+                          disabled={addingMemberId === (member.id || member.userId || member.user_id) || !!addingMemberId}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const channelId = showAddMemberDialog || addMemberDialogChannelIdRef.current;
                             if (
-                              showAddMemberDialog &&
+                              channelId &&
                               (member.id || member.userId || member.user_id)
                             ) {
                               handleAddMember(
-                                showAddMemberDialog,
+                                channelId,
                                 member.id ||
                                   member.userId ||
                                   member.user_id ||
@@ -1459,8 +1487,17 @@ export const Channels = () => {
                             }
                           }}
                         >
-                          <UserPlus className="mr-2 h-4 w-4" />
-                          Add
+                          {addingMemberId === (member.id || member.userId || member.user_id) ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Adding...
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus className="mr-2 h-4 w-4" />
+                              Add
+                            </>
+                          )}
                         </Button>
                       )}
                     </div>
@@ -1476,7 +1513,10 @@ export const Channels = () => {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowAddMemberDialog(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAddMemberDialog(null);
+              }}
             >
               Close
             </Button>
@@ -1490,9 +1530,9 @@ export const Channels = () => {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove Channel Members</DialogTitle>
+            <DialogTitle>Channel Members</DialogTitle>
             <DialogDescription>
-              Select members to remove from this channel
+              Manage channel members and their roles
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -1504,115 +1544,139 @@ export const Channels = () => {
                     const channel = channels.find(
                       (c) => c.id === showRemoveMemberDialog
                     );
+                    const canManage = channel
+                      ? isCreatorOrAdmin(channel)
+                      : false;
+                    const isCreator =
+                      channel?.createdBy &&
+                      (channel.createdBy === member.id ||
+                        String(channel.createdBy) === String(member.id));
+                    const isCurrentUserCreator = !!(
+                      channel?.createdBy &&
+                      loggedInUser &&
+                      (channel.createdBy === loggedInUser.id ||
+                        String(channel.createdBy) === String(loggedInUser.id))
+                    );
                     const adminMembers =
                       channel?.members.filter((m) => m.role === "ADMIN") || [];
                     const isLastAdmin =
                       member.role === "ADMIN" && adminMembers.length === 1;
-
-                    const memberUserId = member.id;
-                    let teamMember = teamMembers.find((tm) => {
-                      return (
-                        tm.id === memberUserId ||
-                        tm.userId === memberUserId ||
-                        tm.user_id === memberUserId ||
-                        String(tm.id) === String(memberUserId) ||
-                        String(tm.userId) === String(memberUserId) ||
-                        String(tm.user_id) === String(memberUserId)
-                      );
-                    });
-
-                    if (
-                      !teamMember &&
+                    const isCurrentUser =
                       loggedInUser &&
-                      (loggedInUser.id === memberUserId ||
-                        String(loggedInUser.id) === String(memberUserId))
-                    ) {
-                      teamMember = loggedInUser as any;
-                    }
+                      (member.id === loggedInUser.id ||
+                        String(member.id) === String(loggedInUser.id));
+                    const canChangeRoleOrRemove = !isCreator && 
+                      (isCurrentUserCreator || member.role !== "ADMIN");
 
-                    const getDisplayName = () => {
-                      if (teamMember?.firstName && teamMember?.lastName) {
-                        return `${teamMember.firstName} ${teamMember.lastName}`;
-                      }
-                      if (teamMember?.firstName) {
-                        return teamMember.firstName;
-                      }
-                      if (teamMember?.name) {
-                        return teamMember.name;
-                      }
-                      if (member.name && member.name !== "User") {
-                        return member.name;
-                      }
-                      return (
-                        teamMember?.email ||
-                        teamMember?.profiles?.email ||
-                        member.email ||
-                        "User"
-                      );
-                    };
-
-                    const displayName = getDisplayName();
-                    const displayEmail =
-                      teamMember?.email ||
-                      teamMember?.profiles?.email ||
-                      member.email ||
-                      "";
+                    const displayName = member.name || "User";
+                    const displayEmail = member.email || "";
 
                     return (
                       <div
                         key={member.id}
                         className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <Avatar>
-                            <AvatarImage
-                              src={
-                                teamMember?.profileImage ||
-                                teamMember?.avatar ||
-                                member.avatar
-                              }
+                            <AvatarImage 
+                              src={member.avatar ? member.avatar : undefined} 
+                              alt={displayName} 
                             />
                             <AvatarFallback>
                               {getInitials(displayName)}
                             </AvatarFallback>
                           </Avatar>
-                          <div>
+                          <div className="flex-1">
                             <p className="text-sm font-medium">{displayName}</p>
                             {displayEmail && (
                               <p className="text-xs text-muted-foreground">
                                 {displayEmail}
                               </p>
                             )}
-                            {member.role === "ADMIN" && (
-                              <Badge
-                                variant="secondary"
-                                className="mt-1 text-xs"
-                              >
-                                Admin
-                              </Badge>
-                            )}
+                            <div className="flex gap-1 mt-1">
+                              {isCreator && (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  Creator
+                                </Badge>
+                              )}
+                              {member.role === "ADMIN" && (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  Admin
+                                </Badge>
+                              )}
+                              {!isCreator && member.role === "MEMBER" && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs"
+                                >
+                                  Member
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          disabled={isLastAdmin}
-                          onClick={() =>
-                            showRemoveMemberDialog &&
-                            handleRemoveMember(
-                              showRemoveMemberDialog,
-                              member.id
-                            )
-                          }
-                          title={
-                            isLastAdmin
-                              ? "Cannot remove the last admin from the group"
-                              : "Remove member"
-                          }
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Remove
-                        </Button>
+                        {canManage && (
+                          <div className="flex items-center gap-2">
+                            {canChangeRoleOrRemove && (
+                              <Select
+                                value={member.role}
+                                onValueChange={(value: "ADMIN" | "MEMBER") => {
+                                  if (
+                                    showRemoveMemberDialog &&
+                                    value !== member.role
+                                  ) {
+                                    handleChangeMemberRole(
+                                      showRemoveMemberDialog,
+                                      member.id,
+                                      value
+                                    );
+                                  }
+                                }}
+                                disabled={!!isCurrentUser || changingRoleMemberId === member.id}
+                              >
+                                <SelectTrigger className="w-32 h-8">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="MEMBER">Member</SelectItem>
+                                  <SelectItem value="ADMIN">Admin</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                            {canChangeRoleOrRemove && !isLastAdmin && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={removingMemberId === member.id}
+                                onClick={() =>
+                                  showRemoveMemberDialog &&
+                                  handleRemoveMember(
+                                    showRemoveMemberDialog,
+                                    member.id
+                                  )
+                                }
+                              >
+                                {removingMemberId === member.id ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Removing...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Remove
+                                  </>
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -1620,7 +1684,7 @@ export const Channels = () => {
                 channels.find((c) => c.id === showRemoveMemberDialog)?.members
                   .length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
-                    No members to remove
+                    No members found
                   </div>
                 )}
             </div>
