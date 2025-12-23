@@ -178,7 +178,9 @@ export const Channels = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [addingMemberId, setAddingMemberId] = useState<string | null>(null);
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
-  const [changingRoleMemberId, setChangingRoleMemberId] = useState<string | null>(null);
+  const [changingRoleMemberId, setChangingRoleMemberId] = useState<
+    string | null
+  >(null);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isLoadingChannelDetails, setIsLoadingChannelDetails] = useState(false);
@@ -253,9 +255,11 @@ export const Channels = () => {
   const isCreatorOrAdmin = (channel: Channel | undefined): boolean => {
     if (!channel || !loggedInUser) return false;
 
-    if (channel.createdBy && 
-        (channel.createdBy === loggedInUser.id || 
-         String(channel.createdBy) === String(loggedInUser.id))) {
+    if (
+      channel.createdBy &&
+      (channel.createdBy === loggedInUser.id ||
+        String(channel.createdBy) === String(loggedInUser.id))
+    ) {
       return true;
     }
 
@@ -275,12 +279,12 @@ export const Channels = () => {
     }
 
     const userData = member.user;
-    const isCreator = creatorId && (
-      member.userId === creatorId ||
-      String(member.userId) === String(creatorId) ||
-      userData.id === creatorId ||
-      String(userData.id) === String(creatorId)
-    );
+    const isCreator =
+      creatorId &&
+      (member.userId === creatorId ||
+        String(member.userId) === String(creatorId) ||
+        userData.id === creatorId ||
+        String(userData.id) === String(creatorId));
 
     const getDisplayName = () => {
       if (userData.firstName && userData.lastName) {
@@ -301,8 +305,6 @@ export const Channels = () => {
       isCreator: !!isCreator,
     };
   };
-
-
 
   useEffect(() => {
     const loadChatGroups = async () => {
@@ -514,13 +516,15 @@ export const Channels = () => {
                 return 0;
               }) || [];
 
-          const finalMembers: TeamMember[] = processedMembers.map((member: any) => ({
-            id: member.id,
-            name: member.name,
-            email: member.email,
-            avatar: member.avatar,
-            role: member.role,
-          }));
+          const finalMembers: TeamMember[] = processedMembers.map(
+            (member: any) => ({
+              id: member.id,
+              name: member.name,
+              email: member.email,
+              avatar: member.avatar,
+              role: member.role,
+            })
+          );
 
           setChannels((prevChannels) =>
             prevChannels.map((channel) =>
@@ -656,13 +660,15 @@ export const Channels = () => {
               return 0;
             }) || [];
 
-        const finalMembers: TeamMember[] = processedMembers.map((member: any) => ({
-          id: member.id,
-          name: member.name,
-          email: member.email,
-          avatar: member.avatar,
-          role: member.role,
-        }));
+        const finalMembers: TeamMember[] = processedMembers.map(
+          (member: any) => ({
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            avatar: member.avatar,
+            role: member.role,
+          })
+        );
 
         setChannels((prevChannels) =>
           prevChannels.map((channel) =>
@@ -702,13 +708,15 @@ export const Channels = () => {
               return 0;
             }) || [];
 
-        const finalMembers: TeamMember[] = processedMembers.map((member: any) => ({
-          id: member.id,
-          name: member.name,
-          email: member.email,
-          avatar: member.avatar,
-          role: member.role,
-        }));
+        const finalMembers: TeamMember[] = processedMembers.map(
+          (member: any) => ({
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            avatar: member.avatar,
+            role: member.role,
+          })
+        );
 
         setChannels((prevChannels) =>
           prevChannels.map((channel) =>
@@ -750,13 +758,15 @@ export const Channels = () => {
               return 0;
             }) || [];
 
-        const finalMembers: TeamMember[] = processedMembers.map((member: any) => ({
-          id: member.id,
-          name: member.name,
-          email: member.email,
-          avatar: member.avatar,
-          role: member.role,
-        }));
+        const finalMembers: TeamMember[] = processedMembers.map(
+          (member: any) => ({
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            avatar: member.avatar,
+            role: member.role,
+          })
+        );
 
         setChannels((prevChannels) =>
           prevChannels.map((channel) =>
@@ -777,7 +787,13 @@ export const Channels = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!messageInput.trim() || !selectedChannelId || !loggedInUser || isSendingMessage) return;
+    if (
+      !messageInput.trim() ||
+      !selectedChannelId ||
+      !loggedInUser ||
+      isSendingMessage
+    )
+      return;
 
     try {
       setIsSendingMessage(true);
@@ -838,14 +854,12 @@ export const Channels = () => {
 
   const getSender = (senderId: string, message?: ChannelMessage) => {
     const channel = channels.find((c) => c.id === selectedChannelId);
-    
+
     if (channel) {
       const channelMember = channel.members.find(
-        (m) =>
-          m.id === senderId ||
-          String(m.id) === String(senderId)
+        (m) => m.id === senderId || String(m.id) === String(senderId)
       );
-      
+
       if (channelMember) {
         return {
           id: channelMember.id,
@@ -1135,7 +1149,8 @@ export const Channels = () => {
                               <DropdownMenuItem
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  addMemberDialogChannelIdRef.current = channel.id;
+                                  addMemberDialogChannelIdRef.current =
+                                    channel.id;
                                   setShowAddMemberDialog(channel.id);
                                 }}
                               >
@@ -1244,7 +1259,8 @@ export const Channels = () => {
                         size="icon"
                         disabled={isLoadingChannelDetails}
                         onClick={() => {
-                          addMemberDialogChannelIdRef.current = selectedChannel.id;
+                          addMemberDialogChannelIdRef.current =
+                            selectedChannel.id;
                           setShowAddMemberDialog(selectedChannel.id);
                         }}
                         title="Add Members"
@@ -1254,7 +1270,10 @@ export const Channels = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        disabled={isLoadingChannelDetails || selectedChannel.members.length === 0}
+                        disabled={
+                          isLoadingChannelDetails ||
+                          selectedChannel.members.length === 0
+                        }
                         onClick={() =>
                           setShowRemoveMemberDialog(selectedChannel.id)
                         }
@@ -1268,7 +1287,10 @@ export const Channels = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      disabled={isLoadingChannelDetails || selectedChannel.members.length === 0}
+                      disabled={
+                        isLoadingChannelDetails ||
+                        selectedChannel.members.length === 0
+                      }
                       onClick={() =>
                         setShowRemoveMemberDialog(selectedChannel.id)
                       }
@@ -1323,9 +1345,11 @@ export const Channels = () => {
                             isCurrentUser ? "items-end" : "items-start"
                           }`}
                         >
-                          <div className={`flex items-center gap-2 mb-1 ${
-                            isCurrentUser ? "flex-row-reverse" : ""
-                          }`}>
+                          <div
+                            className={`flex items-center gap-2 mb-1 ${
+                              isCurrentUser ? "flex-row-reverse" : ""
+                            }`}
+                          >
                             <span className="text-sm font-medium">
                               {sender.name}
                             </span>
@@ -1426,10 +1450,9 @@ export const Channels = () => {
                 </div>
               ) : teamMembers.length > 0 ? (
                 teamMembers.map((member) => {
-                  const channelId = showAddMemberDialog || addMemberDialogChannelIdRef.current;
-                  const channel = channels.find(
-                    (c) => c.id === channelId
-                  );
+                  const channelId =
+                    showAddMemberDialog || addMemberDialogChannelIdRef.current;
+                  const channel = channels.find((c) => c.id === channelId);
                   const isMember = channel?.members.some(
                     (m) =>
                       m.id === member.id ||
@@ -1469,10 +1492,16 @@ export const Channels = () => {
                       ) : (
                         <Button
                           size="sm"
-                          disabled={addingMemberId === (member.id || member.userId || member.user_id) || !!addingMemberId}
+                          disabled={
+                            addingMemberId ===
+                              (member.id || member.userId || member.user_id) ||
+                            !!addingMemberId
+                          }
                           onClick={(e) => {
                             e.stopPropagation();
-                            const channelId = showAddMemberDialog || addMemberDialogChannelIdRef.current;
+                            const channelId =
+                              showAddMemberDialog ||
+                              addMemberDialogChannelIdRef.current;
                             if (
                               channelId &&
                               (member.id || member.userId || member.user_id)
@@ -1487,7 +1516,8 @@ export const Channels = () => {
                             }
                           }}
                         >
-                          {addingMemberId === (member.id || member.userId || member.user_id) ? (
+                          {addingMemberId ===
+                          (member.id || member.userId || member.user_id) ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               Adding...
@@ -1565,7 +1595,8 @@ export const Channels = () => {
                       loggedInUser &&
                       (member.id === loggedInUser.id ||
                         String(member.id) === String(loggedInUser.id));
-                    const canChangeRoleOrRemove = !isCreator && 
+                    const canChangeRoleOrRemove =
+                      !isCreator &&
                       (isCurrentUserCreator || member.role !== "ADMIN");
 
                     const displayName = member.name || "User";
@@ -1578,9 +1609,9 @@ export const Channels = () => {
                       >
                         <div className="flex items-center gap-3 flex-1">
                           <Avatar>
-                            <AvatarImage 
-                              src={member.avatar ? member.avatar : undefined} 
-                              alt={displayName} 
+                            <AvatarImage
+                              src={member.avatar ? member.avatar : undefined}
+                              alt={displayName}
                             />
                             <AvatarFallback>
                               {getInitials(displayName)}
@@ -1595,26 +1626,17 @@ export const Channels = () => {
                             )}
                             <div className="flex gap-1 mt-1">
                               {isCreator && (
-                                <Badge
-                                  variant="secondary"
-                                  className="text-xs"
-                                >
+                                <Badge variant="secondary" className="text-xs">
                                   Creator
                                 </Badge>
                               )}
                               {member.role === "ADMIN" && (
-                                <Badge
-                                  variant="secondary"
-                                  className="text-xs"
-                                >
+                                <Badge variant="secondary" className="text-xs">
                                   Admin
                                 </Badge>
                               )}
                               {!isCreator && member.role === "MEMBER" && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs"
-                                >
+                                <Badge variant="outline" className="text-xs">
                                   Member
                                 </Badge>
                               )}
@@ -1638,7 +1660,10 @@ export const Channels = () => {
                                     );
                                   }
                                 }}
-                                disabled={!!isCurrentUser || changingRoleMemberId === member.id}
+                                disabled={
+                                  !!isCurrentUser ||
+                                  changingRoleMemberId === member.id
+                                }
                               >
                                 <SelectTrigger className="w-32 h-8">
                                   <SelectValue />

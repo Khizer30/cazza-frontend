@@ -126,13 +126,10 @@ export const TeamSettings = () => {
     }
   }, [searchParams, showToast, fetchAllTeamData]);
 
- 
   useEffect(() => {
     fetchAllTeamData();
-   
-  }, []); 
+  }, []);
 
-  
   useEffect(() => {
     const handleFocus = () => {
       fetchAllTeamData();
@@ -327,8 +324,7 @@ export const TeamSettings = () => {
   // Filter out accepted invitations - only show pending ones
   const pendingInvitations = invitations.filter(
     (invitation) =>
-      !invitation.status ||
-      invitation.status.toUpperCase() !== "ACCEPTED"
+      !invitation.status || invitation.status.toUpperCase() !== "ACCEPTED"
   );
 
   if (isLoading && !analytics) {

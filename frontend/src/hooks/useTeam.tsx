@@ -35,8 +35,7 @@ export const useTeam = () => {
         const allInvitations = res.data || [];
         const pendingInvitations = allInvitations.filter(
           (invitation: any) =>
-            !invitation.status ||
-            invitation.status.toUpperCase() !== "ACCEPTED"
+            !invitation.status || invitation.status.toUpperCase() !== "ACCEPTED"
         );
         setInvitations(pendingInvitations);
         return pendingInvitations;
