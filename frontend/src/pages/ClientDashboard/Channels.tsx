@@ -91,6 +91,10 @@ import {
   serverTimestamp,
   limit,
   Timestamp,
+  doc,
+  setDoc,
+  deleteDoc,
+  where,
 } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
@@ -218,8 +222,13 @@ export const Channels = () => {
   const [messageInput, setMessageInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const typingUnsubscribeRef = useRef<(() => void) | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitializingRef = useRef(false);
   const addMemberDialogChannelIdRef = useRef<string | null>(null);
+  const [typingUsers, setTypingUsers] = useState<
+    Array<{ userId: string; userName: string }>
+  >([]);
 
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
@@ -359,12 +368,73 @@ export const Channels = () => {
     loadTeamMembers();
   }, []);
 
+  const updateTypingStatus = useCallback(
+    async (isTyping: boolean) => {
+      if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
+
+      try {
+        const typingRef = doc(
+          db,
+          "chat_groups",
+          selectedChannelId,
+          "typing",
+          loggedInUser.id
+        );
+
+        if (isTyping) {
+          const senderName =
+            loggedInUser.firstName && loggedInUser.lastName
+              ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+              : loggedInUser.firstName || loggedInUser.email || "User";
+
+          await setDoc(
+            typingRef,
+            {
+              isTyping: true,
+              updatedAt: serverTimestamp(),
+              createdAt: serverTimestamp(),
+              createdBy: loggedInUser.id,
+              name: senderName,
+            },
+            { merge: true }
+          );
+        } else {
+          await deleteDoc(typingRef);
+        }
+      } catch (error) {}
+    },
+    [selectedChannelId, loggedInUser]
+  );
+
+  const handleTyping = useCallback(() => {
+    if (!selectedChannelId || !loggedInUser) return;
+
+    updateTypingStatus(true);
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      updateTypingStatus(false);
+    }, 3000);
+  }, [selectedChannelId, loggedInUser, updateTypingStatus]);
+
   useEffect(() => {
     if (!selectedChannelId) {
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
         unsubscribeRef.current = null;
       }
+      if (typingUnsubscribeRef.current) {
+        typingUnsubscribeRef.current();
+        typingUnsubscribeRef.current = null;
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      setTypingUsers([]);
       isInitializingRef.current = false;
       return;
     }
@@ -471,6 +541,45 @@ export const Channels = () => {
           );
 
           unsubscribeRef.current = unsubscribe;
+
+          const typingRef = collection(
+            db,
+            "chat_groups",
+            selectedChannelId,
+            "typing"
+          );
+          const typingQuery = query(typingRef, where("isTyping", "==", true));
+
+          const typingUnsubscribe = onSnapshot(
+            typingQuery,
+            (snapshot) => {
+              const typingUsersList: Array<{
+                userId: string;
+                userName: string;
+              }> = [];
+
+              snapshot.forEach((docSnapshot) => {
+                const data = docSnapshot.data();
+                const userId = docSnapshot.id;
+                if (
+                  data.isTyping &&
+                  loggedInUser &&
+                  userId !== loggedInUser.id &&
+                  String(userId) !== String(loggedInUser.id)
+                ) {
+                  typingUsersList.push({
+                    userId: userId,
+                    userName: data.name || "User",
+                  });
+                }
+              });
+
+              setTypingUsers(typingUsersList);
+            },
+            () => {}
+          );
+
+          typingUnsubscribeRef.current = typingUnsubscribe;
           isInitializingRef.current = false;
         } catch (authError: any) {
           isInitializingRef.current = false;
@@ -489,10 +598,29 @@ export const Channels = () => {
         unsubscribeRef.current();
         unsubscribeRef.current = null;
       }
+      if (typingUnsubscribeRef.current) {
+        typingUnsubscribeRef.current();
+        typingUnsubscribeRef.current = null;
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      if (selectedChannelId && loggedInUser && auth.currentUser) {
+        const typingRef = doc(
+          db,
+          "chat_groups",
+          selectedChannelId,
+          "typing",
+          loggedInUser.id
+        );
+        deleteDoc(typingRef).catch(() => {});
+      }
+      setTypingUsers([]);
       isInitializingRef.current = false;
       setIsLoadingMessages(false);
     };
-  }, [selectedChannelId]);
+  }, [selectedChannelId, loggedInUser]);
 
   useEffect(() => {
     if (!selectedChannelId) {
@@ -553,6 +681,25 @@ export const Channels = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [selectedChannel?.messages]);
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      if (selectedChannelId && loggedInUser && auth.currentUser) {
+        const typingRef = doc(
+          db,
+          "chat_groups",
+          selectedChannelId,
+          "typing",
+          loggedInUser.id
+        );
+        deleteDoc(typingRef).catch(() => {});
+      }
+    };
+  }, [selectedChannelId, loggedInUser]);
 
   const filteredChannels = channels.filter(
     (channel) =>
@@ -799,6 +946,22 @@ export const Channels = () => {
       setIsSendingMessage(true);
       if (!auth.currentUser) {
         return;
+      }
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+
+      if (selectedChannelId && loggedInUser) {
+        const typingRef = doc(
+          db,
+          "chat_groups",
+          selectedChannelId,
+          "typing",
+          loggedInUser.id
+        );
+        await deleteDoc(typingRef).catch(() => {});
       }
 
       const messagesRef = collection(
@@ -1373,6 +1536,28 @@ export const Channels = () => {
                     );
                   })
                 )}
+                {typingUsers.length > 0 && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground px-2 py-1">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                      <div
+                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      />
+                      <div
+                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                        style={{ animationDelay: "0.4s" }}
+                      />
+                    </div>
+                    <span>
+                      {typingUsers.length === 1
+                        ? `${typingUsers[0].userName} is typing...`
+                        : typingUsers.length === 2
+                          ? `${typingUsers[0].userName} and ${typingUsers[1].userName} are typing...`
+                          : `${typingUsers[0].userName} and ${typingUsers.length - 1} others are typing...`}
+                    </span>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
             </ScrollArea>
@@ -1382,7 +1567,20 @@ export const Channels = () => {
                 <Input
                   placeholder={`Message #${selectedChannel.name.toLowerCase()}`}
                   value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
+                  onChange={(e) => {
+                    setMessageInput(e.target.value);
+                    if (e.target.value.trim()) {
+                      handleTyping();
+                    } else {
+                      if (typingTimeoutRef.current) {
+                        clearTimeout(typingTimeoutRef.current);
+                        typingTimeoutRef.current = null;
+                      }
+                      if (selectedChannelId && loggedInUser) {
+                        updateTypingStatus(false);
+                      }
+                    }
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
