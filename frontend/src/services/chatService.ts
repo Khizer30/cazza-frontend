@@ -3,13 +3,18 @@ import { END_POINT } from "@/lib/url";
 
 export interface CreateChatGroupPayload {
   name: string;
+  description?: string;
+  icon?: string;
 }
 
 export interface ChatGroup {
   id: string;
   name: string;
+  description?: string | null;
+  icon?: string | null;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+  createdBy?: string;
   memberCount?: number;
   role?: "ADMIN" | "MEMBER";
   joinedAt?: string;
@@ -71,7 +76,7 @@ export const getChatGroupByIdService = (groupId: string) => {
 
 export const updateChatGroupService = (
   groupId: string,
-  payload: { name: string }
+  payload: { name: string; description?: string; icon?: string }
 ) => {
   return apiInvoker<ChatGroupResponse>(
     `${END_POINT.chat.updateGroup}/${groupId}`,

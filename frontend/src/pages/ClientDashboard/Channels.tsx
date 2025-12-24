@@ -10,6 +10,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -69,9 +80,12 @@ import {
   Code,
   Palette,
   Send,
+  Reply,
+  X,
+  Smile,
   type LucideIcon,
 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { useChat } from "@/hooks/useChat";
 import { useTeam } from "@/hooks/useTeam";
 import { useUserStore } from "@/store/userStore";
@@ -93,8 +107,10 @@ import {
   Timestamp,
   doc,
   setDoc,
-  deleteDoc,
   where,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
@@ -111,8 +127,19 @@ interface ChannelMessage {
   channelId: string;
   senderId: string;
   senderName: string;
-  content: string;
+  text: string;
   timestamp: Date;
+  createdAt: Date;
+  deleted: boolean;
+  edited: boolean;
+  editedAt?: Date;
+  reactions: Record<string, string[]>;
+  replyTo?: {
+    messageId: string;
+    senderName: string;
+    text: string;
+  };
+  attachments: any[];
 }
 
 interface Channel {
@@ -190,14 +217,17 @@ export const Channels = () => {
   const [isLoadingChannelDetails, setIsLoadingChannelDetails] = useState(false);
 
   const convertChatGroupToChannel = useCallback(
-    (chatGroup: ChatGroup & { createdBy?: string }): Channel => {
+    (chatGroup: ChatGroup): Channel => {
       const defaultIcon = availableIcons[0];
-      const icon = availableIcons.find((i) => i.name === "Hash") || defaultIcon;
+      const iconFromApi = chatGroup.icon 
+        ? availableIcons.find((i) => i.name === chatGroup.icon) 
+        : null;
+      const icon = iconFromApi || defaultIcon;
 
       return {
         id: chatGroup.id,
         name: chatGroup.name,
-        description: "",
+        description: chatGroup.description || "",
         icon: icon.icon,
         iconName: icon.name,
         color: icon.color,
@@ -205,7 +235,7 @@ export const Channels = () => {
         createdAt: chatGroup.createdAt,
         messages: [],
         userRole: chatGroup.role,
-        createdBy: (chatGroup as any).createdBy,
+        createdBy: chatGroup.createdBy,
       };
     },
     []
@@ -223,12 +253,19 @@ export const Channels = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const typingUnsubscribeRef = useRef<(() => void) | null>(null);
-  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitializingRef = useRef(false);
   const addMemberDialogChannelIdRef = useRef<string | null>(null);
   const [typingUsers, setTypingUsers] = useState<
     Array<{ userId: string; userName: string }>
   >([]);
+
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editingMessageText, setEditingMessageText] = useState("");
+  const [replyingToMessage, setReplyingToMessage] = useState<ChannelMessage | null>(null);
+  const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
+  const [openReactionPopoverId, setOpenReactionPopoverId] = useState<string | null>(null);
+  const messageInputRef = useRef<HTMLInputElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
@@ -237,6 +274,7 @@ export const Channels = () => {
     icon: LucideIcon;
     color: string;
   }>(availableIcons[0]);
+  const [showIconPicker, setShowIconPicker] = useState(false);
 
   const selectedChannel = channels.find((c) => c.id === selectedChannelId);
 
@@ -375,32 +413,27 @@ export const Channels = () => {
       try {
         const typingRef = doc(
           db,
-          "chat_groups",
+          "chatGroups",
           selectedChannelId,
           "typing",
           loggedInUser.id
         );
 
-        if (isTyping) {
-          const senderName =
-            loggedInUser.firstName && loggedInUser.lastName
-              ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
-              : loggedInUser.firstName || loggedInUser.email || "User";
+        const senderName =
+          loggedInUser.firstName && loggedInUser.lastName
+            ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+            : loggedInUser.firstName || loggedInUser.email || "User";
 
-          await setDoc(
-            typingRef,
-            {
-              isTyping: true,
-              updatedAt: serverTimestamp(),
-              createdAt: serverTimestamp(),
-              createdBy: loggedInUser.id,
-              name: senderName,
-            },
-            { merge: true }
-          );
-        } else {
-          await deleteDoc(typingRef);
-        }
+        await setDoc(
+          typingRef,
+          {
+            isTyping: isTyping,
+            updatedAt: serverTimestamp(),
+            createdBy: loggedInUser.id,
+            name: senderName,
+          },
+          { merge: true }
+        );
       } catch (error) {}
     },
     [selectedChannelId, loggedInUser]
@@ -408,17 +441,113 @@ export const Channels = () => {
 
   const handleTyping = useCallback(() => {
     if (!selectedChannelId || !loggedInUser) return;
-
     updateTypingStatus(true);
-
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    typingTimeoutRef.current = setTimeout(() => {
-      updateTypingStatus(false);
-    }, 3000);
   }, [selectedChannelId, loggedInUser, updateTypingStatus]);
+
+  const handleInputBlur = useCallback(() => {
+    if (!selectedChannelId || !loggedInUser) return;
+    updateTypingStatus(false);
+  }, [selectedChannelId, loggedInUser, updateTypingStatus]);
+
+  const handleEditMessage = async (messageId: string, newText: string) => {
+    if (!selectedChannelId || !loggedInUser || !auth.currentUser || !newText.trim()) return;
+    
+    try {
+      const message = selectedChannel?.messages.find(m => m.id === messageId);
+      if (!message) return;
+      
+      const trimmedNewText = newText.trim();
+      const originalText = message.text.trim();
+      
+      if (trimmedNewText === originalText) {
+        setEditingMessageId(null);
+        setEditingMessageText("");
+        return;
+      }
+      
+      const messageRef = doc(db, "chatGroups", selectedChannelId, "messages", messageId);
+      const updateData: any = {
+        text: trimmedNewText,
+      };
+      
+      if (trimmedNewText !== originalText) {
+        updateData.edited = true;
+        updateData.editedAt = serverTimestamp();
+      }
+      
+      await updateDoc(messageRef, updateData);
+      setEditingMessageId(null);
+      setEditingMessageText("");
+    } catch (error) {}
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
+    
+    try {
+      const messageRef = doc(db, "chatGroups", selectedChannelId, "messages", messageId);
+      await updateDoc(messageRef, {
+        deleted: true,
+      });
+    } catch (error) {}
+  };
+
+  const handleToggleReaction = async (messageId: string, emoji: string) => {
+    if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
+    
+    try {
+      const messageRef = doc(db, "chatGroups", selectedChannelId, "messages", messageId);
+      const message = selectedChannel?.messages.find(m => m.id === messageId);
+      const currentReactions = message?.reactions || {};
+      const usersWithReaction = currentReactions[emoji] || [];
+      
+      if (usersWithReaction.includes(loggedInUser.id)) {
+        await updateDoc(messageRef, {
+          [`reactions.${emoji}`]: arrayRemove(loggedInUser.id),
+        });
+      } else {
+        const updates: any = {};
+        
+        Object.keys(currentReactions).forEach((existingEmoji) => {
+          if (existingEmoji !== emoji) {
+            const existingUsers = currentReactions[existingEmoji] || [];
+            if (existingUsers.includes(loggedInUser.id)) {
+              updates[`reactions.${existingEmoji}`] = arrayRemove(loggedInUser.id);
+            }
+          }
+        });
+        
+        updates[`reactions.${emoji}`] = arrayUnion(loggedInUser.id);
+        
+        await updateDoc(messageRef, updates);
+      }
+      setOpenReactionPopoverId(null);
+    } catch (error) {}
+  };
+
+  const handleReply = (message: ChannelMessage) => {
+    setReplyingToMessage(message);
+    messageInputRef.current?.focus();
+  };
+
+  const cancelReply = () => {
+    setReplyingToMessage(null);
+  };
+
+  const startEditMessage = (message: ChannelMessage) => {
+    setEditingMessageId(message.id);
+    setEditingMessageText(message.text);
+    setTimeout(() => {
+      messageInputRef.current?.focus();
+    }, 100);
+  };
+
+  const cancelEditMessage = () => {
+    setEditingMessageId(null);
+    setEditingMessageText("");
+  };
+
+  const commonEmojis = ["👍", "❤️", "😂", "😮", "😢", "🎉"];
 
   useEffect(() => {
     if (!selectedChannelId) {
@@ -429,10 +558,6 @@ export const Channels = () => {
       if (typingUnsubscribeRef.current) {
         typingUnsubscribeRef.current();
         typingUnsubscribeRef.current = null;
-      }
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = null;
       }
       setTypingUsers([]);
       isInitializingRef.current = false;
@@ -498,7 +623,7 @@ export const Channels = () => {
 
           const messagesRef = collection(
             db,
-            "chat_groups",
+            "chatGroups",
             selectedChannelId,
             "messages"
           );
@@ -509,19 +634,28 @@ export const Channels = () => {
             messagesQuery,
             (snapshot) => {
               const firebaseMessages: ChannelMessage[] = snapshot.docs
-                .map((doc) => {
-                  const data = doc.data();
+                .map((docSnapshot) => {
+                  const data = docSnapshot.data();
                   const timestamp = data.timestamp as Timestamp;
+                  const createdAt = data.createdAt as Timestamp;
+                  const editedAt = data.editedAt as Timestamp;
                   return {
-                    id: doc.id,
+                    id: docSnapshot.id,
                     channelId: selectedChannelId,
                     senderId: data.senderId || "",
                     senderName: data.senderName || "",
-                    content: data.content || "",
+                    text: data.text || "",
                     timestamp: timestamp ? timestamp.toDate() : new Date(),
+                    createdAt: createdAt ? createdAt.toDate() : new Date(),
+                    deleted: data.deleted || false,
+                    edited: data.edited || false,
+                    editedAt: editedAt ? editedAt.toDate() : undefined,
+                    reactions: data.reactions || {},
+                    replyTo: data.replyTo || undefined,
+                    attachments: data.attachments || [],
                   };
                 })
-                .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+                .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
               setChannels((prevChannels) =>
                 prevChannels.map((channel) =>
@@ -544,7 +678,7 @@ export const Channels = () => {
 
           const typingRef = collection(
             db,
-            "chat_groups",
+            "chatGroups",
             selectedChannelId,
             "typing"
           );
@@ -602,25 +736,14 @@ export const Channels = () => {
         typingUnsubscribeRef.current();
         typingUnsubscribeRef.current = null;
       }
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = null;
-      }
       if (selectedChannelId && loggedInUser && auth.currentUser) {
-        const typingRef = doc(
-          db,
-          "chat_groups",
-          selectedChannelId,
-          "typing",
-          loggedInUser.id
-        );
-        deleteDoc(typingRef).catch(() => {});
+        updateTypingStatus(false);
       }
       setTypingUsers([]);
       isInitializingRef.current = false;
       setIsLoadingMessages(false);
     };
-  }, [selectedChannelId, loggedInUser]);
+  }, [selectedChannelId, loggedInUser, updateTypingStatus]);
 
   useEffect(() => {
     if (!selectedChannelId) {
@@ -678,28 +801,33 @@ export const Channels = () => {
     loadChannelDetails();
   }, [selectedChannelId, teamMembers, loggedInUser]);
 
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  }, []);
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [selectedChannel?.messages]);
+    scrollToBottom("smooth");
+  }, [selectedChannel?.messages, scrollToBottom]);
+
+  useEffect(() => {
+    if (selectedChannelId && !isLoadingMessages) {
+      setTimeout(() => scrollToBottom("instant"), 100);
+    }
+  }, [selectedChannelId, isLoadingMessages, scrollToBottom]);
 
   useEffect(() => {
     return () => {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = null;
-      }
       if (selectedChannelId && loggedInUser && auth.currentUser) {
-        const typingRef = doc(
-          db,
-          "chat_groups",
-          selectedChannelId,
-          "typing",
-          loggedInUser.id
-        );
-        deleteDoc(typingRef).catch(() => {});
+        updateTypingStatus(false);
       }
     };
-  }, [selectedChannelId, loggedInUser]);
+  }, [selectedChannelId, loggedInUser, updateTypingStatus]);
 
   const filteredChannels = channels.filter(
     (channel) =>
@@ -712,13 +840,14 @@ export const Channels = () => {
 
     try {
       setIsCreating(true);
-      const createdGroup = await createChatGroup({ name: channelName.trim() });
+      const createdGroup = await createChatGroup({
+        name: channelName.trim(),
+        description: channelDescription.trim() || undefined,
+        icon: selectedIcon.name,
+      });
 
       if (createdGroup) {
-        const newChannel = convertChatGroupToChannel({
-          ...createdGroup,
-          createdBy: (createdGroup as any).createdBy,
-        });
+        const newChannel = convertChatGroupToChannel(createdGroup);
         setChannels([newChannel, ...channels]);
         setSelectedChannelId(newChannel.id);
       }
@@ -738,7 +867,11 @@ export const Channels = () => {
 
     try {
       setIsUpdating(true);
-      await updateChatGroup(editingChannel.id, channelName.trim());
+      await updateChatGroup(editingChannel.id, {
+        name: channelName.trim(),
+        description: channelDescription.trim() || undefined,
+        icon: selectedIcon.name,
+      });
 
       setChannels(
         channels.map((channel) =>
@@ -948,25 +1081,13 @@ export const Channels = () => {
         return;
       }
 
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = null;
-      }
-
       if (selectedChannelId && loggedInUser) {
-        const typingRef = doc(
-          db,
-          "chat_groups",
-          selectedChannelId,
-          "typing",
-          loggedInUser.id
-        );
-        await deleteDoc(typingRef).catch(() => {});
+        await updateTypingStatus(false);
       }
 
       const messagesRef = collection(
         db,
-        "chat_groups",
+        "chatGroups",
         selectedChannelId,
         "messages"
       );
@@ -975,14 +1096,30 @@ export const Channels = () => {
           ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
           : loggedInUser.firstName || loggedInUser.email || "User";
 
-      await addDoc(messagesRef, {
+      const messageData: any = {
         senderId: loggedInUser.id,
         senderName: senderName,
-        content: messageInput.trim(),
+        text: messageInput.trim(),
         timestamp: serverTimestamp(),
-      });
+        createdAt: serverTimestamp(),
+        deleted: false,
+        edited: false,
+        reactions: {},
+        attachments: [],
+      };
+
+      if (replyingToMessage) {
+        messageData.replyTo = {
+          messageId: replyingToMessage.id,
+          senderName: replyingToMessage.senderName,
+          text: replyingToMessage.text.substring(0, 100),
+        };
+      }
+
+      await addDoc(messagesRef, messageData);
 
       setMessageInput("");
+      setReplyingToMessage(null);
     } catch (error: any) {
     } finally {
       setIsSendingMessage(false);
@@ -1004,6 +1141,7 @@ export const Channels = () => {
     setChannelName("");
     setChannelDescription("");
     setSelectedIcon(availableIcons[0]);
+    setShowIconPicker(false);
   };
 
   const getInitials = (name: string) => {
@@ -1068,7 +1206,40 @@ export const Channels = () => {
   };
 
   const formatMessageTime = (date: Date) => {
-    return formatDistanceToNow(date, { addSuffix: true });
+    return format(date, "h:mm a");
+  };
+
+  const getReactionUserNames = (userIds: string[]): string[] => {
+    const channel = channels.find((c) => c.id === selectedChannelId);
+    const names: string[] = [];
+
+    userIds.forEach((userId) => {
+      if (channel) {
+        const channelMember = channel.members.find(
+          (m) => m.id === userId || String(m.id) === String(userId)
+        );
+        if (channelMember) {
+          names.push(channelMember.name);
+          return;
+        }
+      }
+
+      if (
+        loggedInUser &&
+        (loggedInUser.id === userId || String(loggedInUser.id) === String(userId))
+      ) {
+        const displayName =
+          loggedInUser.firstName && loggedInUser.lastName
+            ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+            : loggedInUser.firstName || loggedInUser.email || "User";
+        names.push(displayName);
+        return;
+      }
+
+      names.push("User");
+    });
+
+    return names;
   };
 
   return (
@@ -1142,8 +1313,8 @@ export const Channels = () => {
                   </div>
                   <div className="grid gap-2">
                     <Label>Channel Icon</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
+                    <Dialog open={showIconPicker} onOpenChange={setShowIconPicker}>
+                      <DialogTrigger asChild>
                         <Button
                           variant="outline"
                           className="w-full justify-start"
@@ -1160,16 +1331,22 @@ export const Channels = () => {
                           })()}
                           {selectedIcon.name}
                         </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80">
-                        <div className="grid grid-cols-4 gap-2">
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[400px]">
+                        <DialogHeader>
+                          <DialogTitle>Select Icon</DialogTitle>
+                        </DialogHeader>
+                        <div className="grid grid-cols-4 gap-2 py-4">
                           {availableIcons.map((iconOption) => {
                             const IconComponent = iconOption.icon;
                             return (
                               <button
                                 key={iconOption.name}
                                 type="button"
-                                onClick={() => setSelectedIcon(iconOption)}
+                                onClick={() => {
+                                  setSelectedIcon(iconOption);
+                                  setShowIconPicker(false);
+                                }}
                                 className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all hover:bg-muted ${
                                   selectedIcon.name === iconOption.name
                                     ? "border-primary bg-primary/10"
@@ -1187,8 +1364,8 @@ export const Channels = () => {
                             );
                           })}
                         </div>
-                      </PopoverContent>
-                    </Popover>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
                 <DialogFooter>
@@ -1251,8 +1428,6 @@ export const Channels = () => {
               filteredChannels.map((channel) => {
                 const IconComponent = channel.icon;
                 const isSelected = channel.id === selectedChannelId;
-                const lastMessage =
-                  channel.messages[channel.messages.length - 1];
                 return (
                   <div
                     key={channel.id}
@@ -1357,17 +1532,6 @@ export const Channels = () => {
                           {channel.description}
                         </p>
                       )}
-                      {lastMessage && (
-                        <p
-                          className={`text-xs truncate mt-1 ${
-                            isSelected
-                              ? "text-primary-foreground/80"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {lastMessage.senderName}: {lastMessage.content}
-                        </p>
-                      )}
                     </div>
                   </div>
                 );
@@ -1377,7 +1541,7 @@ export const Channels = () => {
         </ScrollArea>
       </div>
 
-      <div className="flex-1 flex flex-col bg-background">
+      <div className="flex-1 flex flex-col bg-background min-h-0 overflow-hidden">
         {selectedChannel ? (
           <>
             <div className="p-4 border-b border-border bg-card">
@@ -1466,8 +1630,8 @@ export const Channels = () => {
               </div>
             </div>
 
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
+            <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-0">
+              <div className="space-y-4 p-4">
                 {isLoadingMessages ? (
                   <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
                     <Loader2 className="h-8 w-8 text-muted-foreground mb-4 animate-spin" />
@@ -1493,7 +1657,7 @@ export const Channels = () => {
                     return (
                       <div
                         key={message.id}
-                        className={`flex gap-3 ${
+                        className={`group flex gap-3 ${
                           isCurrentUser ? "flex-row-reverse" : ""
                         }`}
                       >
@@ -1520,17 +1684,151 @@ export const Channels = () => {
                               {formatMessageTime(message.timestamp)}
                             </span>
                           </div>
-                          <div
-                            className={`rounded-lg px-4 py-2 inline-block ${
-                              isCurrentUser
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-card border border-border"
-                            }`}
-                          >
-                            <p className="text-sm whitespace-pre-wrap">
-                              {message.content}
-                            </p>
-                          </div>
+                          {message.replyTo && !message.deleted && (
+                            <div className={`text-xs text-muted-foreground mb-1 px-2 py-1 rounded bg-muted/50 border-l-2 border-primary ${isCurrentUser ? "text-right" : "text-left"}`}>
+                              <span className="font-medium">{message.replyTo.senderName}</span>
+                              <p className="truncate max-w-[200px]">{message.replyTo.text}</p>
+                            </div>
+                          )}
+                          <div className="relative">
+                              <div
+                                className={`rounded-lg px-4 py-2 inline-block ${
+                                  isCurrentUser
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-card border border-border"
+                                }`}
+                              >
+                                {message.deleted ? (
+                                  <p className="text-sm italic text-muted-foreground">
+                                    This message was deleted
+                                  </p>
+                                ) : (
+                                  <p className="text-sm whitespace-pre-wrap">
+                                    {message.text}
+                                    {message.edited && (
+                                      <span className="text-xs text-muted-foreground ml-2">
+                                        (edited)
+                                      </span>
+                                    )}
+                                  </p>
+                                )}
+                              </div>
+                              {!message.deleted && (
+                                <div className={`absolute top-0 ${isCurrentUser ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1`}>
+                                  <Popover open={openReactionPopoverId === message.id} onOpenChange={(open) => setOpenReactionPopoverId(open ? message.id : null)}>
+                                    <PopoverTrigger asChild>
+                                      <Button size="icon" variant="ghost" className="h-6 w-6">
+                                        <Smile className="h-3 w-3" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-2">
+                                      <div className="flex gap-1">
+                                        {commonEmojis.map((emoji) => {
+                                          const hasReacted = message.reactions?.[emoji]?.includes(loggedInUser?.id || "");
+                                          return (
+                                            <button
+                                              key={emoji}
+                                              onClick={() => handleToggleReaction(message.id, emoji)}
+                                              className={`text-lg hover:bg-muted p-1 rounded transition-colors ${
+                                                hasReacted
+                                                  ? "bg-primary/20 border border-primary"
+                                                  : ""
+                                              }`}
+                                            >
+                                              {emoji}
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-6 w-6"
+                                    onClick={() => handleReply(message)}
+                                  >
+                                    <Reply className="h-3 w-3" />
+                                  </Button>
+                                  {isCurrentUser && (
+                                    <>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-6 w-6"
+                                        onClick={() => startEditMessage(message)}
+                                      >
+                                        <Edit className="h-3 w-3" />
+                                      </Button>
+                                      <AlertDialog open={deleteMessageId === message.id} onOpenChange={(open) => setDeleteMessageId(open ? message.id : null)}>
+                                        <AlertDialogTrigger asChild>
+                                          <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="h-6 w-6 text-destructive hover:text-destructive"
+                                          >
+                                            <Trash2 className="h-3 w-3" />
+                                          </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              Are you sure you want to delete this message? This action cannot be undone.
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel onClick={() => setDeleteMessageId(null)}>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction
+                                              onClick={() => {
+                                                if (deleteMessageId) {
+                                                  handleDeleteMessage(deleteMessageId);
+                                                  setDeleteMessageId(null);
+                                                }
+                                              }}
+                                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                            >
+                                              Delete
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          {Object.keys(message.reactions || {}).length > 0 && !message.deleted && (
+                            <div className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? "justify-end" : "justify-start"}`}>
+                              {Object.entries(message.reactions).map(([emoji, users]) => {
+                                if (users.length === 0) return null;
+                                const userNames = getReactionUserNames(users);
+                                return (
+                                  <div key={emoji} className="relative inline-block group/reaction">
+                                    <button
+                                      onClick={() => handleToggleReaction(message.id, emoji)}
+                                      className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                                        users.includes(loggedInUser?.id || "") 
+                                          ? "bg-primary/20 border-primary" 
+                                          : "bg-muted border-border hover:bg-muted/80"
+                                      }`}
+                                    >
+                                      <span>{emoji}</span>
+                                      <span>{users.length}</span>
+                                    </button>
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover border border-border rounded-md shadow-md text-xs opacity-0 invisible group-hover/reaction:opacity-100 group-hover/reaction:visible transition-all duration-200 z-[100] pointer-events-none min-w-[120px]">
+                                      <p className="font-medium mb-1 text-foreground">Reacted by:</p>
+                                      <div className="space-y-0.5">
+                                        {userNames.map((name, index) => (
+                                          <p key={index} className="text-muted-foreground">{name}</p>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -1563,35 +1861,86 @@ export const Channels = () => {
             </ScrollArea>
 
             <div className="p-4 border-t border-border bg-card">
+              {replyingToMessage && (
+                <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg border-l-2 border-primary">
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs text-muted-foreground">Replying to </span>
+                    <span className="text-xs font-medium">{replyingToMessage.senderName}</span>
+                    <p className="text-sm text-muted-foreground truncate">{replyingToMessage.text}</p>
+                  </div>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-6 w-6 flex-shrink-0"
+                    onClick={cancelReply}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              {editingMessageId && selectedChannel?.messages.find(m => m.id === editingMessageId) && (
+                <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg border-l-2 border-primary">
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs text-muted-foreground">Editing message</span>
+                    <p className="text-sm text-muted-foreground truncate">{selectedChannel.messages.find(m => m.id === editingMessageId)?.text}</p>
+                  </div>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-6 w-6 flex-shrink-0"
+                    onClick={cancelEditMessage}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Input
-                  placeholder={`Message #${selectedChannel.name.toLowerCase()}`}
-                  value={messageInput}
+                  ref={messageInputRef}
+                  placeholder={editingMessageId ? "Edit your message..." : `Message #${selectedChannel.name.toLowerCase()}`}
+                  value={editingMessageId ? editingMessageText : messageInput}
                   onChange={(e) => {
-                    setMessageInput(e.target.value);
-                    if (e.target.value.trim()) {
-                      handleTyping();
+                    if (editingMessageId) {
+                      setEditingMessageText(e.target.value);
                     } else {
-                      if (typingTimeoutRef.current) {
-                        clearTimeout(typingTimeoutRef.current);
-                        typingTimeoutRef.current = null;
-                      }
-                      if (selectedChannelId && loggedInUser) {
-                        updateTypingStatus(false);
+                      setMessageInput(e.target.value);
+                      if (e.target.value.trim()) {
+                        handleTyping();
+                      } else {
+                        if (selectedChannelId && loggedInUser) {
+                          updateTypingStatus(false);
+                        }
                       }
                     }
                   }}
+                  onBlur={editingMessageId ? undefined : handleInputBlur}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      handleSendMessage();
+                      if (editingMessageId) {
+                        handleEditMessage(editingMessageId, editingMessageText);
+                      } else {
+                        handleSendMessage();
+                      }
+                    } else if (e.key === "Escape" && editingMessageId) {
+                      cancelEditMessage();
                     }
                   }}
                   className="flex-1"
                 />
                 <Button
-                  onClick={handleSendMessage}
-                  disabled={!messageInput.trim() || isSendingMessage}
+                  onClick={() => {
+                    if (editingMessageId) {
+                      handleEditMessage(editingMessageId, editingMessageText);
+                    } else {
+                      handleSendMessage();
+                    }
+                  }}
+                  disabled={
+                    editingMessageId
+                      ? !editingMessageText.trim() || isSendingMessage
+                      : !messageInput.trim() || isSendingMessage
+                  }
                   size="icon"
                 >
                   {isSendingMessage ? (
