@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useTeam } from "@/hooks/useTeam";
+import { useUser } from "@/hooks/useUser";
 import { getMyInvitationsService } from "@/services/teamService";
 import { useToast } from "@/components/ToastProvider";
 import { SettingsSidebar } from "@/components/SettingsSidebar";
+import { useTeamStore } from "@/store/teamStore";
 import {
   Card,
   CardContent,
@@ -12,13 +14,14 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Mail, CheckCircle2 } from "lucide-react";
 import type { TeamInvitation } from "@/types/auth";
 import { AxiosError } from "axios";
 
 export const MyInvitations = () => {
   const { acceptInvitation, isLoading } = useTeam();
+  const { fetchUserProfile } = useUser();
   const { showToast } = useToast();
   const [myInvitations, setMyInvitations] = useState<TeamInvitation[]>([]);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
@@ -52,16 +55,24 @@ export const MyInvitations = () => {
       }
     };
     fetchInvitations();
-  }, [showToast]);
+  }, []);
+
+  const triggerInvitationsRefresh = useTeamStore((state) => state.triggerInvitationsRefresh);
 
   const handleAccept = async (invitationId: string) => {
     setAcceptingId(invitationId);
     let successResult = null;
     try {
       successResult = await acceptInvitation(invitationId);
+      try {
+        await fetchUserProfile();
+      } catch (profileError) {
+        console.error("Failed to refresh user profile:", profileError);
+      }
       const res = await getMyInvitationsService();
       if (res && res.success) {
         setMyInvitations(res.data || []);
+        triggerInvitationsRefresh();
       }
     } catch (error) {
       console.error("Failed to accept invitation:", error);
@@ -115,6 +126,10 @@ export const MyInvitations = () => {
                       >
                         <div className="flex items-center gap-4">
                           <Avatar className="h-10 w-10">
+                            <AvatarImage 
+                              src={invitation.teamOwner?.profileImage || invitation.sender?.profileImage} 
+                              alt={invitation.teamOwner?.firstName || invitation.sender?.firstName || "User"}
+                            />
                             <AvatarFallback>
                               {invitation.teamOwner?.firstName?.[0] ||
                                 invitation.sender?.firstName?.[0] ||

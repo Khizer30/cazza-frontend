@@ -44,12 +44,12 @@ export const useTeam = () => {
         return [];
       }
     } catch (error: unknown) {
-      console.error("Fetch invitations error:", error);
       if (error instanceof AxiosError) {
         if (error.response?.status === 400) {
           setInvitations([]);
           return [];
         }
+        console.error("Fetch invitations error:", error);
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||
@@ -78,12 +78,12 @@ export const useTeam = () => {
         return [];
       }
     } catch (error: unknown) {
-      console.error("Fetch team members error:", error);
       if (error instanceof AxiosError) {
         if (error.response?.status === 400) {
           setMembers([]);
           return [];
         }
+        console.error("Fetch team members error:", error);
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||
@@ -112,12 +112,12 @@ export const useTeam = () => {
         return null;
       }
     } catch (error: unknown) {
-      console.error("Fetch team analytics error:", error);
       if (error instanceof AxiosError) {
         if (error.response?.status === 400) {
           setAnalytics(null);
           return null;
         }
+        console.error("Fetch team analytics error:", error);
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||
