@@ -219,12 +219,14 @@ export interface TeamInvitation {
     firstName: string;
     lastName: string;
     email: string;
+    profileImage?: string | null;
   };
   teamOwner?: {
     id: string;
     firstName: string;
     lastName: string;
     email: string;
+    profileImage?: string | null;
   };
   [key: string]: any;
 }

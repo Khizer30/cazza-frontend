@@ -101,47 +101,25 @@ export const TeamSettings = () => {
   );
   const hasProcessedMessage = useRef(false);
 
-  // Check for payment success/failure message in URL
-  useEffect(() => {
-    const message = searchParams.get("message");
-    if (message && !hasProcessedMessage.current) {
-      hasProcessedMessage.current = true;
-
-      // Show toast first
-      if (message === "success") {
-        showToast(
-          "Payment successful! Team member subscription is now active.",
-          "success"
-        );
-      } else {
-        showToast("Payment failed. Please try again.", "error");
-      }
-
-      // Remove query parameter from URL
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, "", newUrl);
-
-      // Refresh team data to get updated subscription status
-      fetchAllTeamData();
-    }
-  }, [searchParams, showToast, fetchAllTeamData]);
-
   useEffect(() => {
     fetchAllTeamData();
   }, []);
 
   useEffect(() => {
-    const handleFocus = () => {
+    const message = searchParams.get("message");
+    if (message && !hasProcessedMessage.current) {
+      hasProcessedMessage.current = true;
+      if (message === "success") {
+        showToast("Payment successful! Team member subscription is now active.", "success");
+      } else {
+        showToast("Payment failed. Please try again.", "error");
+      }
+      window.history.replaceState({}, "", window.location.pathname);
       fetchAllTeamData();
-    };
+    }
+  }, [searchParams, fetchAllTeamData, showToast]);
 
-    window.addEventListener("focus", handleFocus);
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, [fetchAllTeamData]);
-
-  const canManageTeam = true;
+  const canManageTeam = !currentUser?.ownerId;
 
   // Handle invite button click
   const handleInvite = useCallback(() => {
@@ -776,3 +754,4 @@ export const TeamSettings = () => {
     </div>
   );
 };
+

@@ -12,6 +12,8 @@ interface TeamState {
   invitations: TeamInvitation[];
   analytics: TeamAnalytics | null;
   isLoading: boolean;
+  invitationsRefreshTrigger: number;
+  pendingInvitationsCount: number;
   setMembers: (members: TeamMember[]) => void;
   setInvitations: (invitations: TeamInvitation[]) => void;
   setAnalytics: (analytics: TeamAnalytics | null) => void;
@@ -20,6 +22,8 @@ interface TeamState {
   removeInvitation: (invitationId: string) => void;
   removeMember: (memberId: string) => void;
   clearTeam: () => void;
+  triggerInvitationsRefresh: () => void;
+  setPendingInvitationsCount: (count: number) => void;
 }
 
 export const useTeamStore = create<TeamState>((set) => ({
@@ -27,6 +31,8 @@ export const useTeamStore = create<TeamState>((set) => ({
   invitations: [],
   analytics: null,
   isLoading: false,
+  invitationsRefreshTrigger: 0,
+  pendingInvitationsCount: 0,
 
   setMembers: (members) => set({ members }),
 
@@ -44,6 +50,7 @@ export const useTeamStore = create<TeamState>((set) => ({
   removeInvitation: (invitationId) =>
     set((state) => ({
       invitations: state.invitations.filter((inv) => inv.id !== invitationId),
+      invitationsRefreshTrigger: state.invitationsRefreshTrigger + 1,
     })),
 
   removeMember: (memberId) =>
@@ -51,5 +58,12 @@ export const useTeamStore = create<TeamState>((set) => ({
       members: state.members.filter((member) => member.id !== memberId),
     })),
 
-  clearTeam: () => set({ members: [], invitations: [], analytics: null }),
+  clearTeam: () => set({ members: [], invitations: [], analytics: null, invitationsRefreshTrigger: 0, pendingInvitationsCount: 0 }),
+
+  triggerInvitationsRefresh: () =>
+    set((state) => ({
+      invitationsRefreshTrigger: state.invitationsRefreshTrigger + 1,
+    })),
+
+  setPendingInvitationsCount: (count) => set({ pendingInvitationsCount: count }),
 }));

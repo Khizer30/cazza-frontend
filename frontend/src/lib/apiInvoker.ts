@@ -1,4 +1,5 @@
 import axiosInstance from "./axiosInstance";
+import { AxiosError } from "axios";
 
 async function apiInvoker<T>(
   url: string,
@@ -13,7 +14,15 @@ async function apiInvoker<T>(
     });
     return response.data;
   } catch (error) {
-    console.error(`API call to ${url} failed: `, error);
+    if (error instanceof AxiosError) {
+      const status = error.response?.status;
+      if (status === 400) {
+        throw error;
+      }
+      console.error(`API call to ${url} failed: `, error);
+    } else {
+      console.error(`API call to ${url} failed: `, error);
+    }
     throw error;
   }
 }

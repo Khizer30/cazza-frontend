@@ -10,7 +10,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { usePendingInvitations } from "@/hooks/usePendingInvitations";
 
 interface SettingsSidebarProps {
   className?: string;
@@ -19,6 +21,7 @@ interface SettingsSidebarProps {
 export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
   const location = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const pendingInvitationsCount = usePendingInvitations();
 
   const menuItems = [
     {
@@ -110,14 +113,27 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
                 to={item.path}
                 onClick={() => setIsMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
-                <Icon className="h-5 w-5" />
-                <span>{item.title}</span>
+                <div className="flex items-center gap-3">
+                  <Icon className="h-5 w-5" />
+                  <span>{item.title}</span>
+                </div>
+                {item.path === "/client/invitations" && pendingInvitationsCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className={cn(
+                      "h-5 min-w-5 px-1.5 text-xs flex items-center justify-center",
+                      isActive && "bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
+                    )}
+                  >
+                    {pendingInvitationsCount}
+                  </Badge>
+                )}
               </Link>
             );
           })}

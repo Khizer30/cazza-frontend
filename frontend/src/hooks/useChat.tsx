@@ -74,9 +74,12 @@ export const useChat = () => {
     }
   };
 
-  const updateChatGroup = async (groupId: string, name: string) => {
+  const updateChatGroup = async (
+    groupId: string,
+    data: { name: string; description?: string; icon?: string }
+  ) => {
     try {
-      const res = await updateChatGroupService(groupId, { name });
+      const res = await updateChatGroupService(groupId, data);
       if (res && res.success) {
         showToast(res.message || "Chat group updated successfully", "success");
         return true;
