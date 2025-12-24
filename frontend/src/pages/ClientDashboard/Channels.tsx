@@ -266,6 +266,7 @@ export const Channels = () => {
   const [openReactionPopoverId, setOpenReactionPopoverId] = useState<string | null>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const previousMessageCountRef = useRef<number>(0);
 
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
@@ -812,7 +813,18 @@ export const Channels = () => {
   }, []);
 
   useEffect(() => {
-    scrollToBottom("smooth");
+    previousMessageCountRef.current = 0;
+  }, [selectedChannelId]);
+
+  useEffect(() => {
+    const currentMessageCount = selectedChannel?.messages.length || 0;
+    const previousCount = previousMessageCountRef.current;
+    
+    if (currentMessageCount > previousCount) {
+      scrollToBottom("smooth");
+    }
+    
+    previousMessageCountRef.current = currentMessageCount;
   }, [selectedChannel?.messages, scrollToBottom]);
 
   useEffect(() => {
@@ -1685,7 +1697,7 @@ export const Channels = () => {
                             </span>
                           </div>
                           {message.replyTo && !message.deleted && (
-                            <div className={`text-xs text-muted-foreground mb-1 px-2 py-1 rounded bg-muted/50 border-l-2 border-primary ${isCurrentUser ? "text-right" : "text-left"}`}>
+                            <div className={`text-xs text-muted-foreground mb-1 px-2 py-1 rounded bg-muted/50 ${isCurrentUser ? "text-right" : "text-left"}`}>
                               <span className="font-medium">{message.replyTo.senderName}</span>
                               <p className="truncate max-w-[200px]">{message.replyTo.text}</p>
                             </div>
@@ -1699,14 +1711,22 @@ export const Channels = () => {
                                 }`}
                               >
                                 {message.deleted ? (
-                                  <p className="text-sm italic text-muted-foreground">
+                                  <p className={`text-sm italic ${
+                                    isCurrentUser 
+                                      ? "text-primary-foreground/70" 
+                                      : "text-foreground/70"
+                                  }`}>
                                     This message was deleted
                                   </p>
                                 ) : (
                                   <p className="text-sm whitespace-pre-wrap">
                                     {message.text}
                                     {message.edited && (
-                                      <span className="text-xs text-muted-foreground ml-2">
+                                      <span className={`text-xs ml-2 ${
+                                        isCurrentUser 
+                                          ? "text-primary-foreground/70" 
+                                          : "text-foreground/70"
+                                      }`}>
                                         (edited)
                                       </span>
                                     )}
@@ -1862,7 +1882,7 @@ export const Channels = () => {
 
             <div className="p-4 border-t border-border bg-card">
               {replyingToMessage && (
-                <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg border-l-2 border-primary">
+                <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg">
                   <div className="flex-1 min-w-0">
                     <span className="text-xs text-muted-foreground">Replying to </span>
                     <span className="text-xs font-medium">{replyingToMessage.senderName}</span>
@@ -1879,7 +1899,7 @@ export const Channels = () => {
                 </div>
               )}
               {editingMessageId && selectedChannel?.messages.find(m => m.id === editingMessageId) && (
-                <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg border-l-2 border-primary">
+                <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg">
                   <div className="flex-1 min-w-0">
                     <span className="text-xs text-muted-foreground">Editing message</span>
                     <p className="text-sm text-muted-foreground truncate">{selectedChannel.messages.find(m => m.id === editingMessageId)?.text}</p>
