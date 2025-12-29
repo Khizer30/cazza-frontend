@@ -4,6 +4,7 @@ import { ChatLayout } from "@/layouts/ChatLayout";
 import { Send, Loader2, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
 import ZZLogo from "@/assets/imgs/ZZ logo.png";
 import { suggestedPrompts } from "@/constants/AiChat";
 import { useChatStore, type ChatMessage } from "@/store/chatStore";
@@ -19,6 +20,94 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+const markdownComponents: Components = {
+  p: ({ children }) => (
+    <p className="mb-3 last:mb-0 text-foreground leading-relaxed">
+      {children}
+    </p>
+  ),
+  strong: ({ children }) => (
+    <strong className="font-bold text-foreground">{children}</strong>
+  ),
+  em: ({ children }) => (
+    <em className="italic text-foreground">{children}</em>
+  ),
+  h1: ({ children }) => (
+    <h1 className="text-2xl font-bold mb-4 mt-5 first:mt-0 text-foreground">
+      {children}
+    </h1>
+  ),
+  h2: ({ children }) => (
+    <h2 className="text-xl font-bold mb-3 mt-4 first:mt-0 text-foreground">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }) => (
+    <h3 className="text-lg font-semibold mb-3 mt-4 first:mt-0 text-foreground">
+      {children}
+    </h3>
+  ),
+  h4: ({ children }) => (
+    <h4 className="text-base font-semibold mb-2 mt-3 first:mt-0 text-foreground">
+      {children}
+    </h4>
+  ),
+  h5: ({ children }) => (
+    <h5 className="text-sm font-semibold mb-2 mt-3 first:mt-0 text-foreground">
+      {children}
+    </h5>
+  ),
+  h6: ({ children }) => (
+    <h6 className="text-sm font-medium mb-2 mt-2 first:mt-0 text-foreground">
+      {children}
+    </h6>
+  ),
+  ul: ({ children }) => (
+    <ul className="list-disc ml-5 mb-3 space-y-2 text-foreground">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="list-decimal ml-5 mb-3 space-y-2 text-foreground">
+      {children}
+    </ol>
+  ),
+  li: ({ children }) => (
+    <li className="text-foreground leading-relaxed pl-1">{children}</li>
+  ),
+  code: ({ children, className }) => {
+    const isInline = !className;
+    return isInline ? (
+      <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground">
+        {children}
+      </code>
+    ) : (
+      <code className={className}>{children}</code>
+    );
+  },
+  pre: ({ children }) => (
+    <pre className="bg-muted p-3 rounded-lg overflow-x-auto mb-3 text-sm font-mono text-foreground">
+      {children}
+    </pre>
+  ),
+  hr: () => <hr className="my-4 border-border" />,
+  a: ({ children, href }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary underline hover:text-primary/80 transition-colors"
+    >
+      {children}
+    </a>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="border-l-4 border-muted-foreground/30 pl-4 my-3 italic text-foreground/80">
+      {children}
+    </blockquote>
+  ),
+};
 
 export const AIChat = () => {
   const [input, setInput] = useState("");
@@ -54,7 +143,6 @@ export const AIChat = () => {
     deleteMessage,
   } = useChatbot();
 
-  // Get current conversation messages
   const currentConversation = getCurrentConversation();
   const messages = currentConversation?.messages || [];
 
@@ -100,12 +188,10 @@ export const AIChat = () => {
     loadMessages();
   }, [currentConversationId]);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Send a message and get AI response from backend
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -141,7 +227,6 @@ export const AIChat = () => {
 
       removeMessageFromConversation(activeChatId, tempUserMessageId);
 
-      // Add user message with backend ID
       const backendUserMessage: ChatMessage = {
         id: `user-${response.id}`,
         type: "user",
@@ -199,7 +284,6 @@ export const AIChat = () => {
     }
   };
 
-  // Handle chat selection
   const handleSelectChat = (chatId: string) => {
     setCurrentConversation(chatId);
   };
@@ -222,22 +306,18 @@ export const AIChat = () => {
     }
   };
 
-  // Handle delete message click - opens confirmation dialog
   const handleDeleteMessageClick = (messageId: string) => {
     setMessageToDelete(messageId);
     setDeleteDialogOpen(true);
   };
 
-  // Confirm and delete message
   const handleConfirmDelete = async () => {
     if (!currentConversationId || !messageToDelete) return;
 
     setIsDeleting(true);
     try {
-      // Find the message to get its backendId
       const message = messages.find((msg) => msg.id === messageToDelete);
       if (!message?.backendId) {
-        // If no backendId, just remove from local store
         removeMessageFromConversation(currentConversationId, messageToDelete);
         setDeleteDialogOpen(false);
         setMessageToDelete(null);
@@ -245,13 +325,11 @@ export const AIChat = () => {
       }
 
       await deleteMessage(message.backendId);
-      // Remove message from conversation after successful deletion
       removeMessageFromConversation(currentConversationId, messageToDelete);
       setDeleteDialogOpen(false);
       setMessageToDelete(null);
     } catch (error) {
       console.error("Failed to delete message:", error);
-      // Error toast is already shown in the hook
     } finally {
       setIsDeleting(false);
     }
@@ -278,14 +356,12 @@ export const AIChat = () => {
       onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
     >
       <div className="h-[92vh] flex flex-col bg-background">
-        {/* Header - fixed at top */}
         <div className="flex-shrink-0 p-4 border-b border-border bg-card">
           <h1 className="text-lg font-semibold">
             {currentConversation?.title || "Ask Cazza"}
           </h1>
         </div>
 
-        {/* Messages container */}
         <div className="flex-1 overflow-y-auto p-6">
           {isLoadingHistory ? (
             <div className="flex items-center justify-center h-full">
@@ -301,14 +377,22 @@ export const AIChat = () => {
                   }`}
                 >
                   <div
-                    className={`relative max-w-xs lg:max-w-md px-4 py-3 pb-8 rounded-lg ${
+                    className={`relative ${
+                      message.type === "user"
+                        ? "max-w-xs lg:max-w-md"
+                        : "max-w-2xl lg:max-w-3xl"
+                    } px-4 py-3 pb-8 rounded-lg ${
                       message.type === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-card border border-border shadow-sm text-foreground"
                     }`}
                   >
                     {message.type === "assistant" ? (
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      <div className="markdown-content">
+                        <ReactMarkdown components={markdownComponents}>
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
                     ) : (
                       <span>{message.content}</span>
                     )}
@@ -334,7 +418,6 @@ export const AIChat = () => {
               <div ref={messagesEndRef} />
             </div>
           ) : (
-            /* Welcome state */
             <div className="flex flex-col items-center justify-center h-full p-8">
               <div className="w-full max-w-2xl bg-card rounded-lg shadow-soft border border-border midday-card">
                 <div className="p-8">
@@ -373,7 +456,6 @@ export const AIChat = () => {
           )}
         </div>
 
-        {/* Input area fixed at bottom */}
         <div className="flex-shrink-0 p-4 border-t border-border bg-background">
           <div className="flex items-center gap-2">
             <Input
@@ -398,7 +480,6 @@ export const AIChat = () => {
         </div>
       </div>
 
-      {/* Delete confirmation dialog */}
       <AlertDialog
         open={deleteDialogOpen}
         onOpenChange={(open) => {
