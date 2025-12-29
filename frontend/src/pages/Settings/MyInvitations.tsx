@@ -57,7 +57,9 @@ export const MyInvitations = () => {
     fetchInvitations();
   }, []);
 
-  const triggerInvitationsRefresh = useTeamStore((state) => state.triggerInvitationsRefresh);
+  const triggerInvitationsRefresh = useTeamStore(
+    (state) => state.triggerInvitationsRefresh
+  );
 
   const handleAccept = async (invitationId: string) => {
     setAcceptingId(invitationId);
@@ -126,9 +128,16 @@ export const MyInvitations = () => {
                       >
                         <div className="flex items-center gap-4">
                           <Avatar className="h-10 w-10">
-                            <AvatarImage 
-                              src={invitation.teamOwner?.profileImage || invitation.sender?.profileImage} 
-                              alt={invitation.teamOwner?.firstName || invitation.sender?.firstName || "User"}
+                            <AvatarImage
+                              src={
+                                invitation.teamOwner?.profileImage ||
+                                invitation.sender?.profileImage
+                              }
+                              alt={
+                                invitation.teamOwner?.firstName ||
+                                invitation.sender?.firstName ||
+                                "User"
+                              }
                             />
                             <AvatarFallback>
                               {invitation.teamOwner?.firstName?.[0] ||

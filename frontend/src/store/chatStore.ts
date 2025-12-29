@@ -34,7 +34,10 @@ interface ChatState {
   getConversationMessages: (conversationId: string) => ChatMessage[];
   loadChatHistoryFromBackend: (apiMessages: ApiChatMessage[]) => void;
   loadChatsFromBackend: (chats: Chat[]) => void;
-  loadChatMessagesFromBackend: (chatId: string, messages: ApiChatMessage[]) => void;
+  loadChatMessagesFromBackend: (
+    chatId: string,
+    messages: ApiChatMessage[]
+  ) => void;
   removeMessageFromConversation: (
     conversationId: string,
     messageId: string

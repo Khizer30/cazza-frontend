@@ -44,7 +44,15 @@ export const AIChat = () => {
     setLoadingHistory,
   } = useChatStore();
 
-  const { createChat, getAllChats, updateChatTitle, deleteChat: deleteChatAPI, askQuestion, getChatHistory, deleteMessage } = useChatbot();
+  const {
+    createChat,
+    getAllChats,
+    updateChatTitle,
+    deleteChat: deleteChatAPI,
+    askQuestion,
+    getChatHistory,
+    deleteMessage,
+  } = useChatbot();
 
   // Get current conversation messages
   const currentConversation = getCurrentConversation();
@@ -77,7 +85,10 @@ export const AIChat = () => {
           try {
             const historyData = await getChatHistory(currentConversationId);
             if (historyData && historyData.messages) {
-              loadChatMessagesFromBackend(currentConversationId, historyData.messages);
+              loadChatMessagesFromBackend(
+                currentConversationId,
+                historyData.messages
+              );
             }
           } catch (error) {
             console.error("Failed to load messages:", error);
@@ -171,13 +182,16 @@ export const AIChat = () => {
     try {
       const newChat = await createChat();
       if (newChat) {
-        loadChatsFromBackend([...conversations.map(c => ({
-          id: c.id,
-          title: c.title,
-          userId: "",
-          createdAt: c.createdAt.toISOString(),
-          updatedAt: c.updatedAt.toISOString()
-        })), newChat]);
+        loadChatsFromBackend([
+          ...conversations.map((c) => ({
+            id: c.id,
+            title: c.title,
+            userId: "",
+            createdAt: c.createdAt.toISOString(),
+            updatedAt: c.updatedAt.toISOString(),
+          })),
+          newChat,
+        ]);
         setCurrentConversation(newChat.id);
       }
     } catch (error) {
@@ -246,9 +260,10 @@ export const AIChat = () => {
   const chatHistoryItems = conversations.map((conv) => ({
     id: conv.id,
     title: conv.title,
-    timestamp: conv.updatedAt && !isNaN(conv.updatedAt.getTime())
-      ? formatDistanceToNow(conv.updatedAt, { addSuffix: true })
-      : "just now",
+    timestamp:
+      conv.updatedAt && !isNaN(conv.updatedAt.getTime())
+        ? formatDistanceToNow(conv.updatedAt, { addSuffix: true })
+        : "just now",
   }));
 
   return (

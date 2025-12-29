@@ -52,8 +52,12 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
   const { logout } = useauth();
   const { user } = useUserStore();
   const pendingInvitationsCount = usePendingInvitations();
-  const invitationsRefreshTrigger = useTeamStore((state) => state.invitationsRefreshTrigger);
-  const setPendingInvitationsCount = useTeamStore((state) => state.setPendingInvitationsCount);
+  const invitationsRefreshTrigger = useTeamStore(
+    (state) => state.invitationsRefreshTrigger
+  );
+  const setPendingInvitationsCount = useTeamStore(
+    (state) => state.setPendingInvitationsCount
+  );
 
   useEffect(() => {
     const fetchPendingInvitations = async () => {
@@ -62,7 +66,10 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
         if (res && res.success && res.data) {
           const invitations = res.data as TeamInvitation[];
           const pendingCount = invitations.filter((invitation) => {
-            if (invitation.status && invitation.status.toUpperCase() === "ACCEPTED") {
+            if (
+              invitation.status &&
+              invitation.status.toUpperCase() === "ACCEPTED"
+            ) {
               return false;
             }
             if (invitation.expiresAt) {

@@ -36,7 +36,10 @@ export const getChatService = (chatId: string) => {
   );
 };
 
-export const updateChatTitleService = (chatId: string, payload: UPDATE_CHAT_TITLE_PAYLOAD) => {
+export const updateChatTitleService = (
+  chatId: string,
+  payload: UPDATE_CHAT_TITLE_PAYLOAD
+) => {
   return apiInvoker<UPDATE_CHAT_TITLE_RESPONSE>(
     END_POINT.chatbot.updateChatTitle(chatId),
     "PUT",
@@ -60,7 +63,10 @@ export const askQuestionService = (payload: CHATBOT_ASK_PAYLOAD) => {
 };
 
 export const getChatHistoryService = (chatId: string) => {
-  return apiInvoker<CHATBOT_HISTORY_RESPONSE>(END_POINT.chatbot.history(chatId), "GET");
+  return apiInvoker<CHATBOT_HISTORY_RESPONSE>(
+    END_POINT.chatbot.history(chatId),
+    "GET"
+  );
 };
 
 export const deleteMessageService = (messageId: string) => {

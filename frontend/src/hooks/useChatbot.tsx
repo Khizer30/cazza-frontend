@@ -10,7 +10,10 @@ import {
   deleteMessageService,
 } from "@/services/chatbotService";
 import { AxiosError } from "axios";
-import type { CREATE_CHAT_PAYLOAD, UPDATE_CHAT_TITLE_PAYLOAD } from "@/types/auth";
+import type {
+  CREATE_CHAT_PAYLOAD,
+  UPDATE_CHAT_TITLE_PAYLOAD,
+} from "@/types/auth";
 
 export const useChatbot = () => {
   const { showToast } = useToast();
@@ -171,7 +174,10 @@ export const useChatbot = () => {
     }
   };
 
-  const updateChatTitle = async (chatId: string, payload: UPDATE_CHAT_TITLE_PAYLOAD) => {
+  const updateChatTitle = async (
+    chatId: string,
+    payload: UPDATE_CHAT_TITLE_PAYLOAD
+  ) => {
     try {
       const res = await updateChatTitleService(chatId, payload);
       if (res && res.success && res.data) {

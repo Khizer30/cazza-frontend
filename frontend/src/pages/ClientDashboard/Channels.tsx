@@ -219,8 +219,8 @@ export const Channels = () => {
   const convertChatGroupToChannel = useCallback(
     (chatGroup: ChatGroup): Channel => {
       const defaultIcon = availableIcons[0];
-      const iconFromApi = chatGroup.icon 
-        ? availableIcons.find((i) => i.name === chatGroup.icon) 
+      const iconFromApi = chatGroup.icon
+        ? availableIcons.find((i) => i.name === chatGroup.icon)
         : null;
       const icon = iconFromApi || defaultIcon;
 
@@ -261,9 +261,12 @@ export const Channels = () => {
 
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingMessageText, setEditingMessageText] = useState("");
-  const [replyingToMessage, setReplyingToMessage] = useState<ChannelMessage | null>(null);
+  const [replyingToMessage, setReplyingToMessage] =
+    useState<ChannelMessage | null>(null);
   const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
-  const [openReactionPopoverId, setOpenReactionPopoverId] = useState<string | null>(null);
+  const [openReactionPopoverId, setOpenReactionPopoverId] = useState<
+    string | null
+  >(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const previousMessageCountRef = useRef<number>(0);
@@ -451,31 +454,43 @@ export const Channels = () => {
   }, [selectedChannelId, loggedInUser, updateTypingStatus]);
 
   const handleEditMessage = async (messageId: string, newText: string) => {
-    if (!selectedChannelId || !loggedInUser || !auth.currentUser || !newText.trim()) return;
-    
+    if (
+      !selectedChannelId ||
+      !loggedInUser ||
+      !auth.currentUser ||
+      !newText.trim()
+    )
+      return;
+
     try {
-      const message = selectedChannel?.messages.find(m => m.id === messageId);
+      const message = selectedChannel?.messages.find((m) => m.id === messageId);
       if (!message) return;
-      
+
       const trimmedNewText = newText.trim();
       const originalText = message.text.trim();
-      
+
       if (trimmedNewText === originalText) {
         setEditingMessageId(null);
         setEditingMessageText("");
         return;
       }
-      
-      const messageRef = doc(db, "chatGroups", selectedChannelId, "messages", messageId);
+
+      const messageRef = doc(
+        db,
+        "chatGroups",
+        selectedChannelId,
+        "messages",
+        messageId
+      );
       const updateData: any = {
         text: trimmedNewText,
       };
-      
+
       if (trimmedNewText !== originalText) {
         updateData.edited = true;
         updateData.editedAt = serverTimestamp();
       }
-      
+
       await updateDoc(messageRef, updateData);
       setEditingMessageId(null);
       setEditingMessageText("");
@@ -484,9 +499,15 @@ export const Channels = () => {
 
   const handleDeleteMessage = async (messageId: string) => {
     if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
-    
+
     try {
-      const messageRef = doc(db, "chatGroups", selectedChannelId, "messages", messageId);
+      const messageRef = doc(
+        db,
+        "chatGroups",
+        selectedChannelId,
+        "messages",
+        messageId
+      );
       await updateDoc(messageRef, {
         deleted: true,
       });
@@ -495,31 +516,39 @@ export const Channels = () => {
 
   const handleToggleReaction = async (messageId: string, emoji: string) => {
     if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
-    
+
     try {
-      const messageRef = doc(db, "chatGroups", selectedChannelId, "messages", messageId);
-      const message = selectedChannel?.messages.find(m => m.id === messageId);
+      const messageRef = doc(
+        db,
+        "chatGroups",
+        selectedChannelId,
+        "messages",
+        messageId
+      );
+      const message = selectedChannel?.messages.find((m) => m.id === messageId);
       const currentReactions = message?.reactions || {};
       const usersWithReaction = currentReactions[emoji] || [];
-      
+
       if (usersWithReaction.includes(loggedInUser.id)) {
         await updateDoc(messageRef, {
           [`reactions.${emoji}`]: arrayRemove(loggedInUser.id),
         });
       } else {
         const updates: any = {};
-        
+
         Object.keys(currentReactions).forEach((existingEmoji) => {
           if (existingEmoji !== emoji) {
             const existingUsers = currentReactions[existingEmoji] || [];
             if (existingUsers.includes(loggedInUser.id)) {
-              updates[`reactions.${existingEmoji}`] = arrayRemove(loggedInUser.id);
+              updates[`reactions.${existingEmoji}`] = arrayRemove(
+                loggedInUser.id
+              );
             }
           }
         });
-        
+
         updates[`reactions.${emoji}`] = arrayUnion(loggedInUser.id);
-        
+
         await updateDoc(messageRef, updates);
       }
       setOpenReactionPopoverId(null);
@@ -804,7 +833,9 @@ export const Channels = () => {
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
       if (scrollContainer) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
@@ -819,11 +850,11 @@ export const Channels = () => {
   useEffect(() => {
     const currentMessageCount = selectedChannel?.messages.length || 0;
     const previousCount = previousMessageCountRef.current;
-    
+
     if (currentMessageCount > previousCount) {
       scrollToBottom("smooth");
     }
-    
+
     previousMessageCountRef.current = currentMessageCount;
   }, [selectedChannel?.messages, scrollToBottom]);
 
@@ -1238,7 +1269,8 @@ export const Channels = () => {
 
       if (
         loggedInUser &&
-        (loggedInUser.id === userId || String(loggedInUser.id) === String(userId))
+        (loggedInUser.id === userId ||
+          String(loggedInUser.id) === String(userId))
       ) {
         const displayName =
           loggedInUser.firstName && loggedInUser.lastName
@@ -1325,7 +1357,10 @@ export const Channels = () => {
                   </div>
                   <div className="grid gap-2">
                     <Label>Channel Icon</Label>
-                    <Dialog open={showIconPicker} onOpenChange={setShowIconPicker}>
+                    <Dialog
+                      open={showIconPicker}
+                      onOpenChange={setShowIconPicker}
+                    >
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"
@@ -1697,158 +1732,230 @@ export const Channels = () => {
                             </span>
                           </div>
                           {message.replyTo && !message.deleted && (
-                            <div className={`text-xs text-muted-foreground mb-1 px-2 py-1 rounded bg-muted/50 ${isCurrentUser ? "text-right" : "text-left"}`}>
-                              <span className="font-medium">{message.replyTo.senderName}</span>
-                              <p className="truncate max-w-[200px]">{message.replyTo.text}</p>
+                            <div
+                              className={`text-xs text-muted-foreground mb-1 px-2 py-1 rounded bg-muted/50 ${isCurrentUser ? "text-right" : "text-left"}`}
+                            >
+                              <span className="font-medium">
+                                {message.replyTo.senderName}
+                              </span>
+                              <p className="truncate max-w-[200px]">
+                                {message.replyTo.text}
+                              </p>
                             </div>
                           )}
                           <div className="relative">
-                              <div
-                                className={`rounded-lg px-4 py-2 inline-block ${
-                                  isCurrentUser
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-card border border-border"
-                                }`}
-                              >
-                                {message.deleted ? (
-                                  <p className={`text-sm italic ${
-                                    isCurrentUser 
-                                      ? "text-primary-foreground/70" 
+                            <div
+                              className={`rounded-lg px-4 py-2 inline-block ${
+                                isCurrentUser
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-card border border-border"
+                              }`}
+                            >
+                              {message.deleted ? (
+                                <p
+                                  className={`text-sm italic ${
+                                    isCurrentUser
+                                      ? "text-primary-foreground/70"
                                       : "text-foreground/70"
-                                  }`}>
-                                    This message was deleted
-                                  </p>
-                                ) : (
-                                  <p className="text-sm whitespace-pre-wrap">
-                                    {message.text}
-                                    {message.edited && (
-                                      <span className={`text-xs ml-2 ${
-                                        isCurrentUser 
-                                          ? "text-primary-foreground/70" 
+                                  }`}
+                                >
+                                  This message was deleted
+                                </p>
+                              ) : (
+                                <p className="text-sm whitespace-pre-wrap">
+                                  {message.text}
+                                  {message.edited && (
+                                    <span
+                                      className={`text-xs ml-2 ${
+                                        isCurrentUser
+                                          ? "text-primary-foreground/70"
                                           : "text-foreground/70"
-                                      }`}>
-                                        (edited)
-                                      </span>
-                                    )}
-                                  </p>
-                                )}
-                              </div>
-                              {!message.deleted && (
-                                <div className={`absolute top-0 ${isCurrentUser ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1`}>
-                                  <Popover open={openReactionPopoverId === message.id} onOpenChange={(open) => setOpenReactionPopoverId(open ? message.id : null)}>
-                                    <PopoverTrigger asChild>
-                                      <Button size="icon" variant="ghost" className="h-6 w-6">
-                                        <Smile className="h-3 w-3" />
-                                      </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-2">
-                                      <div className="flex gap-1">
-                                        {commonEmojis.map((emoji) => {
-                                          const hasReacted = message.reactions?.[emoji]?.includes(loggedInUser?.id || "");
-                                          return (
-                                            <button
-                                              key={emoji}
-                                              onClick={() => handleToggleReaction(message.id, emoji)}
-                                              className={`text-lg hover:bg-muted p-1 rounded transition-colors ${
-                                                hasReacted
-                                                  ? "bg-primary/20 border border-primary"
-                                                  : ""
-                                              }`}
-                                            >
-                                              {emoji}
-                                            </button>
-                                          );
-                                        })}
-                                      </div>
-                                    </PopoverContent>
-                                  </Popover>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-6 w-6"
-                                    onClick={() => handleReply(message)}
-                                  >
-                                    <Reply className="h-3 w-3" />
-                                  </Button>
-                                  {isCurrentUser && (
-                                    <>
-                                      <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="h-6 w-6"
-                                        onClick={() => startEditMessage(message)}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>
-                                      <AlertDialog open={deleteMessageId === message.id} onOpenChange={(open) => setDeleteMessageId(open ? message.id : null)}>
-                                        <AlertDialogTrigger asChild>
-                                          <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            className="h-6 w-6 text-destructive hover:text-destructive"
-                                          >
-                                            <Trash2 className="h-3 w-3" />
-                                          </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                          <AlertDialogHeader>
-                                            <AlertDialogTitle>Delete Message</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                              Are you sure you want to delete this message? This action cannot be undone.
-                                            </AlertDialogDescription>
-                                          </AlertDialogHeader>
-                                          <AlertDialogFooter>
-                                            <AlertDialogCancel onClick={() => setDeleteMessageId(null)}>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction
-                                              onClick={() => {
-                                                if (deleteMessageId) {
-                                                  handleDeleteMessage(deleteMessageId);
-                                                  setDeleteMessageId(null);
-                                                }
-                                              }}
-                                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                            >
-                                              Delete
-                                            </AlertDialogAction>
-                                          </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                      </AlertDialog>
-                                    </>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          {Object.keys(message.reactions || {}).length > 0 && !message.deleted && (
-                            <div className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? "justify-end" : "justify-start"}`}>
-                              {Object.entries(message.reactions).map(([emoji, users]) => {
-                                if (users.length === 0) return null;
-                                const userNames = getReactionUserNames(users);
-                                return (
-                                  <div key={emoji} className="relative inline-block group/reaction">
-                                    <button
-                                      onClick={() => handleToggleReaction(message.id, emoji)}
-                                      className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${
-                                        users.includes(loggedInUser?.id || "") 
-                                          ? "bg-primary/20 border-primary" 
-                                          : "bg-muted border-border hover:bg-muted/80"
                                       }`}
                                     >
-                                      <span>{emoji}</span>
-                                      <span>{users.length}</span>
-                                    </button>
-                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover border border-border rounded-md shadow-md text-xs opacity-0 invisible group-hover/reaction:opacity-100 group-hover/reaction:visible transition-all duration-200 z-[100] pointer-events-none min-w-[120px]">
-                                      <p className="font-medium mb-1 text-foreground">Reacted by:</p>
-                                      <div className="space-y-0.5">
-                                        {userNames.map((name, index) => (
-                                          <p key={index} className="text-muted-foreground">{name}</p>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              })}
+                                      (edited)
+                                    </span>
+                                  )}
+                                </p>
+                              )}
                             </div>
-                          )}
+                            {!message.deleted && (
+                              <div
+                                className={`absolute top-0 ${isCurrentUser ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1`}
+                              >
+                                <Popover
+                                  open={openReactionPopoverId === message.id}
+                                  onOpenChange={(open) =>
+                                    setOpenReactionPopoverId(
+                                      open ? message.id : null
+                                    )
+                                  }
+                                >
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-6 w-6"
+                                    >
+                                      <Smile className="h-3 w-3" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-2">
+                                    <div className="flex gap-1">
+                                      {commonEmojis.map((emoji) => {
+                                        const hasReacted = message.reactions?.[
+                                          emoji
+                                        ]?.includes(loggedInUser?.id || "");
+                                        return (
+                                          <button
+                                            key={emoji}
+                                            onClick={() =>
+                                              handleToggleReaction(
+                                                message.id,
+                                                emoji
+                                              )
+                                            }
+                                            className={`text-lg hover:bg-muted p-1 rounded transition-colors ${
+                                              hasReacted
+                                                ? "bg-primary/20 border border-primary"
+                                                : ""
+                                            }`}
+                                          >
+                                            {emoji}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-6 w-6"
+                                  onClick={() => handleReply(message)}
+                                >
+                                  <Reply className="h-3 w-3" />
+                                </Button>
+                                {isCurrentUser && (
+                                  <>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-6 w-6"
+                                      onClick={() => startEditMessage(message)}
+                                    >
+                                      <Edit className="h-3 w-3" />
+                                    </Button>
+                                    <AlertDialog
+                                      open={deleteMessageId === message.id}
+                                      onOpenChange={(open) =>
+                                        setDeleteMessageId(
+                                          open ? message.id : null
+                                        )
+                                      }
+                                    >
+                                      <AlertDialogTrigger asChild>
+                                        <Button
+                                          size="icon"
+                                          variant="ghost"
+                                          className="h-6 w-6 text-destructive hover:text-destructive"
+                                        >
+                                          <Trash2 className="h-3 w-3" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>
+                                            Delete Message
+                                          </AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to delete this
+                                            message? This action cannot be
+                                            undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel
+                                            onClick={() =>
+                                              setDeleteMessageId(null)
+                                            }
+                                          >
+                                            Cancel
+                                          </AlertDialogCancel>
+                                          <AlertDialogAction
+                                            onClick={() => {
+                                              if (deleteMessageId) {
+                                                handleDeleteMessage(
+                                                  deleteMessageId
+                                                );
+                                                setDeleteMessageId(null);
+                                              }
+                                            }}
+                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                          >
+                                            Delete
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          {Object.keys(message.reactions || {}).length > 0 &&
+                            !message.deleted && (
+                              <div
+                                className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? "justify-end" : "justify-start"}`}
+                              >
+                                {Object.entries(message.reactions).map(
+                                  ([emoji, users]) => {
+                                    if (users.length === 0) return null;
+                                    const userNames =
+                                      getReactionUserNames(users);
+                                    return (
+                                      <div
+                                        key={emoji}
+                                        className="relative inline-block group/reaction"
+                                      >
+                                        <button
+                                          onClick={() =>
+                                            handleToggleReaction(
+                                              message.id,
+                                              emoji
+                                            )
+                                          }
+                                          className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                                            users.includes(
+                                              loggedInUser?.id || ""
+                                            )
+                                              ? "bg-primary/20 border-primary"
+                                              : "bg-muted border-border hover:bg-muted/80"
+                                          }`}
+                                        >
+                                          <span>{emoji}</span>
+                                          <span>{users.length}</span>
+                                        </button>
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover border border-border rounded-md shadow-md text-xs opacity-0 invisible group-hover/reaction:opacity-100 group-hover/reaction:visible transition-all duration-200 z-[100] pointer-events-none min-w-[120px]">
+                                          <p className="font-medium mb-1 text-foreground">
+                                            Reacted by:
+                                          </p>
+                                          <div className="space-y-0.5">
+                                            {userNames.map((name, index) => (
+                                              <p
+                                                key={index}
+                                                className="text-muted-foreground"
+                                              >
+                                                {name}
+                                              </p>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                )}
+                              </div>
+                            )}
                         </div>
                       </div>
                     );
@@ -1884,9 +1991,15 @@ export const Channels = () => {
               {replyingToMessage && (
                 <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg">
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs text-muted-foreground">Replying to </span>
-                    <span className="text-xs font-medium">{replyingToMessage.senderName}</span>
-                    <p className="text-sm text-muted-foreground truncate">{replyingToMessage.text}</p>
+                    <span className="text-xs text-muted-foreground">
+                      Replying to{" "}
+                    </span>
+                    <span className="text-xs font-medium">
+                      {replyingToMessage.senderName}
+                    </span>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {replyingToMessage.text}
+                    </p>
                   </div>
                   <Button
                     size="icon"
@@ -1898,26 +2011,41 @@ export const Channels = () => {
                   </Button>
                 </div>
               )}
-              {editingMessageId && selectedChannel?.messages.find(m => m.id === editingMessageId) && (
-                <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs text-muted-foreground">Editing message</span>
-                    <p className="text-sm text-muted-foreground truncate">{selectedChannel.messages.find(m => m.id === editingMessageId)?.text}</p>
+              {editingMessageId &&
+                selectedChannel?.messages.find(
+                  (m) => m.id === editingMessageId
+                ) && (
+                  <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs text-muted-foreground">
+                        Editing message
+                      </span>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {
+                          selectedChannel.messages.find(
+                            (m) => m.id === editingMessageId
+                          )?.text
+                        }
+                      </p>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 flex-shrink-0"
+                      onClick={cancelEditMessage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6 flex-shrink-0"
-                    onClick={cancelEditMessage}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+                )}
               <div className="flex items-center gap-2">
                 <Input
                   ref={messageInputRef}
-                  placeholder={editingMessageId ? "Edit your message..." : `Message #${selectedChannel.name.toLowerCase()}`}
+                  placeholder={
+                    editingMessageId
+                      ? "Edit your message..."
+                      : `Message #${selectedChannel.name.toLowerCase()}`
+                  }
                   value={editingMessageId ? editingMessageText : messageInput}
                   onChange={(e) => {
                     if (editingMessageId) {
