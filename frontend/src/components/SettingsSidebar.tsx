@@ -123,17 +123,19 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
                   <Icon className="h-5 w-5" />
                   <span>{item.title}</span>
                 </div>
-                {item.path === "/client/invitations" && pendingInvitationsCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className={cn(
-                      "h-5 min-w-5 px-1.5 text-xs flex items-center justify-center",
-                      isActive && "bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
-                    )}
-                  >
-                    {pendingInvitationsCount}
-                  </Badge>
-                )}
+                {item.path === "/client/invitations" &&
+                  pendingInvitationsCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className={cn(
+                        "h-5 min-w-5 px-1.5 text-xs flex items-center justify-center",
+                        isActive &&
+                          "bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
+                      )}
+                    >
+                      {pendingInvitationsCount}
+                    </Badge>
+                  )}
               </Link>
             );
           })}

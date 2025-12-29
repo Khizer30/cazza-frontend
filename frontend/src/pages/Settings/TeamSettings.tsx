@@ -110,7 +110,10 @@ export const TeamSettings = () => {
     if (message && !hasProcessedMessage.current) {
       hasProcessedMessage.current = true;
       if (message === "success") {
-        showToast("Payment successful! Team member subscription is now active.", "success");
+        showToast(
+          "Payment successful! Team member subscription is now active.",
+          "success"
+        );
       } else {
         showToast("Payment failed. Please try again.", "error");
       }
@@ -754,4 +757,3 @@ export const TeamSettings = () => {
     </div>
   );
 };
-

@@ -22,9 +22,12 @@ axiosInstance.interceptors.request.use(
 
 // Response interceptor to handle errors and auto-logout on token expiration
 axiosInstance.interceptors.response.use(
-  (response) => response, 
+  (response) => response,
   async (error) => {
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
       const isAuthEndpoint = error.config?.url?.includes("/auth/");
       if (!isAuthEndpoint) {
         localStorage.clear();

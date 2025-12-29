@@ -58,12 +58,20 @@ export const useTeamStore = create<TeamState>((set) => ({
       members: state.members.filter((member) => member.id !== memberId),
     })),
 
-  clearTeam: () => set({ members: [], invitations: [], analytics: null, invitationsRefreshTrigger: 0, pendingInvitationsCount: 0 }),
+  clearTeam: () =>
+    set({
+      members: [],
+      invitations: [],
+      analytics: null,
+      invitationsRefreshTrigger: 0,
+      pendingInvitationsCount: 0,
+    }),
 
   triggerInvitationsRefresh: () =>
     set((state) => ({
       invitationsRefreshTrigger: state.invitationsRefreshTrigger + 1,
     })),
 
-  setPendingInvitationsCount: (count) => set({ pendingInvitationsCount: count }),
+  setPendingInvitationsCount: (count) =>
+    set({ pendingInvitationsCount: count }),
 }));
