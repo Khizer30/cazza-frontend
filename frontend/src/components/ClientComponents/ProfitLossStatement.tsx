@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -6,6 +7,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   XAxis,
   YAxis,
@@ -15,16 +30,84 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign, Calendar } from "lucide-react";
-
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  CalendarIcon,
+  ChevronRight,
+  ChevronDown,
+  Download,
+  FileText,
+  FileSpreadsheet,
+  RefreshCw,
+} from "lucide-react";
 import { format } from "date-fns";
-import { expenseData, monthlyPL } from "@/constants/ProfitLssStatement";
+import { cn } from "@/lib/utils";
+import {
+  expenseData,
+  monthlyPL,
+  plTableData,
+  plTableColumns,
+} from "@/constants/ProfitLssStatement";
+
+// Helper function to format currency values
+const formatValue = (value: number | string): string => {
+  if (typeof value === "string") return value;
+  if (value === 0) return "£ 0.00";
+  const prefix = value < 0 ? "-£ " : "£ ";
+  return `${prefix}${Math.abs(value).toLocaleString("en-GB", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+};
+
+// Helper function to determine value color
+const getValueColor = (value: number | string, parameter: string): string => {
+  if (typeof value === "string") {
+    if (value.startsWith("-")) return "text-red-500";
+    return "";
+  }
+  if (value < 0) return "text-red-500";
+  if (
+    value > 0 &&
+    (parameter === "Gross profit" || parameter === "Net profit")
+  )
+    return "text-green-500";
+  return "";
+};
 
 export const ProfitLossStatement = () => {
-  // TODO: Replace with actual data fetching logic or hook
-  const totalRevenue = 42000; // Mock value for demonstration
-  const loading = false; // Mock loading state
-  const dateRange: any = 12 - 2 - 2025;
+  const totalRevenue = 42000;
+  const loading = false;
+
+  // Filter states
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: new Date(2024, 0, 1),
+    to: new Date(),
+  });
+  const [marketplace, setMarketplace] = useState<string>("all");
+  const [sku, setSku] = useState<string>("all");
+  const [country, setCountry] = useState<string>("all");
+  const [currency, setCurrency] = useState<string>("GBP");
+
+  // State for expandable rows
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  const toggleRow = (parameter: string) => {
+    setExpandedRows((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(parameter)) {
+        newSet.delete(parameter);
+      } else {
+        newSet.add(parameter);
+      }
+      return newSet;
+    });
+  };
 
   const totalExpenses = expenseData.reduce(
     (sum, expense) => sum + expense.amount,
@@ -34,12 +117,27 @@ export const ProfitLossStatement = () => {
   const profitMargin =
     totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
 
-  // Calculate month-over-month growth
   const lastMonth = monthlyPL[monthlyPL.length - 1];
   const previousMonth = monthlyPL[monthlyPL.length - 2];
   const profitGrowth = previousMonth
     ? ((lastMonth.profit - previousMonth.profit) / previousMonth.profit) * 100
     : 0;
+
+  // Export handlers
+  const handleExportCSV = () => {
+    console.log("Exporting to CSV...");
+    // TODO: Implement CSV export API call
+  };
+
+  const handleExportPDF = () => {
+    console.log("Exporting to PDF...");
+    // TODO: Implement PDF export API call
+  };
+
+  const handleXeroSync = () => {
+    console.log("Syncing to Xero...");
+    // TODO: Implement Xero sync API call
+  };
 
   if (loading) {
     return (
@@ -55,23 +153,159 @@ export const ProfitLossStatement = () => {
   }
 
   return (
-    <div className="space-y-3">
-      {/* Date Range Header */}
-      {dateRange && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Profit & Loss Statement
-            </CardTitle>
-            <CardDescription>
-              Financial performance for the period:{" "}
-              {dateRange.from ? format(dateRange.from, "MMM dd, yyyy") : "N/A"}{" "}
-              to {dateRange.to ? format(dateRange.to, "MMM dd, yyyy") : "N/A"}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      )}
+    <div className="space-y-4">
+      {/* Header with Title */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <CalendarIcon className="h-5 w-5" />
+                Profit & Loss Statement
+              </CardTitle>
+              <CardDescription>
+                Granular, accounting-grade reports with full traceability
+              </CardDescription>
+            </div>
+            {/* Export & Sync Buttons */}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleExportCSV}>
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                CSV
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportPDF}>
+                <FileText className="h-4 w-4 mr-2" />
+                PDF
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleXeroSync}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Xero Sync
+              </Button>
+              <Button size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Download Report
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Filters Section */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-4">
+            {/* Date Range Picker */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm text-muted-foreground">Date Range</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !dateRange && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "LLL dd, y")} -{" "}
+                          {format(dateRange.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Pick a date range</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={(range) =>
+                      setDateRange({ from: range?.from, to: range?.to })
+                    }
+                    numberOfMonths={2}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Marketplace Filter */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm text-muted-foreground">Marketplace</span>
+              <Select value={marketplace} onValueChange={setMarketplace}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Select marketplace" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Marketplaces</SelectItem>
+                  <SelectItem value="amazon">Amazon</SelectItem>
+                  <SelectItem value="ebay">eBay</SelectItem>
+                  <SelectItem value="shopify">Shopify</SelectItem>
+                  <SelectItem value="tiktok">TikTok Shop</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* SKU Filter */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm text-muted-foreground">SKU</span>
+              <Select value={sku} onValueChange={setSku}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Select SKU" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All SKUs</SelectItem>
+                  <SelectItem value="SKU001">SKU001</SelectItem>
+                  <SelectItem value="SKU002">SKU002</SelectItem>
+                  <SelectItem value="SKU003">SKU003</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Country Filter */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm text-muted-foreground">Country</span>
+              <Select value={country} onValueChange={setCountry}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Countries</SelectItem>
+                  <SelectItem value="UK">United Kingdom</SelectItem>
+                  <SelectItem value="US">United States</SelectItem>
+                  <SelectItem value="DE">Germany</SelectItem>
+                  <SelectItem value="FR">France</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Currency Filter */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm text-muted-foreground">Currency</span>
+              <Select value={currency} onValueChange={setCurrency}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="GBP">GBP (£)</SelectItem>
+                  <SelectItem value="USD">USD ($)</SelectItem>
+                  <SelectItem value="EUR">EUR (€)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* P&L Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -182,6 +416,84 @@ export const ProfitLossStatement = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Dynamic P&L Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>P&L Statement Details</CardTitle>
+          <CardDescription>
+            Revenue, COGS, Fees (commission, shipping, ads) breakdown by period
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="text-left p-3 font-medium text-muted-foreground sticky left-0 bg-muted/50 min-w-[180px]">
+                    Parameter/Date
+                  </th>
+                  {plTableColumns.map((column) => (
+                    <th
+                      key={column}
+                      className="text-right p-3 font-medium text-muted-foreground min-w-[120px]"
+                    >
+                      {column}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {plTableData.map((row) => (
+                  <tr
+                    key={row.parameter}
+                    className={`border-b hover:bg-muted/30 transition-colors ${
+                      row.isHighlighted ? "bg-muted/20" : ""
+                    } ${row.isSubRow ? "bg-muted/10" : ""}`}
+                  >
+                    <td
+                      className={`p-3 sticky left-0 bg-background ${
+                        row.isBold ? "font-semibold" : ""
+                      } ${row.isSubRow ? "pl-8" : ""}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {row.isExpandable && (
+                          <button
+                            onClick={() => toggleRow(row.parameter)}
+                            className="p-0.5 hover:bg-muted rounded"
+                          >
+                            {expandedRows.has(row.parameter) ? (
+                              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                            )}
+                          </button>
+                        )}
+                        <span>{row.parameter}</span>
+                      </div>
+                    </td>
+                    {plTableColumns.map((column) => {
+                      const value = row.values[column];
+                      return (
+                        <td
+                          key={column}
+                          className={`p-3 text-right ${
+                            row.isBold ? "font-semibold" : ""
+                          } ${getValueColor(value, row.parameter)}`}
+                        >
+                          {typeof value === "number"
+                            ? formatValue(value)
+                            : value}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* P&L Chart */}
       <Card className="midday-card">
