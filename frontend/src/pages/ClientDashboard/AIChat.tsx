@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import ZZLogo from "@/assets/imgs/ZZ logo.png";
 import { suggestedPrompts } from "@/constants/AiChat";
-import { useToast } from "@/components/ToastProvider";
 import { useChatStore, type ChatMessage } from "@/store/chatStore";
 import { useChatbot } from "@/hooks/useChatbot";
 import { formatDistanceToNow } from "date-fns";
@@ -22,7 +21,6 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const AIChat = () => {
-  const { showToast } = useToast();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -34,55 +32,62 @@ export const AIChat = () => {
   const {
     conversations,
     currentConversationId,
-    createNewConversation,
     setCurrentConversation,
     addMessageToConversation,
     getCurrentConversation,
     deleteConversation,
-    loadChatHistoryFromBackend,
+    loadChatsFromBackend,
+    loadChatMessagesFromBackend,
     removeMessageFromConversation,
+    updateConversationTitle,
     isLoadingHistory,
     setLoadingHistory,
   } = useChatStore();
 
-  const { askQuestion, getChatHistory, deleteMessage } = useChatbot();
+  const { createChat, getAllChats, updateChatTitle, deleteChat: deleteChatAPI, askQuestion, getChatHistory, deleteMessage } = useChatbot();
 
   // Get current conversation messages
   const currentConversation = getCurrentConversation();
   const messages = currentConversation?.messages || [];
 
-  // Load chat history from backend on mount
   useEffect(() => {
-    const loadHistory = async () => {
+    const loadChats = async () => {
       try {
         setLoadingHistory(true);
-        const historyData = await getChatHistory();
-        if (historyData && historyData.messages) {
-          loadChatHistoryFromBackend(historyData.messages);
-        } else if (conversations.length === 0) {
-          // If no history and no conversations, create a new one
-          createNewConversation();
+        const chats = await getAllChats();
+        if (chats && chats.length > 0) {
+          loadChatsFromBackend(chats);
+          setCurrentConversation(chats[0].id);
         }
       } catch (error) {
-        console.error("Failed to load chat history:", error);
-        // Create new conversation if loading fails
-        if (conversations.length === 0) {
-          createNewConversation();
-        }
+        console.error("Failed to load chats:", error);
       } finally {
         setLoadingHistory(false);
       }
     };
 
-    loadHistory();
-  }, []); // Only run on mount
+    loadChats();
+  }, []);
 
-  // Set current conversation if none is selected
   useEffect(() => {
-    if (conversations.length > 0 && !currentConversationId) {
-      setCurrentConversation(conversations[0].id);
-    }
-  }, [conversations, currentConversationId]);
+    const loadMessages = async () => {
+      if (currentConversationId && conversations.length > 0) {
+        const conv = conversations.find((c) => c.id === currentConversationId);
+        if (conv && conv.messages.length === 0) {
+          try {
+            const historyData = await getChatHistory(currentConversationId);
+            if (historyData && historyData.messages) {
+              loadChatMessagesFromBackend(currentConversationId, historyData.messages);
+            }
+          } catch (error) {
+            console.error("Failed to load messages:", error);
+          }
+        }
+      }
+    };
+
+    loadMessages();
+  }, [currentConversationId]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -91,29 +96,39 @@ export const AIChat = () => {
 
   // Send a message and get AI response from backend
   const handleSendMessage = async () => {
-    if (!input.trim() || isLoading || !currentConversationId) return;
+    if (!input.trim() || isLoading) return;
 
     const userInput = input.trim();
-    const tempUserMessageId = `temp-user-${Date.now()}`;
-
-    // Add user message optimistically
-    const userMessage: ChatMessage = {
-      id: tempUserMessageId,
-      type: "user",
-      content: userInput,
-      timestamp: new Date(),
-    };
-
-    addMessageToConversation(currentConversationId, userMessage);
     setInput("");
     setIsLoading(true);
 
     try {
-      // Send question to backend
-      const response = await askQuestion(userInput);
+      let activeChatId = currentConversationId;
 
-      // Remove temporary user message
-      removeMessageFromConversation(currentConversationId, tempUserMessageId);
+      if (!activeChatId) {
+        const newChat = await createChat();
+        if (newChat) {
+          loadChatsFromBackend([newChat]);
+          setCurrentConversation(newChat.id);
+          activeChatId = newChat.id;
+        } else {
+          throw new Error("Failed to create chat");
+        }
+      }
+
+      const tempUserMessageId = `temp-user-${Date.now()}`;
+      const userMessage: ChatMessage = {
+        id: tempUserMessageId,
+        type: "user",
+        content: userInput,
+        timestamp: new Date(),
+      };
+
+      addMessageToConversation(activeChatId, userMessage);
+
+      const response = await askQuestion(userInput, activeChatId);
+
+      removeMessageFromConversation(activeChatId, tempUserMessageId);
 
       // Add user message with backend ID
       const backendUserMessage: ChatMessage = {
@@ -124,7 +139,6 @@ export const AIChat = () => {
         backendId: response.id,
       };
 
-      // Add assistant message with backend ID
       const backendAiMessage: ChatMessage = {
         id: `assistant-${response.id}`,
         type: "assistant",
@@ -133,32 +147,42 @@ export const AIChat = () => {
         backendId: response.id,
       };
 
-      // Add backend messages to conversation
-      addMessageToConversation(currentConversationId, backendUserMessage);
-      addMessageToConversation(currentConversationId, backendAiMessage);
+      addMessageToConversation(activeChatId, backendUserMessage);
+      addMessageToConversation(activeChatId, backendAiMessage);
     } catch (error) {
       console.error("Error getting AI response:", error);
 
-      // Remove temporary user message on error
-      removeMessageFromConversation(currentConversationId, tempUserMessageId);
+      if (currentConversationId) {
+        const errorAiMessage: ChatMessage = {
+          id: Date.now().toString() + "-error",
+          type: "assistant",
+          content: "Sorry, I encountered an error. Please try again.",
+          timestamp: new Date(),
+        };
 
-      // Add error message to chat
-      const errorAiMessage: ChatMessage = {
-        id: Date.now().toString() + "-error",
-        type: "assistant",
-        content: "Sorry, I encountered an error. Please try again.",
-        timestamp: new Date(),
-      };
-
-      addMessageToConversation(currentConversationId, errorAiMessage);
+        addMessageToConversation(currentConversationId, errorAiMessage);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle new chat
-  const handleNewChat = () => {
-    createNewConversation();
+  const handleNewChat = async () => {
+    try {
+      const newChat = await createChat();
+      if (newChat) {
+        loadChatsFromBackend([...conversations.map(c => ({
+          id: c.id,
+          title: c.title,
+          userId: "",
+          createdAt: c.createdAt.toISOString(),
+          updatedAt: c.updatedAt.toISOString()
+        })), newChat]);
+        setCurrentConversation(newChat.id);
+      }
+    } catch (error) {
+      console.error("Failed to create new chat:", error);
+    }
   };
 
   // Handle chat selection
@@ -166,10 +190,22 @@ export const AIChat = () => {
     setCurrentConversation(chatId);
   };
 
-  // Handle delete chat
-  const handleDeleteChat = (chatId: string) => {
-    deleteConversation(chatId);
-    showToast("Chat deleted", "success");
+  const handleDeleteChat = async (chatId: string) => {
+    try {
+      await deleteChatAPI(chatId);
+      deleteConversation(chatId);
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    }
+  };
+
+  const handleRenameChat = async (chatId: string, newTitle: string) => {
+    try {
+      await updateChatTitle(chatId, { title: newTitle });
+      updateConversationTitle(chatId, newTitle);
+    } catch (error) {
+      console.error("Failed to rename chat:", error);
+    }
   };
 
   // Handle delete message click - opens confirmation dialog
@@ -207,11 +243,12 @@ export const AIChat = () => {
     }
   };
 
-  // Format chat history for sidebar
   const chatHistoryItems = conversations.map((conv) => ({
     id: conv.id,
     title: conv.title,
-    timestamp: formatDistanceToNow(conv.updatedAt, { addSuffix: true }),
+    timestamp: conv.updatedAt && !isNaN(conv.updatedAt.getTime())
+      ? formatDistanceToNow(conv.updatedAt, { addSuffix: true })
+      : "just now",
   }));
 
   return (
@@ -220,6 +257,7 @@ export const AIChat = () => {
       onNewChat={handleNewChat}
       onSelectChat={handleSelectChat}
       onDeleteChat={handleDeleteChat}
+      onRenameChat={handleRenameChat}
       currentChatId={currentConversationId || undefined}
       isSidebarOpen={isSidebarOpen}
       onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}

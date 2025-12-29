@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import type { ChatMessage as ApiChatMessage } from "@/types/auth";
+import type { ChatMessage as ApiChatMessage, Chat } from "@/types/auth";
 
 export interface ChatMessage {
   id: string;
   type: "user" | "assistant";
   content: string;
   timestamp: Date;
-  backendId?: string; // Store backend message ID for deletion
+  backendId?: string;
 }
 
 export interface ChatConversation {
@@ -22,7 +22,6 @@ interface ChatState {
   currentConversationId: string | null;
   isLoadingHistory: boolean;
 
-  // Actions
   createNewConversation: () => string;
   setCurrentConversation: (id: string | null) => void;
   addMessageToConversation: (
@@ -33,8 +32,9 @@ interface ChatState {
   deleteConversation: (conversationId: string) => void;
   getCurrentConversation: () => ChatConversation | null;
   getConversationMessages: (conversationId: string) => ChatMessage[];
-  // Backend integration methods
   loadChatHistoryFromBackend: (apiMessages: ApiChatMessage[]) => void;
+  loadChatsFromBackend: (chats: Chat[]) => void;
+  loadChatMessagesFromBackend: (chatId: string, messages: ApiChatMessage[]) => void;
   removeMessageFromConversation: (
     conversationId: string,
     messageId: string
@@ -250,5 +250,55 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setLoadingHistory: (loading) => {
     set({ isLoadingHistory: loading });
+  },
+
+  loadChatsFromBackend: (chats) => {
+    const conversations: ChatConversation[] = chats.map((chat) => ({
+      id: chat.id,
+      title: chat.title,
+      messages: [],
+      createdAt: new Date(chat.createdAt),
+      updatedAt: new Date(chat.updatedAt),
+    }));
+
+    set({
+      conversations: conversations.sort(
+        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+      ),
+    });
+  },
+
+  loadChatMessagesFromBackend: (chatId, apiMessages) => {
+    const storeMessages: ChatMessage[] = [];
+    apiMessages.forEach((apiMsg) => {
+      storeMessages.push({
+        id: `user-${apiMsg.id}`,
+        type: "user",
+        content: apiMsg.question,
+        timestamp: new Date(apiMsg.createdAt),
+        backendId: apiMsg.id,
+      });
+      storeMessages.push({
+        id: `assistant-${apiMsg.id}`,
+        type: "assistant",
+        content: apiMsg.answer,
+        timestamp: new Date(apiMsg.updatedAt),
+        backendId: apiMsg.id,
+      });
+    });
+
+    storeMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+    set((state) => ({
+      conversations: state.conversations.map((conv) =>
+        conv.id === chatId
+          ? {
+              ...conv,
+              messages: storeMessages,
+              updatedAt: new Date(),
+            }
+          : conv
+      ),
+    }));
   },
 }));

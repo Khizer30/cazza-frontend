@@ -387,6 +387,7 @@ export interface TEAM_MEMBER_SUBSCRIPTION_RESPONSE {
 
 export interface CHATBOT_ASK_PAYLOAD {
   question: string;
+  chatId?: string;
 }
 
 export interface ChatMessage {
@@ -422,6 +423,58 @@ export interface CHATBOT_HISTORY_RESPONSE {
 }
 
 export interface CHATBOT_DELETE_MESSAGE_RESPONSE {
+  success: boolean;
+  message: string;
+}
+
+export interface Chat {
+  id: string;
+  title: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CREATE_CHAT_PAYLOAD {
+  title?: string;
+}
+
+export interface CREATE_CHAT_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: {
+    chat: Chat;
+  };
+}
+
+export interface GET_ALL_CHATS_RESPONSE {
+  success: boolean;
+  message: string;
+  data: {
+    chats: Chat[];
+  };
+}
+
+export interface GET_CHAT_RESPONSE {
+  success: boolean;
+  message: string;
+  data: {
+    chat: Chat;
+    messages: ChatMessage[];
+  };
+}
+
+export interface UPDATE_CHAT_TITLE_PAYLOAD {
+  title: string;
+}
+
+export interface UPDATE_CHAT_TITLE_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: Chat;
+}
+
+export interface DELETE_CHAT_RESPONSE {
   success: boolean;
   message: string;
 }

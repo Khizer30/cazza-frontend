@@ -28,8 +28,13 @@ export const END_POINT = {
   },
   chatbot: {
     ask: "/chatbot/ask",
-    history: "/chatbot/history",
-    deleteMessage: "/chatbot/message",
+    createChat: "/chatbot/chat",
+    getAllChats: "/chatbot/chats",
+    getChat: (chatId: string) => `/chatbot/chat/${chatId}`,
+    updateChatTitle: (chatId: string) => `/chatbot/chat/${chatId}/title`,
+    deleteChat: (chatId: string) => `/chatbot/chat/${chatId}`,
+    history: (chatId: string) => `/chatbot/chat/${chatId}/history`,
+    deleteMessage: (messageId: string) => `/chatbot/message/${messageId}`,
   },
   chat: {
     createGroup: "/chat/group",
