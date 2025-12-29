@@ -23,16 +23,12 @@ import {
 
 const markdownComponents: Components = {
   p: ({ children }) => (
-    <p className="mb-3 last:mb-0 text-foreground leading-relaxed">
-      {children}
-    </p>
+    <p className="mb-3 last:mb-0 text-foreground leading-relaxed">{children}</p>
   ),
   strong: ({ children }) => (
     <strong className="font-bold text-foreground">{children}</strong>
   ),
-  em: ({ children }) => (
-    <em className="italic text-foreground">{children}</em>
-  ),
+  em: ({ children }) => <em className="italic text-foreground">{children}</em>,
   h1: ({ children }) => (
     <h1 className="text-2xl font-bold mb-4 mt-5 first:mt-0 text-foreground">
       {children}
@@ -203,7 +199,8 @@ export const AIChat = () => {
       let activeChatId = currentConversationId;
 
       if (!activeChatId) {
-        const chatTitle = userInput.slice(0, 50) + (userInput.length > 50 ? "..." : "");
+        const chatTitle =
+          userInput.slice(0, 50) + (userInput.length > 50 ? "..." : "");
         const newChat = await createChat({ title: chatTitle });
         if (newChat) {
           loadChatsFromBackend([newChat]);

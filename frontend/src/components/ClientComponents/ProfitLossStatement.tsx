@@ -69,10 +69,7 @@ const getValueColor = (value: number | string, parameter: string): string => {
     return "";
   }
   if (value < 0) return "text-red-500";
-  if (
-    value > 0 &&
-    (parameter === "Gross profit" || parameter === "Net profit")
-  )
+  if (value > 0 && (parameter === "Gross profit" || parameter === "Net profit"))
     return "text-green-500";
   return "";
 };

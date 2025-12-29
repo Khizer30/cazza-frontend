@@ -154,8 +154,10 @@ export function ChatLayout({
                         value={editingTitle || ""}
                         onChange={(e) => setEditingTitle(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" && !isRenaming) handleSaveEdit(chat.id);
-                          if (e.key === "Escape" && !isRenaming) handleCancelEdit();
+                          if (e.key === "Enter" && !isRenaming)
+                            handleSaveEdit(chat.id);
+                          if (e.key === "Escape" && !isRenaming)
+                            handleCancelEdit();
                         }}
                         className="h-8 text-sm"
                         autoFocus
