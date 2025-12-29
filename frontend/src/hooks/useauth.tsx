@@ -107,10 +107,30 @@ export const useauth = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        showToast(
-          error.response?.data?.message || "An error occurred during signup",
-          "error"
-        );
+        const responseData = error.response?.data;
+        let errorMessage = "An error occurred during signup";
+
+        // Check if backend returned detailed validation errors
+        if (
+          responseData?.errors &&
+          Array.isArray(responseData.errors) &&
+          responseData.errors.length > 0
+        ) {
+          // Extract all error messages from the errors array
+          const errorMessages = responseData.errors
+            .map((err: { message?: string }) => err.message)
+            .filter(Boolean);
+
+          if (errorMessages.length > 0) {
+            errorMessage = errorMessages.join(". ");
+          }
+        } else if (responseData?.message) {
+          errorMessage = responseData.message;
+        } else if (responseData?.error) {
+          errorMessage = responseData.error;
+        }
+
+        showToast(errorMessage, "error");
       } else {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
