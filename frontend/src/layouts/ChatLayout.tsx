@@ -13,6 +13,7 @@ import {
   Pencil,
   Check,
   X,
+  Loader2,
 } from "lucide-react";
 
 interface ChatHistoryItem {
@@ -28,7 +29,7 @@ interface ChatLayoutProps {
   onNewChat?: () => void;
   onSelectChat?: (chatId: string) => void;
   onDeleteChat?: (chatId: string) => void;
-  onRenameChat?: (chatId: string, newTitle: string) => void;
+  onRenameChat?: (chatId: string, newTitle: string) => Promise<void>;
   currentChatId?: string;
   isSidebarOpen?: boolean;
   onToggleSidebar?: () => void;
@@ -51,6 +52,7 @@ export function ChatLayout({
   });
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+  const [isRenaming, setIsRenaming] = useState(false);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -75,11 +77,18 @@ export function ChatLayout({
     setEditingTitle("");
   };
 
-  const handleSaveEdit = (chatId: string) => {
+  const handleSaveEdit = async (chatId: string) => {
     if (editingTitle.trim() && onRenameChat) {
-      onRenameChat(chatId, editingTitle.trim());
+      setIsRenaming(true);
+      try {
+        await onRenameChat(chatId, editingTitle.trim());
+      } finally {
+        setIsRenaming(false);
+        handleCancelEdit();
+      }
+    } else {
+      handleCancelEdit();
     }
-    handleCancelEdit();
   };
 
   return (
@@ -145,12 +154,13 @@ export function ChatLayout({
                         value={editingTitle || ""}
                         onChange={(e) => setEditingTitle(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") handleSaveEdit(chat.id);
-                          if (e.key === "Escape") handleCancelEdit();
+                          if (e.key === "Enter" && !isRenaming) handleSaveEdit(chat.id);
+                          if (e.key === "Escape" && !isRenaming) handleCancelEdit();
                         }}
                         className="h-8 text-sm"
                         autoFocus
                         onClick={(e) => e.stopPropagation()}
+                        disabled={isRenaming}
                       />
                       <button
                         onClick={(e) => {
@@ -160,8 +170,13 @@ export function ChatLayout({
                         className="p-1.5 hover:bg-primary/10 rounded text-primary flex-shrink-0"
                         title="Save"
                         type="button"
+                        disabled={isRenaming}
                       >
-                        <Check className="w-4 h-4" />
+                        {isRenaming ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Check className="w-4 h-4" />
+                        )}
                       </button>
                       <button
                         onClick={(e) => {
@@ -171,15 +186,16 @@ export function ChatLayout({
                         className="p-1.5 hover:bg-destructive/10 rounded text-muted-foreground hover:text-destructive flex-shrink-0"
                         title="Cancel"
                         type="button"
+                        disabled={isRenaming}
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
+                    <div className="flex items-start gap-2 w-full">
+                      <div className="min-w-0 flex-1">
                         <p
-                          className="text-sm font-medium text-foreground truncate"
+                          className="text-sm font-medium text-foreground truncate max-w-[140px]"
                           title={chat.title}
                         >
                           {chat.title}
@@ -188,14 +204,14 @@ export function ChatLayout({
                           {chat.timestamp}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         {onRenameChat && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleStartEdit(chat.id, chat.title);
                             }}
-                            className="p-1.5 hover:bg-primary/10 rounded text-muted-foreground hover:text-primary flex-shrink-0"
+                            className="p-1 hover:bg-primary/10 rounded text-muted-foreground hover:text-primary"
                             title="Rename chat"
                             type="button"
                           >
@@ -208,7 +224,7 @@ export function ChatLayout({
                               e.stopPropagation();
                               onDeleteChat(chat.id);
                             }}
-                            className="p-1.5 hover:bg-destructive/10 rounded text-muted-foreground hover:text-destructive flex-shrink-0"
+                            className="p-1 hover:bg-destructive/10 rounded text-muted-foreground hover:text-destructive"
                             title="Delete chat"
                             type="button"
                           >

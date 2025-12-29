@@ -203,7 +203,8 @@ export const AIChat = () => {
       let activeChatId = currentConversationId;
 
       if (!activeChatId) {
-        const newChat = await createChat();
+        const chatTitle = userInput.slice(0, 50) + (userInput.length > 50 ? "..." : "");
+        const newChat = await createChat({ title: chatTitle });
         if (newChat) {
           loadChatsFromBackend([newChat]);
           setCurrentConversation(newChat.id);
