@@ -20,12 +20,11 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle errors and refresh tokens if necessary
+// Response interceptor to handle errors and auto-logout on token expiration
 axiosInstance.interceptors.response.use(
-  (response) => response, // Just return the response if successful
+  (response) => response, 
   async (error) => {
-    if (error.response && error.response.status === 403) {
-      // Don't redirect for auth endpoints - let components handle the error
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       const isAuthEndpoint = error.config?.url?.includes("/auth/");
       if (!isAuthEndpoint) {
         localStorage.clear();
