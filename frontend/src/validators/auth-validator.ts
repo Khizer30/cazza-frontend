@@ -79,7 +79,67 @@ export const setNewPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+// Onboarding validation schemas - split by step for granular validation
+export const businessInfoSchema = z.object({
+  businessName: z
+    .string()
+    .trim()
+    .min(1, { message: "Business name is required" })
+    .min(2, { message: "Business name must be at least 2 characters" })
+    .max(100, { message: "Business name must not exceed 100 characters" }),
+  businessEntityType: z
+    .string()
+    .min(1, { message: "Please select a business entity type" }),
+  annualRevenueBand: z
+    .string()
+    .min(1, { message: "Please select an annual revenue band" }),
+});
+
+export const marketplacesSchema = z.object({
+  marketplaces: z
+    .array(z.string())
+    .min(1, { message: "Please select at least one marketplace" }),
+});
+
+export const toolsSchema = z.object({
+  tools: z
+    .array(z.string())
+    .min(1, { message: "Please select at least one tool" }),
+  techStack: z.object({
+    useXero: z.boolean(),
+    multipleCurrencies: z.boolean(),
+  }),
+});
+
+// Full onboarding schema for final validation
+export const onboardingSchema = z.object({
+  businessName: z
+    .string()
+    .trim()
+    .min(1, { message: "Business name is required" })
+    .min(2, { message: "Business name must be at least 2 characters" })
+    .max(100, { message: "Business name must not exceed 100 characters" }),
+  businessEntityType: z
+    .string()
+    .min(1, { message: "Please select a business entity type" }),
+  annualRevenueBand: z
+    .string()
+    .min(1, { message: "Please select an annual revenue band" }),
+  marketplaces: z
+    .array(z.string())
+    .min(1, { message: "Please select at least one marketplace" }),
+  tools: z.array(z.string()),
+  techStack: z.object({
+    useXero: z.boolean(),
+    multipleCurrencies: z.boolean(),
+  }),
+});
+
 export type LoginData = z.infer<typeof logInSchema>;
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 export type SignUpData = z.infer<typeof signUpSchema>;
 export type SetNewPasswordData = z.infer<typeof setNewPasswordSchema>;
+export type BusinessInfoData = z.infer<typeof businessInfoSchema>;
+export type MarketplacesData = z.infer<typeof marketplacesSchema>;
+export type ToolsData = z.infer<typeof toolsSchema>;
+export type OnboardingData = z.infer<typeof onboardingSchema>;

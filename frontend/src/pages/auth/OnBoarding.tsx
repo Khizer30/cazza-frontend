@@ -14,6 +14,11 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUser } from "@/hooks/useUser";
 import { Loader2 } from "lucide-react";
+import {
+  businessInfoSchema,
+  marketplacesSchema,
+  toolsSchema,
+} from "@/validators/auth-validator";
 
 interface OnboardingData {
   businessName: string;
@@ -25,6 +30,14 @@ interface OnboardingData {
     useXero: boolean;
     multipleCurrencies: boolean;
   };
+}
+
+interface FormErrors {
+  businessName?: string;
+  businessEntityType?: string;
+  annualRevenueBand?: string;
+  marketplaces?: string;
+  tools?: string;
 }
 
 const steps = ["Business Info", "Online Marketplaces", "Tools & Tech Stack"];
@@ -51,9 +64,81 @@ export function Onboarding() {
     tools: [],
     techStack: { useXero: false, multipleCurrencies: false },
   });
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
-  const back = () => setStep((s) => Math.max(s - 1, 0));
+  const validateStep = (currentStep: number): boolean => {
+    setErrors({});
+
+    if (currentStep === 0) {
+      const result = businessInfoSchema.safeParse({
+        businessName: formData.businessName,
+        businessEntityType: formData.businessEntityType,
+        annualRevenueBand: formData.annualRevenueBand,
+      });
+
+      if (!result.success) {
+        const newErrors: FormErrors = {};
+        result.error.issues.forEach((issue) => {
+          const field = issue.path[0] as keyof FormErrors;
+          if (!newErrors[field]) {
+            newErrors[field] = issue.message;
+          }
+        });
+        setErrors(newErrors);
+        return false;
+      }
+    }
+
+    if (currentStep === 1) {
+      const result = marketplacesSchema.safeParse({
+        marketplaces: formData.marketplaces,
+      });
+
+      if (!result.success) {
+        const newErrors: FormErrors = {};
+        result.error.issues.forEach((issue) => {
+          const field = issue.path[0] as keyof FormErrors;
+          if (!newErrors[field]) {
+            newErrors[field] = issue.message;
+          }
+        });
+        setErrors(newErrors);
+        return false;
+      }
+    }
+
+    if (currentStep === 2) {
+      const result = toolsSchema.safeParse({
+        tools: formData.tools,
+        techStack: formData.techStack,
+      });
+
+      if (!result.success) {
+        const newErrors: FormErrors = {};
+        result.error.issues.forEach((issue) => {
+          const field = issue.path[0] as keyof FormErrors;
+          if (!newErrors[field]) {
+            newErrors[field] = issue.message;
+          }
+        });
+        setErrors(newErrors);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const next = () => {
+    if (validateStep(step)) {
+      setStep((s) => Math.min(s + 1, steps.length - 1));
+    }
+  };
+
+  const back = () => {
+    setErrors({});
+    setStep((s) => Math.max(s - 1, 0));
+  };
 
   const handleCheckbox = (field: string, value: string) => {
     setFormData((prev) => {
@@ -64,15 +149,72 @@ export function Onboarding() {
         [field]: exists ? arr.filter((v) => v !== value) : [...arr, value],
       };
     });
+    // Clear error when user makes a selection
+    if (field === "marketplaces" && errors.marketplaces) {
+      setErrors((prev) => ({ ...prev, marketplaces: undefined }));
+    }
+    if (field === "tools" && errors.tools) {
+      setErrors((prev) => ({ ...prev, tools: undefined }));
+    }
   };
 
   const handleFinish = async () => {
-    // Validate required fields
-    if (
-      !formData.businessName ||
-      !formData.businessEntityType ||
-      !formData.annualRevenueBand
-    ) {
+    // Validate all steps before submitting
+    // First validate step 0 (Business Info)
+    const step0Result = businessInfoSchema.safeParse({
+      businessName: formData.businessName,
+      businessEntityType: formData.businessEntityType,
+      annualRevenueBand: formData.annualRevenueBand,
+    });
+
+    if (!step0Result.success) {
+      // Go back to step 0 and show errors
+      setStep(0);
+      const newErrors: FormErrors = {};
+      step0Result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof FormErrors;
+        if (!newErrors[field]) {
+          newErrors[field] = issue.message;
+        }
+      });
+      setErrors(newErrors);
+      return;
+    }
+
+    // Validate step 1 (Marketplaces)
+    const step1Result = marketplacesSchema.safeParse({
+      marketplaces: formData.marketplaces,
+    });
+
+    if (!step1Result.success) {
+      // Go back to step 1 and show errors
+      setStep(1);
+      const newErrors: FormErrors = {};
+      step1Result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof FormErrors;
+        if (!newErrors[field]) {
+          newErrors[field] = issue.message;
+        }
+      });
+      setErrors(newErrors);
+      return;
+    }
+
+    // Validate step 2 (Tools & Tech Stack)
+    const step2Result = toolsSchema.safeParse({
+      tools: formData.tools,
+      techStack: formData.techStack,
+    });
+
+    if (!step2Result.success) {
+      const newErrors: FormErrors = {};
+      step2Result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof FormErrors;
+        if (!newErrors[field]) {
+          newErrors[field] = issue.message;
+        }
+      });
+      setErrors(newErrors);
       return;
     }
 
@@ -118,28 +260,48 @@ export function Onboarding() {
                     <Input
                       placeholder="Your business or trading name"
                       value={formData.businessName}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         setFormData({
                           ...formData,
                           businessName: e.target.value,
-                        })
-                      }
+                        });
+                        if (errors.businessName) {
+                          setErrors((prev) => ({
+                            ...prev,
+                            businessName: undefined,
+                          }));
+                        }
+                      }}
                       disabled={isLoading}
+                      className={errors.businessName ? "border-red-500" : ""}
                     />
+                    {errors.businessName && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.businessName}
+                      </p>
+                    )}
                   </div>
 
-                  <div className="">
+                  <div>
                     <label className="text-sm font-medium">
                       Business Entity Type
                     </label>
                     <Select
                       value={formData.businessEntityType}
-                      onValueChange={(v) =>
-                        setFormData({ ...formData, businessEntityType: v })
-                      }
+                      onValueChange={(v) => {
+                        setFormData({ ...formData, businessEntityType: v });
+                        if (errors.businessEntityType) {
+                          setErrors((prev) => ({
+                            ...prev,
+                            businessEntityType: undefined,
+                          }));
+                        }
+                      }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger
+                        className={`w-full ${errors.businessEntityType ? "border-red-500" : ""}`}
+                      >
                         <SelectValue placeholder="Select entity type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -155,6 +317,11 @@ export function Onboarding() {
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
+                    {errors.businessEntityType && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.businessEntityType}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -163,12 +330,20 @@ export function Onboarding() {
                     </label>
                     <Select
                       value={formData.annualRevenueBand}
-                      onValueChange={(v) =>
-                        setFormData({ ...formData, annualRevenueBand: v })
-                      }
+                      onValueChange={(v) => {
+                        setFormData({ ...formData, annualRevenueBand: v });
+                        if (errors.annualRevenueBand) {
+                          setErrors((prev) => ({
+                            ...prev,
+                            annualRevenueBand: undefined,
+                          }));
+                        }
+                      }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger
+                        className={`w-full ${errors.annualRevenueBand ? "border-red-500" : ""}`}
+                      >
                         <SelectValue placeholder="Select revenue band" />
                       </SelectTrigger>
                       <SelectContent>
@@ -184,6 +359,11 @@ export function Onboarding() {
                         <SelectItem value="10m+">£10m+</SelectItem>
                       </SelectContent>
                     </Select>
+                    {errors.annualRevenueBand && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.annualRevenueBand}
+                      </p>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -199,6 +379,11 @@ export function Onboarding() {
                 <p className="text-sm mb-3">
                   Select which online marketplaces you use:
                 </p>
+                {errors.marketplaces && (
+                  <p className="text-sm text-red-500 mb-3">
+                    {errors.marketplaces}
+                  </p>
+                )}
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     "Amazon",
@@ -238,6 +423,11 @@ export function Onboarding() {
                     <p className="text-sm mb-3">
                       Select the tools you currently use:
                     </p>
+                    {errors.tools && (
+                      <p className="text-sm text-red-500 mb-3">
+                        {errors.tools}
+                      </p>
+                    )}
                     <div className="grid grid-cols-2 gap-2">
                       {availableTools.map((tool) => (
                         <label
