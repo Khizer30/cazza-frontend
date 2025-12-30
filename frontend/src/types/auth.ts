@@ -478,3 +478,25 @@ export interface DELETE_CHAT_RESPONSE {
   success: boolean;
   message: string;
 }
+
+export interface TikTokShopDataItem {
+  monthYear: string;
+  Orders: number;
+  "Units Sold": number;
+  "Gross Revenue (£)": number;
+  "Commission Fee (£)": number;
+  "Payment Fee (£)": number;
+  "Service Fee (£)": number;
+  "Ad Spend (£)": number;
+  "Refunds (£)": number;
+  "Shipping Deduction (£)": number;
+  "Other Deductions (£)": number;
+  "Payout (£)": number;
+  "Net Profit (£)": number;
+}
+
+export interface TikTokShopResponse {
+  success: boolean;
+  message: string;
+  data: TikTokShopDataItem[];
+}

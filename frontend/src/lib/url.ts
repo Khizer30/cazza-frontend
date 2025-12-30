@@ -47,4 +47,7 @@ export const END_POINT = {
     removeMember: "/chat/group",
     updateMemberRole: "/chat/group",
   },
+  dashboard: {
+    tiktokShop: "/dashboard/tiktok-shop",
+  },
 } as const;
