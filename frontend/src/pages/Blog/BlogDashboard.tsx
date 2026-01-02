@@ -115,7 +115,7 @@ export const BlogDashboard = () => {
     <ScrollArea className="h-[calc(100vh-4rem)]">
       <div className="p-6 lg:p-8">
         <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold text-cyan-400 mb-3">
+          <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-3">
             The latest Cazza news
           </h1>
           <p className="text-muted-foreground text-base max-w-2xl">
@@ -128,7 +128,7 @@ export const BlogDashboard = () => {
           {blogPosts.map((post) => (
             <Card
               key={post.id}
-              className="border border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer group bg-card/50 backdrop-blur-sm"
+              className="border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer group bg-card"
               onClick={() => navigate(`/client/blog/${post.id}`)}
             >
               <CardContent className="p-6 space-y-4">
@@ -172,7 +172,7 @@ export const BlogDashboard = () => {
                     {post.highlights.slice(0, 3).map((highlight, idx) => (
                       <li
                         key={idx}
-                        className="text-sm text-cyan-400 flex items-start gap-2"
+                        className="text-sm text-foreground flex items-start gap-2"
                       >
                         <span className="text-primary mt-1">•</span>
                         <span>{highlight}</span>

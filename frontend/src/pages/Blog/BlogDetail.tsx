@@ -282,7 +282,7 @@ export const BlogDetail = () => {
       <div className="p-6 lg:p-8 max-w-4xl">
         <Button
           variant="ghost"
-          className="mb-8 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-400/10 -ml-4"
+          className="mb-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 -ml-4"
           onClick={() => navigate("/client/blog")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -333,7 +333,7 @@ export const BlogDetail = () => {
             {post.sections.map((section, idx) => (
               <section key={idx} className="space-y-4">
                 {section.heading && (
-                  <h2 className="text-2xl font-bold text-cyan-400">
+                  <h2 className="text-2xl font-bold text-foreground">
                     {section.heading}
                   </h2>
                 )}
@@ -346,7 +346,7 @@ export const BlogDetail = () => {
                   <div className="bg-card border border-border rounded-lg overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-2 bg-muted/50 border-b border-border">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className="text-cyan-400">{">"}_ </span>
+                        <span className="text-primary">{">"}_ </span>
                         <span>{section.codeBlock.title}</span>
                       </div>
                       <Button
@@ -398,7 +398,7 @@ export const BlogDetail = () => {
                           ) : line.startsWith("Visit") ? (
                             <span className="text-purple-400">{line}</span>
                           ) : line.startsWith('"') ? (
-                            <span className="text-cyan-400">{line}</span>
+                            <span className="text-primary">{line}</span>
                           ) : (
                             <span className="text-foreground">{line}</span>
                           )}
