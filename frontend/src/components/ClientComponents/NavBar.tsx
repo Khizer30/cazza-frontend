@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
-import { BarChart3, Bot, ShoppingCart, Hash } from "lucide-react";
+import { BarChart3, Bot, ShoppingCart, Hash, FileText } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { Logo } from "@/assets/svgs/Logo";
 
@@ -107,6 +107,31 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             {/* Hover Tooltip */}
             <div className="absolute left-12 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 pointer-events-none whitespace-nowrap z-50">
               Integrations
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+            </div>
+          </div>
+
+          {/* Blog */}
+          <div className="relative group">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
+                location.pathname === "/client/blog" ||
+                location.pathname.startsWith("/client/blog/")
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+              asChild
+            >
+              <Link to="/client/blog" onClick={onNavigate}>
+                <FileText className="w-5 h-5" />
+              </Link>
+            </Button>
+
+            {/* Hover Tooltip */}
+            <div className="absolute left-12 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 pointer-events-none whitespace-nowrap z-50">
+              Blog
               <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
             </div>
           </div>

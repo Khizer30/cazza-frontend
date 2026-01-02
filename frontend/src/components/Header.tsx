@@ -2,6 +2,7 @@ import { Button } from "./ui/button";
 import {
   Calendar,
   CreditCard,
+  FileEdit,
   HelpCircle,
   LogOut,
   Menu,
@@ -229,6 +230,14 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
                   </Badge>
                 )}
               </div>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate("/client/manage-blogs")}
+            >
+              <FileEdit className="mr-2 h-4 w-4" />
+              Manage Blogs
             </DropdownMenuItem>
 
             <DropdownMenuSeparator />
