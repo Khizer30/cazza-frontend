@@ -27,6 +27,10 @@ import { Disclaimer } from "./pages/auth/Term and Conditions/Disclaimer";
 import { ToastProvider } from "./components/ToastProvider";
 import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
+import { BlogDashboard } from "./pages/Blog/BlogDashboard";
+import { BlogDetail } from "./pages/Blog/BlogDetail";
+import { BlogManagement } from "./pages/Blog/BlogManagement";
+import { BlogForm } from "./pages/Blog/BlogForm";
 
 const App = () => {
   return (
@@ -58,6 +62,7 @@ const App = () => {
             </Route>
 
             {/* Private routes that require authentication */}
+            {/* Private routes that require authentication */}
             <Route element={<PrivateRoute />}>
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/client" element={<ClientLayout />}>
@@ -70,6 +75,11 @@ const App = () => {
                 <Route path="settings" element={<AccountSettings />} />
                 <Route path="teams" element={<TeamSettings />} />
                 <Route path="invitations" element={<MyInvitations />} />
+                <Route path="blog" element={<BlogDashboard />} />
+                <Route path="blog/:slug" element={<BlogDetail />} />
+                <Route path="manage-blogs" element={<BlogManagement />} />
+                <Route path="manage-blogs/create" element={<BlogForm />} />
+                <Route path="manage-blogs/edit/:id" element={<BlogForm />} />
               </Route>
             </Route>
           </Routes>

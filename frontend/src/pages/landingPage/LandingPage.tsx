@@ -120,7 +120,12 @@ export const LandingPage = () => {
               >
                 Integrations
               </a>
-
+              <Link
+                to="/blog"
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Blog
+              </Link>
               <a
                 href="#pricing"
                 className="text-foreground hover:text-primary transition-colors"
