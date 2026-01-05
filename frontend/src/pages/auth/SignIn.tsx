@@ -60,9 +60,9 @@ export const SignIn = () => {
         !currentUser.businessProfile &&
         currentUser.role === "OWNER"
       ) {
-        navigate("/onboarding");
+        navigate("/dashboard");
       } else {
-        navigate("/client");
+        navigate("/dashboard");
       }
     } catch (err) {
       console.error("Sign in error:", err);

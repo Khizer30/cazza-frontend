@@ -276,7 +276,7 @@ export const AccountSettings = () => {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      navigate("/client/dashboard");
+                      navigate("/dashboard");
                     }}
                     className="gap-2 "
                   >
@@ -331,7 +331,7 @@ export const AccountSettings = () => {
                     <Button
                       variant="outline"
                       className="gap-2"
-                      //   disabled={uploading}
+                    //   disabled={uploading}
                     >
                       {uploading ? (
                         <>

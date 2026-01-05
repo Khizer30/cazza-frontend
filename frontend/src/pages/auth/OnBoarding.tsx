@@ -232,7 +232,7 @@ export function Onboarding() {
 
       await completeOnboarding(payload);
       // Navigate to dashboard after successful onboarding
-      navigate("/client");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Onboarding submission error:", error);
     }

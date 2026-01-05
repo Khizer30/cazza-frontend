@@ -142,7 +142,7 @@ export const BlogManagement = () => {
             </p>
           </div>
           <Button
-            onClick={() => navigate("/client/manage-blogs/create")}
+            onClick={() => navigate("/manage-blogs/create")}
             className="bg-primary hover:bg-primary/90"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -267,7 +267,7 @@ export const BlogManagement = () => {
           <div className="text-center py-12">
             <p className="text-muted-foreground mb-4">No blog posts yet</p>
             <Button
-              onClick={() => navigate("/client/manage-blogs/create")}
+              onClick={() => navigate("/manage-blogs/create")}
               className="bg-primary hover:bg-primary/90"
             >
               <Plus className="w-4 h-4 mr-2" />

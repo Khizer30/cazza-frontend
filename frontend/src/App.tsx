@@ -69,22 +69,21 @@ const App = () => {
             </Route>
 
             {/* Private routes that require authentication */}
-            {/* Private routes that require authentication */}
             <Route element={<PrivateRoute />}>
               <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/client" element={<ClientLayout />}>
-                <Route index element={<ClientDashboard />} />
-                <Route path="platforms" element={<ClientPlatforms />} />
-                <Route path="channels" element={<Channels />} />
-                <Route path="ask-cazza" element={<AIChat />} />
-                <Route path="billing" element={<BillingSettings />} />
-                <Route path="support" element={<SupportSettings />} />
-                <Route path="settings" element={<AccountSettings />} />
-              <Route path="teams" element={<TeamSettings />} />
-              <Route path="invitations" element={<MyInvitations />} />
-              <Route path="manage-blogs" element={<BlogManagement />} />
-              <Route path="manage-blogs/create" element={<BlogForm />} />
-              <Route path="manage-blogs/edit/:id" element={<BlogForm />} />
+              <Route element={<ClientLayout />}>
+                <Route path="/dashboard" element={<ClientDashboard />} />
+                <Route path="/platforms" element={<ClientPlatforms />} />
+                <Route path="/channels" element={<Channels />} />
+                <Route path="/ask-cazza" element={<AIChat />} />
+                <Route path="/billing" element={<BillingSettings />} />
+                <Route path="/support" element={<SupportSettings />} />
+                <Route path="/settings" element={<AccountSettings />} />
+                <Route path="/teams" element={<TeamSettings />} />
+                <Route path="/invitations" element={<MyInvitations />} />
+                <Route path="/manage-blogs" element={<BlogManagement />} />
+                <Route path="/manage-blogs/create" element={<BlogForm />} />
+                <Route path="/manage-blogs/edit/:id" element={<BlogForm />} />
               </Route>
             </Route>
           </Routes>

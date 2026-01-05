@@ -19,14 +19,13 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
-                location.pathname === "/client/ask-cazza"
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/client/ask-cazza"
                   ? "bg-primary text-primary-foreground shadow-lg"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
+                }`}
               asChild
             >
-              <Link to="/client/ask-cazza" onClick={onNavigate}>
+              <Link to="/ask-cazza" onClick={onNavigate}>
                 <Bot className="w-5 h-5" />
               </Link>
             </Button>
@@ -44,14 +43,13 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
-                location.pathname === "/client/dashboard"
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/client/dashboard"
                   ? "bg-primary text-primary-foreground shadow-lg"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
+                }`}
               asChild
             >
-              <Link to="/client/dashboard" onClick={onNavigate}>
+              <Link to="/dashboard" onClick={onNavigate}>
                 <BarChart3 className="w-5 h-5" />
               </Link>
             </Button>
@@ -68,14 +66,13 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
-                location.pathname === "/client/channels"
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/client/channels"
                   ? "bg-primary text-primary-foreground shadow-lg"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
+                }`}
               asChild
             >
-              <Link to="/client/channels" onClick={onNavigate}>
+              <Link to="/channels" onClick={onNavigate}>
                 <Hash className="w-5 h-5" />
               </Link>
             </Button>
@@ -92,14 +89,13 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
-                location.pathname === "/client/platforms"
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/client/platforms"
                   ? "bg-primary text-primary-foreground shadow-lg"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
+                }`}
               asChild
             >
-              <Link to="/client/platforms" onClick={onNavigate}>
+              <Link to="/platforms" onClick={onNavigate}>
                 <ShoppingCart className="w-5 h-5" />
               </Link>
             </Button>
@@ -116,12 +112,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
-                location.pathname === "/blog" ||
-                location.pathname.startsWith("/blog/")
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/blog" ||
+                  location.pathname.startsWith("/blog/")
                   ? "bg-primary text-primary-foreground shadow-lg"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
+                }`}
               asChild
             >
               <Link to="/blog" onClick={onNavigate}>
