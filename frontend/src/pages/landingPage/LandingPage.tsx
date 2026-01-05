@@ -101,7 +101,7 @@ export const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <title>
-        Instant Financial Insights for E-commerce & TikTok Shop | Cazza AI
+         Cazza AI | Instant Financial Insights for E-commerce & TikTok Shop
       </title>
       <meta
         name="description"
