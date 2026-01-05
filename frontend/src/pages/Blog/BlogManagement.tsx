@@ -221,7 +221,7 @@ export const BlogManagement = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => navigate(`/client/manage-blogs/edit/${post.id}`)}
+                          onClick={() => navigate(`/manage-blogs/edit/${post.id}`)}
                           className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                         >
                           <Edit className="w-4 h-4" />
