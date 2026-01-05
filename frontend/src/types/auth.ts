@@ -502,3 +502,23 @@ export interface TikTokShopResponse {
   message: string;
   data: TikTokShopDataItem[];
 }
+
+export interface DashboardSummaryData {
+  totalRevenue: string;
+  netProfit: string;
+  totalExpense: string;
+  profitMargin: string;
+  connectedPlatforms: string[];
+  revenueByPlatform: {
+    amazon: string;
+    shopify: string;
+    tiktok: string;
+    ebay: string;
+  };
+}
+
+export interface DashboardSummaryResponse {
+  success: boolean;
+  message: string;
+  data: DashboardSummaryData;
+}

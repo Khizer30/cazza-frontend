@@ -49,5 +49,6 @@ export const END_POINT = {
   },
   dashboard: {
     tiktokShop: "/dashboard/tiktok-shop",
+    summary: "/dashboard/summary",
   },
 } as const;

@@ -46,7 +46,7 @@ import {
   faShopify,
   faMixer,
 } from "@fortawesome/free-brands-svg-icons";
-import { Helmet } from "react-helmet-async";
+
 export const LandingPage = () => {
   const navigate = useNavigate();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -100,15 +100,13 @@ export const LandingPage = () => {
   };
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>
-          Instant Financial Insights for E-commerce & TikTok Shop | Cazza AI
-        </title>
-        <meta
-          name="description"
-          content="Stop manual spreadsheets. Cazza.ai connects Amazon, TikTok Shop, and Shopify to give you instant profit insights and automated Xero reconciliation. Start your free trial today."
-        />
-      </Helmet>
+      <title>
+        Instant Financial Insights for E-commerce & TikTok Shop | Cazza AI
+      </title>
+      <meta
+        name="description"
+        content="Stop manual spreadsheets. Cazza.ai connects Amazon, TikTok Shop, and Shopify to give you instant profit insights and automated Xero reconciliation. Start your free trial today."
+      />
       {/* Navbar */}
       <nav className="border-b border-border bg-card sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
