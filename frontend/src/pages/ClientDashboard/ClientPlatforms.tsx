@@ -41,7 +41,7 @@ const analyticsData = [
     type: "marketplace",
     icon: faTiktok,
     description: "Sync TikTok Shop orders and products",
-    color: "#000000",
+    color: "#FFFFFF",
   },
   {
     id: "xero",
@@ -108,18 +108,12 @@ export const ClientPlatforms = () => {
         </CardDescription>
 
         {/* Overview Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4">
+        <div className="grid grid-cols-2 gap-4 pt-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">
               {/* {connectedPlatforms.length} */}0
             </div>
             <p className="text-sm text-muted-foreground">Connected</p>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-primary">
-              {/* {connectedPlatforms.length} */}0
-            </div>
-            <p className="text-sm text-muted-foreground">Monthly Revenue</p>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold">

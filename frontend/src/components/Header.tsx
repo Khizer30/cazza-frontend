@@ -216,20 +216,16 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               className="cursor-pointer"
               onClick={() => navigate("/client/teams")}
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <Users className="mr-2 h-4 w-4" />
-                  Teams
-                </div>
-                {pendingInvitationsCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="h-5 min-w-5 px-1.5 text-xs flex items-center justify-center ml-2"
-                  >
-                    {pendingInvitationsCount}
-                  </Badge>
-                )}
-              </div>
+              <Users className="mr-2 h-4 w-4" />
+              Teams
+              {pendingInvitationsCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="h-5 min-w-5 px-1.5 text-xs flex items-center justify-center ml-auto"
+                >
+                  {pendingInvitationsCount}
+                </Badge>
+              )}
             </DropdownMenuItem>
 
             <DropdownMenuItem
