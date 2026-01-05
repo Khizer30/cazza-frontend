@@ -118,7 +118,12 @@ export const AccountSettings = () => {
         },
         businessName: currentUser.businessProfile?.businessName || "",
         entityType: currentUser.businessProfile?.businessEntityType || "",
-        revenueBand: currentUser.businessProfile?.annualRevenueBand || "",
+        revenueBand:
+          currentUser.businessProfile?.annualRevenueBand === "0-85k"
+            ? "0-90k"
+            : currentUser.businessProfile?.annualRevenueBand === "85k-750k"
+              ? "90k-750k"
+              : currentUser.businessProfile?.annualRevenueBand || "",
       });
 
       // Set avatar preview if profile image exists
