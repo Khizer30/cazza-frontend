@@ -91,7 +91,7 @@ export const ClientDashboard = () => {
 
   return (
     <div className="flex-1 space-y-3 p-4">
-      <title>Dashboard | Cazza</title>
+      <title>Cazza</title>
       <meta
         name="description"
         content="View your real-time financial insights and platform performance on the Cazza dashboard."
