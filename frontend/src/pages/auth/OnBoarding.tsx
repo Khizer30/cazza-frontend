@@ -46,7 +46,6 @@ const availableTools = [
   "QuickBooks",
   "Stripe",
   "PayPal",
-  "Xero",
   "Sage",
   "FreeAgent",
   "Other",
@@ -446,43 +445,6 @@ export function Onboarding() {
                       ))}
                     </div>
                   </div>
-
-                  <div className="pt-4 border-t">
-                    <p className="text-sm mb-3">Additional preferences:</p>
-                    <label className="flex items-center space-x-2 mb-2">
-                      <Checkbox
-                        checked={formData.techStack.useXero}
-                        onCheckedChange={(checked) =>
-                          setFormData({
-                            ...formData,
-                            techStack: {
-                              ...formData.techStack,
-                              useXero: !!checked,
-                            },
-                          })
-                        }
-                        disabled={isLoading}
-                      />
-                      <span>I use Xero</span>
-                    </label>
-
-                    <label className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={formData.techStack.multipleCurrencies}
-                        onCheckedChange={(checked) =>
-                          setFormData({
-                            ...formData,
-                            techStack: {
-                              ...formData.techStack,
-                              multipleCurrencies: !!checked,
-                            },
-                          })
-                        }
-                        disabled={isLoading}
-                      />
-                      <span>I work with multiple currencies</span>
-                    </label>
-                  </div>
                 </div>
               </motion.div>
             )}
@@ -515,6 +477,6 @@ export function Onboarding() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 }

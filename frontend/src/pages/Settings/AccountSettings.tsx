@@ -568,34 +568,6 @@ export const AccountSettings = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="hasXero"
-                      checked={formData.accountingStack.hasXero}
-                      onCheckedChange={(checked) =>
-                        updateFormData("accountingStack", {
-                          ...formData.accountingStack,
-                          hasXero: checked,
-                        })
-                      }
-                    />
-                    <Label htmlFor="hasXero">I use Xero</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="multiCurrency"
-                      checked={formData.accountingStack.multiCurrency}
-                      onCheckedChange={(checked) =>
-                        updateFormData("accountingStack", {
-                          ...formData.accountingStack,
-                          multiCurrency: checked,
-                        })
-                      }
-                    />
-                    <Label htmlFor="multiCurrency">
-                      I work with multiple currencies
-                    </Label>
-                  </div>
                 </div>
 
                 <div>
