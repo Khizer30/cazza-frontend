@@ -246,20 +246,23 @@ export const AIChat = () => {
 
       removeMessageFromConversation(activeChatId, tempUserMessageId);
 
+      const messageId = response.messageId || response.id;
+      const now = new Date();
+
       const backendUserMessage: ChatMessage = {
-        id: `user-${response.id}`,
+        id: `user-${messageId}`,
         type: "user",
         content: response.question,
-        timestamp: new Date(response.createdAt),
-        backendId: response.id,
+        timestamp: now,
+        backendId: messageId,
       };
 
       const backendAiMessage: ChatMessage = {
-        id: `assistant-${response.id}`,
+        id: `assistant-${messageId}`,
         type: "assistant",
         content: response.answer,
-        timestamp: new Date(response.updatedAt),
-        backendId: response.id,
+        timestamp: now,
+        backendId: messageId,
       };
 
       addMessageToConversation(activeChatId, backendUserMessage);
@@ -420,7 +423,7 @@ export const AIChat = () => {
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
-                  key={message.id}
+                  key={`${message.id}-${message.backendId || 'temp'}`}
                   className={`flex group ${message.type === "user" ? "justify-end" : "justify-start"
                     }`}
                 >

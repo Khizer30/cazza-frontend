@@ -402,11 +402,13 @@ export interface CHATBOT_ASK_RESPONSE {
   success: boolean;
   message: string;
   data?: {
-    id: string;
+    id?: string;
+    messageId?: string;
+    chatId?: string;
     question: string;
     answer: string;
-    createdAt: string;
-    updatedAt: string;
+    createdAt?: string;
+    updatedAt?: string;
   };
   errors?: string;
 }

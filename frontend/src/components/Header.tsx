@@ -228,13 +228,15 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               )}
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => navigate("/manage-blogs")}
-            >
-              <FileEdit className="mr-2 h-4 w-4" />
-              Manage Blogs
-            </DropdownMenuItem>
+            {user?.role === "SUPERADMIN" && (
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => navigate("/manage-blogs")}
+              >
+                <FileEdit className="mr-2 h-4 w-4" />
+                Manage Blogs
+              </DropdownMenuItem>
+            )}
 
             <DropdownMenuSeparator />
 
