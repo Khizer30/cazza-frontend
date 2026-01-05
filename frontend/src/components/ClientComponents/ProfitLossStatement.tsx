@@ -44,10 +44,11 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { type PLTableRow } from "@/constants/ProfitLssStatement";
 import {
-  type PLTableRow,
-} from "@/constants/ProfitLssStatement";
-import { getTikTokShopDataService, getDashboardSummaryService } from "@/services/dashboardService";
+  getTikTokShopDataService,
+  getDashboardSummaryService,
+} from "@/services/dashboardService";
 import type { TikTokShopDataItem, DashboardSummaryData } from "@/types/auth";
 
 // Helper function to format currency values
@@ -81,7 +82,7 @@ const getValueColor = (value: number | string, parameter: string): string => {
 // Transform TikTok Shop API data to table structure
 const transformTikTokShopData = (
   data: TikTokShopDataItem[]
-): { columns: string[]; rows: PLTableRow[]; } => {
+): { columns: string[]; rows: PLTableRow[] } => {
   if (!data || data.length === 0) {
     return { columns: [], rows: [] };
   }
@@ -111,7 +112,8 @@ const transformTikTokShopData = (
     columns.forEach((monthYear) => {
       const item = data.find((d) => d.monthYear === monthYear);
       if (item) {
-        values[monthYear] = Number(item[metric as keyof TikTokShopDataItem]) || 0;
+        values[monthYear] =
+          Number(item[metric as keyof TikTokShopDataItem]) || 0;
       }
     });
 
@@ -126,14 +128,20 @@ const transformTikTokShopData = (
   return { columns, rows };
 };
 
-export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: DashboardSummaryData | null }) => {
+export const ProfitLossStatement = ({
+  summary: externalSummary,
+}: {
+  summary?: DashboardSummaryData | null;
+}) => {
   // API data states
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [tiktokShopData, setTiktokShopData] = useState<TikTokShopDataItem[]>(
     []
   );
-  const [summary, setSummary] = useState<DashboardSummaryData | null>(externalSummary || null);
+  const [summary, setSummary] = useState<DashboardSummaryData | null>(
+    externalSummary || null
+  );
   const [tableColumns, setTableColumns] = useState<string[]>([]);
   const [tableRows, setTableRows] = useState<PLTableRow[]>([]);
 
@@ -162,7 +170,9 @@ export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: Da
 
         const [tiktokRes, summaryRes] = await Promise.all([
           getTikTokShopDataService(),
-          !externalSummary ? getDashboardSummaryService() : Promise.resolve(null)
+          !externalSummary
+            ? getDashboardSummaryService()
+            : Promise.resolve(null),
         ]);
 
         if (tiktokRes && tiktokRes.success && tiktokRes.data) {
@@ -205,7 +215,6 @@ export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: Da
   const totalExpenses = Number(summary?.totalExpense || 0);
   const grossProfit = Number(summary?.netProfit || 0);
   const profitMargin = Number(summary?.profitMargin || 0);
-
 
   // Export handlers
   const handleExportCSV = () => {
@@ -465,8 +474,9 @@ export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: Da
                   Net Profit
                 </p>
                 <p
-                  className={`text-2xl font-bold ${grossProfit >= 0 ? "text-success" : "text-destructive"
-                    }`}
+                  className={`text-2xl font-bold ${
+                    grossProfit >= 0 ? "text-success" : "text-destructive"
+                  }`}
                 >
                   £{Math.round(grossProfit).toLocaleString()}
                 </p>
@@ -486,12 +496,13 @@ export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: Da
                   Profit Margin
                 </p>
                 <p
-                  className={`text-2xl font-bold ${profitMargin >= 20
-                    ? "text-success"
-                    : profitMargin >= 10
-                      ? "text-warning"
-                      : "text-destructive"
-                    }`}
+                  className={`text-2xl font-bold ${
+                    profitMargin >= 20
+                      ? "text-success"
+                      : profitMargin >= 10
+                        ? "text-warning"
+                        : "text-destructive"
+                  }`}
                 >
                   {profitMargin.toFixed(2)}%
                 </p>
@@ -547,12 +558,14 @@ export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: Da
                 {tableRows.map((row) => (
                   <tr
                     key={row.parameter}
-                    className={`border-b hover:bg-muted/30 transition-colors ${row.isHighlighted ? "bg-muted/20" : ""
-                      } ${row.isSubRow ? "bg-muted/10" : ""}`}
+                    className={`border-b hover:bg-muted/30 transition-colors ${
+                      row.isHighlighted ? "bg-muted/20" : ""
+                    } ${row.isSubRow ? "bg-muted/10" : ""}`}
                   >
                     <td
-                      className={`p-3 sticky left-0 bg-background ${row.isBold ? "font-semibold" : ""
-                        } ${row.isSubRow ? "pl-8" : ""}`}
+                      className={`p-3 sticky left-0 bg-background ${
+                        row.isBold ? "font-semibold" : ""
+                      } ${row.isSubRow ? "pl-8" : ""}`}
                     >
                       <div className="flex items-center gap-2">
                         {row.isExpandable && (
@@ -575,8 +588,9 @@ export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: Da
                       return (
                         <td
                           key={column}
-                          className={`p-3 text-right ${row.isBold ? "font-semibold" : ""
-                            } ${getValueColor(value, row.parameter)}`}
+                          className={`p-3 text-right ${
+                            row.isBold ? "font-semibold" : ""
+                          } ${getValueColor(value, row.parameter)}`}
                         >
                           {typeof value === "number"
                             ? formatValue(value)
@@ -597,17 +611,24 @@ export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: Da
         <CardHeader>
           <CardTitle>Profit & Loss Trend</CardTitle>
           <CardDescription>
-            Monthly revenue, expenses, and profit over time from your connected platforms
+            Monthly revenue, expenses, and profit over time from your connected
+            platforms
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={tiktokShopData.map(item => ({
-              month: item.monthYear.split(" ")[0],
-              revenue: Number(item["Gross Revenue (£)"]),
-              expenses: Number(item["Gross Revenue (£)"]) - Number(item["Net Profit (£)"]),
-              profit: Number(item["Net Profit (£)"])
-            })).reverse()}>
+            <AreaChart
+              data={tiktokShopData
+                .map((item) => ({
+                  month: item.monthYear.split(" ")[0],
+                  revenue: Number(item["Gross Revenue (£)"]),
+                  expenses:
+                    Number(item["Gross Revenue (£)"]) -
+                    Number(item["Net Profit (£)"]),
+                  profit: Number(item["Net Profit (£)"]),
+                }))
+                .reverse()}
+            >
               <defs>
                 <linearGradient
                   id="revenueGradient"
@@ -653,9 +674,9 @@ export const ProfitLossStatement = ({ summary: externalSummary }: { summary?: Da
                   value: number | undefined,
                   name: string | undefined
                 ) => [
-                    value !== undefined ? `£${value.toLocaleString()}` : "£0",
-                    name ? name.charAt(0).toUpperCase() + name.slice(1) : "",
-                  ]}
+                  value !== undefined ? `£${value.toLocaleString()}` : "£0",
+                  name ? name.charAt(0).toUpperCase() + name.slice(1) : "",
+                ]}
                 labelFormatter={(label) => `Month: ${label}`}
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",

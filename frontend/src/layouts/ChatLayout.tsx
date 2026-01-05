@@ -97,8 +97,9 @@ export function ChatLayout({
     <div className="flex h-[100%] bg-background overflow-hidden">
       {/* Sidebar */}
       <div
-        className={`${sidebarOpen ? "w-64" : "w-0 lg:w-64"
-          } transition-all duration-300 border-r border-border bg-card flex flex-col overflow-hidden absolute inset-y-0 left-0 z-50 lg:relative lg:z-auto lg:block`}
+        className={`${
+          sidebarOpen ? "w-64" : "w-0 lg:w-64"
+        } transition-all duration-300 border-r border-border bg-card flex flex-col overflow-hidden absolute inset-y-0 left-0 z-50 lg:relative lg:z-auto lg:block`}
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -144,10 +145,11 @@ export function ChatLayout({
               chatHistory.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`group relative rounded-lg p-3 transition-all duration-200 ${currentChatId === chat.id
-                    ? "bg-primary/10 border border-primary/20"
-                    : "hover:bg-muted/50"
-                    } ${editingChatId === chat.id ? "" : "cursor-pointer"}`}
+                  className={`group relative rounded-lg p-3 transition-all duration-200 ${
+                    currentChatId === chat.id
+                      ? "bg-primary/10 border border-primary/20"
+                      : "hover:bg-muted/50"
+                  } ${editingChatId === chat.id ? "" : "cursor-pointer"}`}
                   onClick={() => {
                     if (editingChatId !== chat.id) {
                       onSelectChat?.(chat.id);

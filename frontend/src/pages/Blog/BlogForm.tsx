@@ -34,7 +34,8 @@ interface BlogFormData {
 const existingBlogs: Record<string, BlogFormData> = {
   "cazza-ai-launch": {
     title: "Cazza AI Launch",
-    excerpt: "Cazza AI is now available. Connect your Amazon, TikTok Shop, Shopify & Xero accounts securely and get instant financial insights powered by OpenAI.",
+    excerpt:
+      "Cazza AI is now available. Connect your Amazon, TikTok Shop, Shopify & Xero accounts securely and get instant financial insights powered by OpenAI.",
     status: "published",
     authorName: "James Wilson",
     authorHandle: "@jameswilson",
@@ -55,7 +56,8 @@ const existingBlogs: Record<string, BlogFormData> = {
   },
   "ecommerce-accounting-tips": {
     title: "E-commerce Accounting Tips: December 2025",
-    excerpt: "Essential accounting practices for e-commerce sellers. Learn how to streamline your bookkeeping and prepare for tax season with confidence.",
+    excerpt:
+      "Essential accounting practices for e-commerce sellers. Learn how to streamline your bookkeeping and prepare for tax season with confidence.",
     status: "published",
     authorName: "Emma Roberts",
     authorHandle: "@emmaroberts",
@@ -290,7 +292,11 @@ export const BlogForm = () => {
                       placeholder="Enter section heading"
                       value={section.heading}
                       onChange={(e) =>
-                        handleSectionChange(section.id, "heading", e.target.value)
+                        handleSectionChange(
+                          section.id,
+                          "heading",
+                          e.target.value
+                        )
                       }
                     />
                   </div>
@@ -315,7 +321,11 @@ export const BlogForm = () => {
                         placeholder="Enter image URL"
                         value={section.image}
                         onChange={(e) =>
-                          handleSectionChange(section.id, "image", e.target.value)
+                          handleSectionChange(
+                            section.id,
+                            "image",
+                            e.target.value
+                          )
                         }
                       />
                       <Button
@@ -334,7 +344,8 @@ export const BlogForm = () => {
                           alt="Preview"
                           className="w-full h-32 object-cover"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
+                            (e.target as HTMLImageElement).style.display =
+                              "none";
                           }}
                         />
                       </div>
@@ -367,4 +378,3 @@ export const BlogForm = () => {
     </ScrollArea>
   );
 };
-

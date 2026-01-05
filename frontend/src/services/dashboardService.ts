@@ -1,12 +1,12 @@
 import apiInvoker from "@/lib/apiInvoker";
 import { END_POINT } from "@/lib/url";
-import type { TikTokShopResponse, DashboardSummaryResponse } from "@/types/auth";
+import type {
+  TikTokShopResponse,
+  DashboardSummaryResponse,
+} from "@/types/auth";
 
 export const getTikTokShopDataService = () => {
-  return apiInvoker<TikTokShopResponse>(
-    END_POINT.dashboard.tiktokShop,
-    "GET"
-  );
+  return apiInvoker<TikTokShopResponse>(END_POINT.dashboard.tiktokShop, "GET");
 };
 
 export const getDashboardSummaryService = () => {
@@ -15,5 +15,3 @@ export const getDashboardSummaryService = () => {
     "GET"
   );
 };
-
-

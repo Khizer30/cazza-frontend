@@ -411,10 +411,17 @@ export const AIChat = () => {
           {isLoadingHistory ? (
             <div className="space-y-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`space-y-2 max-w-[70%] ${i % 2 === 0 ? 'items-end' : 'items-start'} flex flex-col`}>
+                <div
+                  key={i}
+                  className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`space-y-2 max-w-[70%] ${i % 2 === 0 ? "items-end" : "items-start"} flex flex-col`}
+                  >
                     <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                    <div className={`h-20 w-64 md:w-96 bg-muted animate-pulse rounded-2xl ${i % 2 === 0 ? 'rounded-tr-none' : 'rounded-tl-none'}`} />
+                    <div
+                      className={`h-20 w-64 md:w-96 bg-muted animate-pulse rounded-2xl ${i % 2 === 0 ? "rounded-tr-none" : "rounded-tl-none"}`}
+                    />
                   </div>
                 </div>
               ))}
@@ -423,18 +430,21 @@ export const AIChat = () => {
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
-                  key={`${message.id}-${message.backendId || 'temp'}`}
-                  className={`flex group ${message.type === "user" ? "justify-end" : "justify-start"
-                    }`}
+                  key={`${message.id}-${message.backendId || "temp"}`}
+                  className={`flex group ${
+                    message.type === "user" ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <div
-                    className={`relative ${message.type === "user"
-                      ? "max-w-xs lg:max-w-md"
-                      : "max-w-2xl lg:max-w-3xl"
-                      } px-4 py-3 pb-8 rounded-lg ${message.type === "user"
+                    className={`relative ${
+                      message.type === "user"
+                        ? "max-w-xs lg:max-w-md"
+                        : "max-w-2xl lg:max-w-3xl"
+                    } px-4 py-3 pb-8 rounded-lg ${
+                      message.type === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-card border border-border shadow-sm text-foreground"
-                      }`}
+                    }`}
                   >
                     {message.type === "assistant" ? (
                       <div className="markdown-content">
@@ -448,10 +458,11 @@ export const AIChat = () => {
                     <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       <button
                         onClick={() => handleCopy(message.id, message.content)}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 ${copiedId === message.id
-                          ? "bg-green-500 text-white"
-                          : "bg-muted hover:bg-muted-foreground/20 text-muted-foreground"
-                          }`}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 ${
+                          copiedId === message.id
+                            ? "bg-green-500 text-white"
+                            : "bg-muted hover:bg-muted-foreground/20 text-muted-foreground"
+                        }`}
                         title="Copy message"
                       >
                         {copiedId === message.id ? (
@@ -595,12 +606,14 @@ export const AIChat = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Conversation</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this entire conversation? This action cannot
-              be undone and all messages will be lost.
+              Are you sure you want to delete this entire conversation? This
+              action cannot be undone and all messages will be lost.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeletingChat}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeletingChat}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDeleteChat}
               disabled={isDeletingChat}

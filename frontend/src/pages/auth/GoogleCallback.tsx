@@ -26,8 +26,8 @@ export const GoogleCallback = () => {
       if (oauthError) {
         setError(
           errorDescription ||
-          oauthError ||
-          "Google authentication was cancelled or failed"
+            oauthError ||
+            "Google authentication was cancelled or failed"
         );
         setTimeout(() => {
           navigate("/login");

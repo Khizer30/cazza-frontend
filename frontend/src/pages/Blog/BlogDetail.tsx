@@ -63,7 +63,7 @@ const blogPostsContent: Record<string, BlogPostContent> = {
             "Amazon Seller Central, TikTok Shop, Shopify, Xero",
             "",
             "# Start asking questions",
-            "\"What's my profit margin on TikTok Shop?\"",
+            '"What\'s my profit margin on TikTok Shop?"',
           ],
         },
       },
@@ -117,7 +117,9 @@ const blogPostsContent: Record<string, BlogPostContent> = {
     id: "vat-compliance-guide",
     date: "Wednesday, December 3rd 2025",
     title: "VAT Compliance Guide for UK Sellers",
-    postedBy: [{ name: "David Thompson", handle: "@davidthompson", avatar: "" }],
+    postedBy: [
+      { name: "David Thompson", handle: "@davidthompson", avatar: "" },
+    ],
     sections: [
       {
         body: "A comprehensive guide to VAT registration, quarterly returns, and compliance requirements for UK-based e-commerce businesses.",
@@ -223,7 +225,7 @@ const blogPostsContent: Record<string, BlogPostContent> = {
       },
       {
         heading: "Unified Reporting with Cazza",
-        body: "Cazza connects to all your platforms and provides unified insights. Ask questions like \"Which platform has the best profit margin?\" or \"What's my total revenue across all channels this month?\" to get instant answers without manual data compilation.",
+        body: 'Cazza connects to all your platforms and provides unified insights. Ask questions like "Which platform has the best profit margin?" or "What\'s my total revenue across all channels this month?" to get instant answers without manual data compilation.',
       },
     ],
   },

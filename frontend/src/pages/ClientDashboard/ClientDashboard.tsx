@@ -10,7 +10,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getDashboardSummaryService, getTikTokShopDataService } from "@/services/dashboardService";
+import {
+  getDashboardSummaryService,
+  getTikTokShopDataService,
+} from "@/services/dashboardService";
 import type { DashboardSummaryData, TikTokShopDataItem } from "@/types/auth";
 import {
   BarChart3,
@@ -51,7 +54,7 @@ export const ClientDashboard = () => {
         // Fetch summary and chart data in parallel
         const [summaryRes, tiktokRes] = await Promise.all([
           getDashboardSummaryService(),
-          getTikTokShopDataService()
+          getTikTokShopDataService(),
         ]);
 
         if (summaryRes.success && summaryRes.data) {
@@ -61,16 +64,18 @@ export const ClientDashboard = () => {
         if (tiktokRes.success && tiktokRes.data) {
           // Transform tiktok data for the chart
           // monthYear: "October 2025" -> month: "Oct"
-          const transformed = tiktokRes.data.map((item: TikTokShopDataItem) => {
-            const [monthStr] = item.monthYear.split(" ");
-            const revenue = Number(item["Gross Revenue (£)"]);
-            const profit = Number(item["Net Profit (£)"]);
-            return {
-              month: monthStr.slice(0, 3),
-              revenue: revenue,
-              expenses: revenue - profit
-            };
-          }).reverse(); // Show oldest to newest
+          const transformed = tiktokRes.data
+            .map((item: TikTokShopDataItem) => {
+              const [monthStr] = item.monthYear.split(" ");
+              const revenue = Number(item["Gross Revenue (£)"]);
+              const profit = Number(item["Net Profit (£)"]);
+              return {
+                month: monthStr.slice(0, 3),
+                revenue: revenue,
+                expenses: revenue - profit,
+              };
+            })
+            .reverse(); // Show oldest to newest
           setChartData(transformed);
         }
       } catch (error) {
@@ -223,9 +228,16 @@ export const ClientDashboard = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
-                      {summary && summary.totalRevenue && Number(summary.totalRevenue) > 0
-                        ? ((Number(summary.totalExpense) / Number(summary.totalRevenue)) * 100).toFixed(1)
-                        : 0}% of revenue
+                      {summary &&
+                      summary.totalRevenue &&
+                      Number(summary.totalRevenue) > 0
+                        ? (
+                            (Number(summary.totalExpense) /
+                              Number(summary.totalRevenue)) *
+                            100
+                          ).toFixed(1)
+                        : 0}
+                      % of revenue
                     </span>
                   </div>
                 </div>
@@ -253,7 +265,11 @@ export const ClientDashboard = () => {
                         x2="0"
                         y2="1"
                       >
-                        <stop offset="5%" stopColor="#96BF47" stopOpacity={0.3} />
+                        <stop
+                          offset="5%"
+                          stopColor="#96BF47"
+                          stopOpacity={0.3}
+                        />
                         <stop
                           offset="95%"
                           stopColor="#96BF47"
@@ -267,7 +283,11 @@ export const ClientDashboard = () => {
                         x2="0"
                         y2="1"
                       >
-                        <stop offset="5%" stopColor="#FFB3B3" stopOpacity={0.3} />
+                        <stop
+                          offset="5%"
+                          stopColor="#FFB3B3"
+                          stopOpacity={0.3}
+                        />
                         <stop
                           offset="95%"
                           stopColor="#FFB3B3"
@@ -294,9 +314,11 @@ export const ClientDashboard = () => {
                         value: number | undefined,
                         name: string | undefined
                       ) => [
-                          value !== undefined ? `£${value.toLocaleString()}` : "£0",
-                          name || "",
-                        ]}
+                        value !== undefined
+                          ? `£${value.toLocaleString()}`
+                          : "£0",
+                        name || "",
+                      ]}
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
@@ -339,6 +361,6 @@ export const ClientDashboard = () => {
           <ProfitLossStatement />
         </TabsContent>
       </Tabs>
-    </div >
+    </div>
   );
 };

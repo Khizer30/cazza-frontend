@@ -6,13 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import {
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Badge } from "../ui/badge";
 import { PLATFORM_COLORS } from "@/constants/PlatfromRevenueChart";
 import type { DashboardSummaryData } from "@/types/auth";
@@ -28,7 +22,10 @@ interface PlatformRevenueChartProps {
   isLoading: boolean;
 }
 
-export const PlatformRevenueChart = ({ summary, isLoading }: PlatformRevenueChartProps) => {
+export const PlatformRevenueChart = ({
+  summary,
+  isLoading,
+}: PlatformRevenueChartProps) => {
   const error = false;
 
   if (isLoading) {
@@ -46,12 +43,30 @@ export const PlatformRevenueChart = ({ summary, isLoading }: PlatformRevenueChar
     );
   }
 
-  const platformRevenue: PlatformRevenue[] = summary ? [
-    { platform: "tiktok", platform_name: "TikTok Shop", total_revenue: Number(summary.revenueByPlatform.tiktok) },
-    { platform: "amazon", platform_name: "Amazon", total_revenue: Number(summary.revenueByPlatform.amazon) },
-    { platform: "shopify", platform_name: "Shopify", total_revenue: Number(summary.revenueByPlatform.shopify) },
-    { platform: "ebay", platform_name: "eBay", total_revenue: Number(summary.revenueByPlatform.ebay) },
-  ] : [];
+  const platformRevenue: PlatformRevenue[] = summary
+    ? [
+        {
+          platform: "tiktok",
+          platform_name: "TikTok Shop",
+          total_revenue: Number(summary.revenueByPlatform.tiktok),
+        },
+        {
+          platform: "amazon",
+          platform_name: "Amazon",
+          total_revenue: Number(summary.revenueByPlatform.amazon),
+        },
+        {
+          platform: "shopify",
+          platform_name: "Shopify",
+          total_revenue: Number(summary.revenueByPlatform.shopify),
+        },
+        {
+          platform: "ebay",
+          platform_name: "eBay",
+          total_revenue: Number(summary.revenueByPlatform.ebay),
+        },
+      ]
+    : [];
 
   const totalRevenue = platformRevenue.reduce(
     (sum, platform) => sum + platform.total_revenue,
@@ -69,7 +84,6 @@ export const PlatformRevenueChart = ({ summary, isLoading }: PlatformRevenueChar
       </Card>
     );
   }
-
 
   const pieData = platformRevenue
     .filter((p) => p.total_revenue > 0)
@@ -125,8 +139,9 @@ export const PlatformRevenueChart = ({ summary, isLoading }: PlatformRevenueChar
                 <p className="text-sm font-medium text-muted-foreground">
                   Connected Platforms
                 </p>
-                <p className="text-2xl font-bold">{summary?.connectedPlatforms.length || 0}</p>
-
+                <p className="text-2xl font-bold">
+                  {summary?.connectedPlatforms.length || 0}
+                </p>
               </div>
               <div className="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center">
                 <Zap className="w-4 h-4 text-success" />
@@ -134,8 +149,6 @@ export const PlatformRevenueChart = ({ summary, isLoading }: PlatformRevenueChar
             </div>
           </CardContent>
         </Card>
-
-
       </div>
 
       {/* Revenue by Platform Section */}
@@ -164,7 +177,7 @@ export const PlatformRevenueChart = ({ summary, isLoading }: PlatformRevenueChar
                           key={`cell-${index}`}
                           fill={
                             PLATFORM_COLORS[
-                            entry.platform as keyof typeof PLATFORM_COLORS
+                              entry.platform as keyof typeof PLATFORM_COLORS
                             ] || PLATFORM_COLORS.other
                           }
                         />
@@ -193,7 +206,7 @@ export const PlatformRevenueChart = ({ summary, isLoading }: PlatformRevenueChar
                         style={{
                           backgroundColor:
                             PLATFORM_COLORS[
-                            platform.platform as keyof typeof PLATFORM_COLORS
+                              platform.platform as keyof typeof PLATFORM_COLORS
                             ] || PLATFORM_COLORS.other,
                         }}
                       />
@@ -201,7 +214,10 @@ export const PlatformRevenueChart = ({ summary, isLoading }: PlatformRevenueChar
                         {platform.platform_name}
                       </span>
                     </div>
-                    <Badge variant="secondary" className="text-sm font-semibold">
+                    <Badge
+                      variant="secondary"
+                      className="text-sm font-semibold"
+                    >
                       £{platform.total_revenue.toLocaleString()}
                     </Badge>
                   </div>

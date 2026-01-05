@@ -130,7 +130,7 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
                       className={cn(
                         "h-5 min-w-5 px-1.5 text-xs flex items-center justify-center",
                         isActive &&
-                        "bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
+                          "bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                       )}
                     >
                       {pendingInvitationsCount}
