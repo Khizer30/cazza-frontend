@@ -118,7 +118,12 @@ export const AccountSettings = () => {
         },
         businessName: currentUser.businessProfile?.businessName || "",
         entityType: currentUser.businessProfile?.businessEntityType || "",
-        revenueBand: currentUser.businessProfile?.annualRevenueBand || "",
+        revenueBand:
+          currentUser.businessProfile?.annualRevenueBand === "0-85k"
+            ? "0-90k"
+            : currentUser.businessProfile?.annualRevenueBand === "85k-750k"
+              ? "90k-750k"
+              : currentUser.businessProfile?.annualRevenueBand || "",
       });
 
       // Set avatar preview if profile image exists
@@ -276,7 +281,7 @@ export const AccountSettings = () => {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      navigate("/client/dashboard");
+                      navigate("/dashboard");
                     }}
                     className="gap-2 "
                   >
@@ -331,7 +336,7 @@ export const AccountSettings = () => {
                     <Button
                       variant="outline"
                       className="gap-2"
-                      //   disabled={uploading}
+                    //   disabled={uploading}
                     >
                       {uploading ? (
                         <>
@@ -486,11 +491,11 @@ export const AccountSettings = () => {
                         <SelectValue placeholder="Select revenue band" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="0-85k">
-                          £0 to £85,000 (Below VAT threshold)
+                        <SelectItem value="0-90k">
+                          £0 to £90,000 (Below VAT threshold)
                         </SelectItem>
-                        <SelectItem value="85k-750k">
-                          £85,000 - £750,000
+                        <SelectItem value="90k-750k">
+                          £90,000 - £750,000
                         </SelectItem>
                         <SelectItem value="750k-2m">£750,000 - £2m</SelectItem>
                         <SelectItem value="2m-5m">£2-5m</SelectItem>
@@ -568,34 +573,6 @@ export const AccountSettings = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="hasXero"
-                      checked={formData.accountingStack.hasXero}
-                      onCheckedChange={(checked) =>
-                        updateFormData("accountingStack", {
-                          ...formData.accountingStack,
-                          hasXero: checked,
-                        })
-                      }
-                    />
-                    <Label htmlFor="hasXero">I use Xero</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="multiCurrency"
-                      checked={formData.accountingStack.multiCurrency}
-                      onCheckedChange={(checked) =>
-                        updateFormData("accountingStack", {
-                          ...formData.accountingStack,
-                          multiCurrency: checked,
-                        })
-                      }
-                    />
-                    <Label htmlFor="multiCurrency">
-                      I work with multiple currencies
-                    </Label>
-                  </div>
                 </div>
 
                 <div>

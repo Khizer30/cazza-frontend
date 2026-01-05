@@ -176,12 +176,15 @@ export const useChatbot = () => {
 
   const updateChatTitle = async (
     chatId: string,
-    payload: UPDATE_CHAT_TITLE_PAYLOAD
+    payload: UPDATE_CHAT_TITLE_PAYLOAD,
+    muteToast: boolean = false
   ) => {
     try {
       const res = await updateChatTitleService(chatId, payload);
       if (res && res.success && res.data) {
-        showToast(res.message || "Chat title updated successfully", "success");
+        if (!muteToast) {
+          showToast(res.message || "Chat title updated successfully", "success");
+        }
         return res.data;
       } else if (res && !res.success) {
         const errorMessage = res.message || "Failed to update chat title";

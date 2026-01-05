@@ -140,13 +140,13 @@ export const BlogForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitting blog:", formData);
-    navigate("/client/manage-blogs");
+    navigate("/manage-blogs");
   };
 
   const handleSaveDraft = () => {
     setFormData((prev) => ({ ...prev, status: "draft" }));
     console.log("Saving as draft:", { ...formData, status: "draft" });
-    navigate("/client/manage-blogs");
+    navigate("/manage-blogs");
   };
 
   return (
@@ -155,7 +155,7 @@ export const BlogForm = () => {
         <Button
           variant="ghost"
           className="mb-6 text-muted-foreground hover:text-foreground -ml-4"
-          onClick={() => navigate("/client/manage-blogs")}
+          onClick={() => navigate("/manage-blogs")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Manage Blogs

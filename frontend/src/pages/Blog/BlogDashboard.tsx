@@ -129,7 +129,7 @@ export const BlogDashboard = () => {
             <Card
               key={post.id}
               className="border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer group bg-card"
-              onClick={() => navigate(`/client/blog/${post.id}`)}
+              onClick={() => navigate(`/blog/${post.id}`)}
             >
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-center justify-between">

@@ -20,6 +20,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import {
   AreaChart,
   Area,
@@ -49,6 +50,15 @@ export const ClientDashboard = () => {
 
   return (
     <div className="flex-1 space-y-3 p-4">
+      <Helmet>
+        <title>
+          Instant Financial Insights for E-commerce & TikTok Shop | Cazza AI
+        </title>
+        <meta
+          name="description"
+          content="Stop manual spreadsheets. Cazza.ai connects Amazon, TikTok Shop, and Shopify to give you instant profit insights and automated Xero reconciliation. Start your free trial today."
+        />
+      </Helmet>
       {/* Date Range Selector */}
       <Card className="hover:shadow-none hover:transform-none">
         <CardHeader>
@@ -121,12 +131,6 @@ export const ClientDashboard = () => {
                   <div className="text-3xl font-bold text-foreground">
                     £{totalRevenue.toLocaleString()}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      +12.5% vs last month
-                    </span>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -143,7 +147,7 @@ export const ClientDashboard = () => {
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-foreground">
-                    £{(totalRevenue * 0.37).toLocaleString()}
+                    £{(totalRevenue * 3).toLocaleString()}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
@@ -166,7 +170,7 @@ export const ClientDashboard = () => {
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-foreground">
-                    £{(totalRevenue * 0.63).toLocaleString()}
+                    £{(totalRevenue * 3).toLocaleString()}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
@@ -236,9 +240,9 @@ export const ClientDashboard = () => {
                       value: number | undefined,
                       name: string | undefined
                     ) => [
-                      value !== undefined ? `£${value.toLocaleString()}` : "£0",
-                      name || "",
-                    ]}
+                        value !== undefined ? `£${value.toLocaleString()}` : "£0",
+                        name || "",
+                      ]}
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",

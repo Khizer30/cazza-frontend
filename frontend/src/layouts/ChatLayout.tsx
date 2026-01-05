@@ -33,6 +33,7 @@ interface ChatLayoutProps {
   currentChatId?: string;
   isSidebarOpen?: boolean;
   onToggleSidebar?: () => void;
+  isLoading?: boolean;
 }
 
 export function ChatLayout({
@@ -45,6 +46,7 @@ export function ChatLayout({
   currentChatId,
   isSidebarOpen = false,
   onToggleSidebar,
+  isLoading = false,
 }: ChatLayoutProps) {
   const [internalSidebarOpen, setInternalSidebarOpen] = useState(() => {
     if (typeof window !== "undefined") return window.innerWidth >= 1024;
@@ -95,9 +97,8 @@ export function ChatLayout({
     <div className="flex h-[100%] bg-background overflow-hidden">
       {/* Sidebar */}
       <div
-        className={`${
-          sidebarOpen ? "w-64" : "w-0 lg:w-64"
-        } transition-all duration-300 border-r border-border bg-card flex flex-col overflow-hidden absolute inset-y-0 left-0 z-50 lg:relative lg:z-auto lg:block`}
+        className={`${sidebarOpen ? "w-64" : "w-0 lg:w-64"
+          } transition-all duration-300 border-r border-border bg-card flex flex-col overflow-hidden absolute inset-y-0 left-0 z-50 lg:relative lg:z-auto lg:block`}
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -126,7 +127,14 @@ export function ChatLayout({
 
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {chatHistory.length === 0 ? (
+            {isLoading ? (
+              <div className="p-8 flex flex-col items-center justify-center space-y-3">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground animate-pulse">
+                  Loading history...
+                </p>
+              </div>
+            ) : chatHistory.length === 0 ? (
               <div className="p-4 text-center text-muted-foreground">
                 <History className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No chat history yet</p>
@@ -136,11 +144,10 @@ export function ChatLayout({
               chatHistory.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`group relative rounded-lg p-3 transition-all duration-200 ${
-                    currentChatId === chat.id
-                      ? "bg-primary/10 border border-primary/20"
-                      : "hover:bg-muted/50"
-                  } ${editingChatId === chat.id ? "" : "cursor-pointer"}`}
+                  className={`group relative rounded-lg p-3 transition-all duration-200 ${currentChatId === chat.id
+                    ? "bg-primary/10 border border-primary/20"
+                    : "hover:bg-muted/50"
+                    } ${editingChatId === chat.id ? "" : "cursor-pointer"}`}
                   onClick={() => {
                     if (editingChatId !== chat.id) {
                       onSelectChat?.(chat.id);

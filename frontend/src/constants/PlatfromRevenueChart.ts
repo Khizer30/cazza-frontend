@@ -13,7 +13,7 @@ export const platformDummy = [
   {
     platform: "shopify",
     platform_name: "Shopify",
-    total_revenue: 28750.5,
+    total_revenue: 28750,
     transaction_count: 234,
     currency: "GBP",
     last_sync: "2025-10-20T23:30:00Z",
@@ -21,7 +21,7 @@ export const platformDummy = [
   {
     platform: "amazon",
     platform_name: "Amazon",
-    total_revenue: 19340.25,
+    total_revenue: 19340,
     transaction_count: 156,
     currency: "GBP",
     last_sync: "2025-10-20T23:30:00Z",
@@ -29,7 +29,7 @@ export const platformDummy = [
   {
     platform: "ebay",
     platform_name: "eBay",
-    total_revenue: 12680.75,
+    total_revenue: 12680,
     transaction_count: 89,
     currency: "GBP",
     last_sync: "2025-10-20T23:30:00Z",
@@ -37,7 +37,7 @@ export const platformDummy = [
   {
     platform: "tiktok_shop",
     platform_name: "TikTok Shop",
-    total_revenue: 8750.0,
+    total_revenue: 875,
     transaction_count: 67,
     currency: "GBP",
     last_sync: "2025-10-20T23:30:00Z",
@@ -46,7 +46,7 @@ export const platformDummy = [
 export const MonthlyRevenueDummy = [
   {
     month: "2025-08",
-    total_revenue: 56000.75,
+    total_revenue: 56000,
     platform_breakdown: {
       shopify: 22000.5,
       amazon: 16000.25,

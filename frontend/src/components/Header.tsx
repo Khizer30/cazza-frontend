@@ -125,7 +125,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
         <div
           className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={() => navigate("/client/dashboard")}
+          onClick={() => navigate("/dashboard")}
         >
           {/* <Logo size="md" /> */}
           <img
@@ -190,7 +190,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
           >
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => navigate("/client/settings")}
+              onClick={() => navigate("/settings")}
             >
               <Settings className="mr-2 h-4 w-4" />
               Account Settings
@@ -198,7 +198,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => navigate("/client/billing")}
+              onClick={() => navigate("/billing")}
             >
               <CreditCard className="mr-2 h-4 w-4" />
               Billing
@@ -206,7 +206,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => navigate("/client/support")}
+              onClick={() => navigate("/support")}
             >
               <HelpCircle className="mr-2 h-4 w-4" />
               Support
@@ -214,31 +214,29 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => navigate("/client/teams")}
+              onClick={() => navigate("/teams")}
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <Users className="mr-2 h-4 w-4" />
-                  Teams
-                </div>
-                {pendingInvitationsCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="h-5 min-w-5 px-1.5 text-xs flex items-center justify-center ml-2"
-                  >
-                    {pendingInvitationsCount}
-                  </Badge>
-                )}
-              </div>
+              <Users className="mr-2 h-4 w-4" />
+              Teams
+              {pendingInvitationsCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="h-5 min-w-5 px-1.5 text-xs flex items-center justify-center ml-auto"
+                >
+                  {pendingInvitationsCount}
+                </Badge>
+              )}
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => navigate("/client/manage-blogs")}
-            >
-              <FileEdit className="mr-2 h-4 w-4" />
-              Manage Blogs
-            </DropdownMenuItem>
+            {user?.role === "SUPERADMIN" && (
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => navigate("/manage-blogs")}
+              >
+                <FileEdit className="mr-2 h-4 w-4" />
+                Manage Blogs
+              </DropdownMenuItem>
+            )}
 
             <DropdownMenuSeparator />
 

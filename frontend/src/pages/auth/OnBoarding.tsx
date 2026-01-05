@@ -46,7 +46,6 @@ const availableTools = [
   "QuickBooks",
   "Stripe",
   "PayPal",
-  "Xero",
   "Sage",
   "FreeAgent",
   "Other",
@@ -232,7 +231,7 @@ export function Onboarding() {
 
       await completeOnboarding(payload);
       // Navigate to dashboard after successful onboarding
-      navigate("/client");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Onboarding submission error:", error);
     }
@@ -347,11 +346,11 @@ export function Onboarding() {
                         <SelectValue placeholder="Select revenue band" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="0-85k">
-                          £0 to £85,000 (Below VAT threshold)
+                        <SelectItem value="0-90k">
+                          £0 to £90,000 (Below VAT threshold)
                         </SelectItem>
-                        <SelectItem value="85k-750k">
-                          £85,000 - £750,000
+                        <SelectItem value="90k-750k">
+                          £90,000 - £750,000
                         </SelectItem>
                         <SelectItem value="750k-2m">£750,000 - £2m</SelectItem>
                         <SelectItem value="2m-5m">£2-5m</SelectItem>
@@ -446,43 +445,6 @@ export function Onboarding() {
                       ))}
                     </div>
                   </div>
-
-                  <div className="pt-4 border-t">
-                    <p className="text-sm mb-3">Additional preferences:</p>
-                    <label className="flex items-center space-x-2 mb-2">
-                      <Checkbox
-                        checked={formData.techStack.useXero}
-                        onCheckedChange={(checked) =>
-                          setFormData({
-                            ...formData,
-                            techStack: {
-                              ...formData.techStack,
-                              useXero: !!checked,
-                            },
-                          })
-                        }
-                        disabled={isLoading}
-                      />
-                      <span>I use Xero</span>
-                    </label>
-
-                    <label className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={formData.techStack.multipleCurrencies}
-                        onCheckedChange={(checked) =>
-                          setFormData({
-                            ...formData,
-                            techStack: {
-                              ...formData.techStack,
-                              multipleCurrencies: !!checked,
-                            },
-                          })
-                        }
-                        disabled={isLoading}
-                      />
-                      <span>I work with multiple currencies</span>
-                    </label>
-                  </div>
                 </div>
               </motion.div>
             )}
@@ -515,6 +477,6 @@ export function Onboarding() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 }

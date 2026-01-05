@@ -31,12 +31,15 @@ import { BlogDashboard } from "./pages/Blog/BlogDashboard";
 import { BlogDetail } from "./pages/Blog/BlogDetail";
 import { BlogManagement } from "./pages/Blog/BlogManagement";
 import { BlogForm } from "./pages/Blog/BlogForm";
+import { BlogLayout } from "./layouts/BlogLayout";
+import { CanonicalManager } from "./components/CanonicalManager";
 
 const App = () => {
   return (
     <ToastProvider>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <BrowserRouter>
+          <CanonicalManager />
           <Routes>
             {/* Public routes that redirect if authenticated */}
             <Route element={<PublicRoute />}>
@@ -61,25 +64,28 @@ const App = () => {
               />
             </Route>
 
-            {/* Private routes that require authentication */}
+            {/* Public blog routes with conditional layout */}
+            <Route path="/blog" element={<BlogLayout />}>
+              <Route index element={<BlogDashboard />} />
+              <Route path=":slug" element={<BlogDetail />} />
+            </Route>
+
             {/* Private routes that require authentication */}
             <Route element={<PrivateRoute />}>
               <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/client" element={<ClientLayout />}>
-                <Route index element={<ClientDashboard />} />
-                <Route path="platforms" element={<ClientPlatforms />} />
-                <Route path="channels" element={<Channels />} />
-                <Route path="ask-cazza" element={<AIChat />} />
-                <Route path="billing" element={<BillingSettings />} />
-                <Route path="support" element={<SupportSettings />} />
-                <Route path="settings" element={<AccountSettings />} />
-                <Route path="teams" element={<TeamSettings />} />
-                <Route path="invitations" element={<MyInvitations />} />
-                <Route path="blog" element={<BlogDashboard />} />
-                <Route path="blog/:slug" element={<BlogDetail />} />
-                <Route path="manage-blogs" element={<BlogManagement />} />
-                <Route path="manage-blogs/create" element={<BlogForm />} />
-                <Route path="manage-blogs/edit/:id" element={<BlogForm />} />
+              <Route element={<ClientLayout />}>
+                <Route path="/dashboard" element={<ClientDashboard />} />
+                <Route path="/platforms" element={<ClientPlatforms />} />
+                <Route path="/channels" element={<Channels />} />
+                <Route path="/ask-cazza" element={<AIChat />} />
+                <Route path="/billing" element={<BillingSettings />} />
+                <Route path="/support" element={<SupportSettings />} />
+                <Route path="/settings" element={<AccountSettings />} />
+                <Route path="/teams" element={<TeamSettings />} />
+                <Route path="/invitations" element={<MyInvitations />} />
+                <Route path="/manage-blogs" element={<BlogManagement />} />
+                <Route path="/manage-blogs/create" element={<BlogForm />} />
+                <Route path="/manage-blogs/edit/:id" element={<BlogForm />} />
               </Route>
             </Route>
           </Routes>

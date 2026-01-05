@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatLayout } from "@/layouts/ChatLayout";
-import { Send, Loader2, Trash2 } from "lucide-react";
+import { Send, Loader2, Trash2, Copy, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
@@ -111,8 +111,18 @@ export const AIChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [chatDeleteDialogOpen, setChatDeleteDialogOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingChat, setIsDeletingChat] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (messageId: string, content: string) => {
+    navigator.clipboard.writeText(content);
+    setCopiedId(messageId);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const {
     conversations,
@@ -167,6 +177,7 @@ export const AIChat = () => {
         const conv = conversations.find((c) => c.id === currentConversationId);
         if (conv && conv.messages.length === 0) {
           try {
+            setLoadingHistory(true);
             const historyData = await getChatHistory(currentConversationId);
             if (historyData && historyData.messages) {
               loadChatMessagesFromBackend(
@@ -176,6 +187,8 @@ export const AIChat = () => {
             }
           } catch (error) {
             console.error("Failed to load messages:", error);
+          } finally {
+            setLoadingHistory(false);
           }
         }
       }
@@ -209,6 +222,14 @@ export const AIChat = () => {
         } else {
           throw new Error("Failed to create chat");
         }
+      } else {
+        // If chat exists but has no messages, update title to match the first message
+        const conv = conversations.find((c) => c.id === activeChatId);
+        if (conv && conv.messages.length === 0) {
+          const chatTitle =
+            userInput.slice(0, 50) + (userInput.length > 50 ? "..." : "");
+          handleRenameChat(activeChatId, chatTitle, true);
+        }
       }
 
       const tempUserMessageId = `temp-user-${Date.now()}`;
@@ -225,20 +246,23 @@ export const AIChat = () => {
 
       removeMessageFromConversation(activeChatId, tempUserMessageId);
 
+      const messageId = response.messageId || response.id;
+      const now = new Date();
+
       const backendUserMessage: ChatMessage = {
-        id: `user-${response.id}`,
+        id: `user-${messageId}`,
         type: "user",
         content: response.question,
-        timestamp: new Date(response.createdAt),
-        backendId: response.id,
+        timestamp: now,
+        backendId: messageId,
       };
 
       const backendAiMessage: ChatMessage = {
-        id: `assistant-${response.id}`,
+        id: `assistant-${messageId}`,
         type: "assistant",
         content: response.answer,
-        timestamp: new Date(response.updatedAt),
-        backendId: response.id,
+        timestamp: now,
+        backendId: messageId,
       };
 
       addMessageToConversation(activeChatId, backendUserMessage);
@@ -283,21 +307,43 @@ export const AIChat = () => {
   };
 
   const handleSelectChat = (chatId: string) => {
+    // Set loading to true immediately if we know we need to fetch messages
+    // This prevents the "Welcome Card" from flashing
+    const conv = conversations.find((c) => c.id === chatId);
+    if (conv && conv.messages.length === 0) {
+      setLoadingHistory(true);
+    }
     setCurrentConversation(chatId);
   };
 
-  const handleDeleteChat = async (chatId: string) => {
+  const handleDeleteChat = (chatId: string) => {
+    setChatToDelete(chatId);
+    setChatDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDeleteChat = async () => {
+    if (!chatToDelete) return;
+
+    setIsDeletingChat(true);
     try {
-      await deleteChatAPI(chatId);
-      deleteConversation(chatId);
+      await deleteChatAPI(chatToDelete);
+      deleteConversation(chatToDelete);
+      setChatDeleteDialogOpen(false);
+      setChatToDelete(null);
     } catch (error) {
       console.error("Failed to delete chat:", error);
+    } finally {
+      setIsDeletingChat(false);
     }
   };
 
-  const handleRenameChat = async (chatId: string, newTitle: string) => {
+  const handleRenameChat = async (
+    chatId: string,
+    newTitle: string,
+    muteToast: boolean = false
+  ) => {
     try {
-      await updateChatTitle(chatId, { title: newTitle });
+      await updateChatTitle(chatId, { title: newTitle }, muteToast);
       updateConversationTitle(chatId, newTitle);
     } catch (error) {
       console.error("Failed to rename chat:", error);
@@ -352,6 +398,7 @@ export const AIChat = () => {
       currentChatId={currentConversationId || undefined}
       isSidebarOpen={isSidebarOpen}
       onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+      isLoading={isLoadingHistory}
     >
       <div className="h-[92vh] flex flex-col bg-background">
         <div className="flex-shrink-0 p-4 border-b border-border bg-card">
@@ -362,28 +409,32 @@ export const AIChat = () => {
 
         <div className="flex-1 overflow-y-auto p-6">
           {isLoadingHistory ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="w-6 h-6 animate-spin" />
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`space-y-2 max-w-[70%] ${i % 2 === 0 ? 'items-end' : 'items-start'} flex flex-col`}>
+                    <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                    <div className={`h-20 w-64 md:w-96 bg-muted animate-pulse rounded-2xl ${i % 2 === 0 ? 'rounded-tr-none' : 'rounded-tl-none'}`} />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : messages.length > 0 ? (
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
-                  key={message.id}
-                  className={`flex group ${
-                    message.type === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  key={`${message.id}-${message.backendId || 'temp'}`}
+                  className={`flex group ${message.type === "user" ? "justify-end" : "justify-start"
+                    }`}
                 >
                   <div
-                    className={`relative ${
-                      message.type === "user"
-                        ? "max-w-xs lg:max-w-md"
-                        : "max-w-2xl lg:max-w-3xl"
-                    } px-4 py-3 pb-8 rounded-lg ${
-                      message.type === "user"
+                    className={`relative ${message.type === "user"
+                      ? "max-w-xs lg:max-w-md"
+                      : "max-w-2xl lg:max-w-3xl"
+                      } px-4 py-3 pb-8 rounded-lg ${message.type === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-card border border-border shadow-sm text-foreground"
-                    }`}
+                      }`}
                   >
                     {message.type === "assistant" ? (
                       <div className="markdown-content">
@@ -394,15 +445,31 @@ export const AIChat = () => {
                     ) : (
                       <span>{message.content}</span>
                     )}
-                    {message.backendId && (
+                    <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       <button
-                        onClick={() => handleDeleteMessageClick(message.id)}
-                        className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
-                        title="Delete message"
+                        onClick={() => handleCopy(message.id, message.content)}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 ${copiedId === message.id
+                          ? "bg-green-500 text-white"
+                          : "bg-muted hover:bg-muted-foreground/20 text-muted-foreground"
+                          }`}
+                        title="Copy message"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        {copiedId === message.id ? (
+                          <Check className="w-3.5 h-3.5" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
                       </button>
-                    )}
+                      {message.backendId && (
+                        <button
+                          onClick={() => handleDeleteMessageClick(message.id)}
+                          className="w-6 h-6 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center transition-all hover:scale-110"
+                          title="Delete message"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -509,6 +576,43 @@ export const AIChat = () => {
                 </>
               ) : (
                 "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={chatDeleteDialogOpen}
+        onOpenChange={(open) => {
+          setChatDeleteDialogOpen(open);
+          if (!open) {
+            setChatToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Conversation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this entire conversation? This action cannot
+              be undone and all messages will be lost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingChat}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDeleteChat}
+              disabled={isDeletingChat}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeletingChat ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Chat"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

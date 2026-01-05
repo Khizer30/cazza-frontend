@@ -26,27 +26,27 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
   const menuItems = [
     {
       title: "Account Settings",
-      path: "/client/settings",
+      path: "/settings",
       icon: Settings,
     },
     {
       title: "Billing",
-      path: "/client/billing",
+      path: "/billing",
       icon: CreditCard,
     },
     {
       title: "Support",
-      path: "/client/support",
+      path: "/support",
       icon: HelpCircle,
     },
     {
       title: "Teams",
-      path: "/client/teams",
+      path: "/teams",
       icon: Users,
     },
     {
       title: "My Invitations",
-      path: "/client/invitations",
+      path: "/invitations",
       icon: Mail,
     },
   ];
@@ -123,14 +123,14 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
                   <Icon className="h-5 w-5" />
                   <span>{item.title}</span>
                 </div>
-                {item.path === "/client/invitations" &&
+                {item.path === "/invitations" &&
                   pendingInvitationsCount > 0 && (
                     <Badge
                       variant="destructive"
                       className={cn(
                         "h-5 min-w-5 px-1.5 text-xs flex items-center justify-center",
                         isActive &&
-                          "bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
+                        "bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
                       )}
                     >
                       {pendingInvitationsCount}
