@@ -32,12 +32,14 @@ import { BlogDetail } from "./pages/Blog/BlogDetail";
 import { BlogManagement } from "./pages/Blog/BlogManagement";
 import { BlogForm } from "./pages/Blog/BlogForm";
 import { BlogLayout } from "./layouts/BlogLayout";
+import { CanonicalManager } from "./components/CanonicalManager";
 
 const App = () => {
   return (
     <ToastProvider>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <BrowserRouter>
+          <CanonicalManager />
           <Routes>
             {/* Public routes that redirect if authenticated */}
             <Route element={<PublicRoute />}>
