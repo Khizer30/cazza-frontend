@@ -91,12 +91,10 @@ export const ClientDashboard = () => {
 
   return (
     <div className="flex-1 space-y-3 p-4">
-      <title>
-        Instant Financial Insights for E-commerce & TikTok Shop | Cazza AI
-      </title>
+      <title>Dashboard | Cazza</title>
       <meta
         name="description"
-        content="Stop manual spreadsheets. Cazza.ai connects Amazon, TikTok Shop, and Shopify to give you instant profit insights and automated Xero reconciliation. Start your free trial today."
+        content="View your real-time financial insights and platform performance on the Cazza dashboard."
       />
       {/* Date Range Selector */}
       <Card className="hover:shadow-none hover:transform-none">
