@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatLayout } from "@/layouts/ChatLayout";
-import { Send, Loader2, Trash2 } from "lucide-react";
+import { Send, Loader2, Trash2, Copy, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
@@ -113,6 +113,13 @@ export const AIChat = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (messageId: string, content: string) => {
+    navigator.clipboard.writeText(content);
+    setCopiedId(messageId);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const {
     conversations,
@@ -209,6 +216,14 @@ export const AIChat = () => {
         } else {
           throw new Error("Failed to create chat");
         }
+      } else {
+        // If chat exists but has no messages, update title to match the first message
+        const conv = conversations.find((c) => c.id === activeChatId);
+        if (conv && conv.messages.length === 0) {
+          const chatTitle =
+            userInput.slice(0, 50) + (userInput.length > 50 ? "..." : "");
+          handleRenameChat(activeChatId, chatTitle, true);
+        }
       }
 
       const tempUserMessageId = `temp-user-${Date.now()}`;
@@ -295,9 +310,13 @@ export const AIChat = () => {
     }
   };
 
-  const handleRenameChat = async (chatId: string, newTitle: string) => {
+  const handleRenameChat = async (
+    chatId: string,
+    newTitle: string,
+    muteToast: boolean = false
+  ) => {
     try {
-      await updateChatTitle(chatId, { title: newTitle });
+      await updateChatTitle(chatId, { title: newTitle }, muteToast);
       updateConversationTitle(chatId, newTitle);
     } catch (error) {
       console.error("Failed to rename chat:", error);
@@ -370,20 +389,17 @@ export const AIChat = () => {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex group ${
-                    message.type === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex group ${message.type === "user" ? "justify-end" : "justify-start"
+                    }`}
                 >
                   <div
-                    className={`relative ${
-                      message.type === "user"
-                        ? "max-w-xs lg:max-w-md"
-                        : "max-w-2xl lg:max-w-3xl"
-                    } px-4 py-3 pb-8 rounded-lg ${
-                      message.type === "user"
+                    className={`relative ${message.type === "user"
+                      ? "max-w-xs lg:max-w-md"
+                      : "max-w-2xl lg:max-w-3xl"
+                      } px-4 py-3 pb-8 rounded-lg ${message.type === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-card border border-border shadow-sm text-foreground"
-                    }`}
+                      }`}
                   >
                     {message.type === "assistant" ? (
                       <div className="markdown-content">
@@ -394,15 +410,31 @@ export const AIChat = () => {
                     ) : (
                       <span>{message.content}</span>
                     )}
-                    {message.backendId && (
+                    <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       <button
-                        onClick={() => handleDeleteMessageClick(message.id)}
-                        className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
-                        title="Delete message"
+                        onClick={() => handleCopy(message.id, message.content)}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 ${copiedId === message.id
+                          ? "bg-green-500 text-white"
+                          : "bg-muted hover:bg-muted-foreground/20 text-muted-foreground"
+                          }`}
+                        title="Copy message"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        {copiedId === message.id ? (
+                          <Check className="w-3.5 h-3.5" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
                       </button>
-                    )}
+                      {message.backendId && (
+                        <button
+                          onClick={() => handleDeleteMessageClick(message.id)}
+                          className="w-6 h-6 rounded-full bg-destructive/80 hover:bg-destructive text-destructive-foreground flex items-center justify-center transition-all hover:scale-110"
+                          title="Delete message"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
