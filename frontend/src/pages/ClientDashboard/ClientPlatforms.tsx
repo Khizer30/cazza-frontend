@@ -89,14 +89,16 @@ export const ClientPlatforms = () => {
               size="sm"
               // onClick={handleSync}
               // disabled={isSyncing}
-              className={`flex items-center gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 focus:bg-primary/10 focus:text-primary focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all duration-200 midday-button ${isSyncing
-                ? "bg-success/10 border-success/20 text-success animate-pulse"
-                : ""
-                } ${isSyncing ? "cursor-not-allowed" : "cursor-pointer"}`}
+              className={`flex items-center gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 focus:bg-primary/10 focus:text-primary focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all duration-200 midday-button ${
+                isSyncing
+                  ? "bg-success/10 border-success/20 text-success animate-pulse"
+                  : ""
+              } ${isSyncing ? "cursor-not-allowed" : "cursor-pointer"}`}
             >
               <RefreshCw
-                className={`h-4 w-4 ${isSyncing ? "animate-spin text-success" : ""
-                  }`}
+                className={`h-4 w-4 ${
+                  isSyncing ? "animate-spin text-success" : ""
+                }`}
               />
               {isSyncing ? "Syncing..." : "Sync"}
             </Button>
@@ -234,7 +236,7 @@ export const ClientPlatforms = () => {
           setSelectedPlatform(null);
         }}
         platform={selectedPlatform}
-      // onConnectionSuccess={handleConnectionSuccess}
+        // onConnectionSuccess={handleConnectionSuccess}
       />
     </Card>
   );

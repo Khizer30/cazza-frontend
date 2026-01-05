@@ -477,6 +477,6 @@ export function Onboarding() {
           </div>
         </CardContent>
       </Card>
-    </div >
+    </div>
   );
 }

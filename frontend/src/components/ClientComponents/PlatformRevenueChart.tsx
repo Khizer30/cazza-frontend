@@ -6,51 +6,34 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import {
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Badge } from "../ui/badge";
-import { useState } from "react";
-import {
-  platformDummy,
-  PLATFORM_COLORS,
-} from "@/constants/PlatfromRevenueChart";
+import { PLATFORM_COLORS } from "@/constants/PlatfromRevenueChart";
+import type { DashboardSummaryData } from "@/types/auth";
+
 interface PlatformRevenue {
   platform: string;
   platform_name: string;
   total_revenue: number;
-  transaction_count: number;
-  currency: string;
-  last_sync?: string;
 }
 
-export const PlatformRevenueChart = () => {
-  const [platformRevenue] = useState<PlatformRevenue[]>(platformDummy);
-  const [loading] = useState(false);
-  const totalRevenue = platformRevenue.reduce(
-    (sum, platform) => sum + platform.total_revenue,
-    0
-  );
+interface PlatformRevenueChartProps {
+  summary: DashboardSummaryData | null;
+  isLoading: boolean;
+}
+
+export const PlatformRevenueChart = ({
+  summary,
+  isLoading,
+}: PlatformRevenueChartProps) => {
   const error = false;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Loading...</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 bg-muted animate-pulse rounded" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Loading...</CardTitle>
+            <CardTitle>Loading Platform Data...</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-64 bg-muted animate-pulse rounded" />
@@ -60,13 +43,42 @@ export const PlatformRevenueChart = () => {
     );
   }
 
+  const platformRevenue: PlatformRevenue[] = summary
+    ? [
+        {
+          platform: "tiktok",
+          platform_name: "TikTok Shop",
+          total_revenue: Number(summary.revenueByPlatform.tiktok),
+        },
+        {
+          platform: "amazon",
+          platform_name: "Amazon",
+          total_revenue: Number(summary.revenueByPlatform.amazon),
+        },
+        {
+          platform: "shopify",
+          platform_name: "Shopify",
+          total_revenue: Number(summary.revenueByPlatform.shopify),
+        },
+        {
+          platform: "ebay",
+          platform_name: "eBay",
+          total_revenue: Number(summary.revenueByPlatform.ebay),
+        },
+      ]
+    : [];
+
+  const totalRevenue = platformRevenue.reduce(
+    (sum, platform) => sum + platform.total_revenue,
+    0
+  );
+
   if (error) {
     return (
       <Card>
         <CardContent className="p-6">
           <div className="text-center text-muted-foreground">
-            <p>Unable to load revenue data: {error}</p>
-            <p className="text-sm mt-2">Showing demo data instead</p>
+            <p>Unable to load revenue data</p>
           </div>
         </CardContent>
       </Card>
@@ -127,8 +139,9 @@ export const PlatformRevenueChart = () => {
                 <p className="text-sm font-medium text-muted-foreground">
                   Connected Platforms
                 </p>
-                <p className="text-2xl font-bold">{platformRevenue.length}</p>
-                
+                <p className="text-2xl font-bold">
+                  {summary?.connectedPlatforms.length || 0}
+                </p>
               </div>
               <div className="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center">
                 <Zap className="w-4 h-4 text-success" />
@@ -136,8 +149,6 @@ export const PlatformRevenueChart = () => {
             </div>
           </CardContent>
         </Card>
-
-       
       </div>
 
       {/* Revenue by Platform Section */}
@@ -184,7 +195,7 @@ export const PlatformRevenueChart = () => {
               </div>
 
               <div className="w-full lg:w-1/2 space-y-3">
-                {pieData.map((platform) => (
+                {platformRevenue.map((platform) => (
                   <div
                     key={platform.platform}
                     className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
@@ -200,11 +211,14 @@ export const PlatformRevenueChart = () => {
                         }}
                       />
                       <span className="text-sm font-medium">
-                        {platform.name}
+                        {platform.platform_name}
                       </span>
                     </div>
-                    <Badge variant="secondary" className="text-sm font-semibold">
-                      £{platform.value.toLocaleString()}
+                    <Badge
+                      variant="secondary"
+                      className="text-sm font-semibold"
+                    >
+                      £{platform.total_revenue.toLocaleString()}
                     </Badge>
                   </div>
                 ))}

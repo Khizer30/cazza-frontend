@@ -44,13 +44,12 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { type PLTableRow } from "@/constants/ProfitLssStatement";
 import {
-monthlyPL,
-type PLTableRow,
-} from "@/constants/ProfitLssStatement";
-import { getTikTokShopDataService } from "@/services/dashboardService";
-import type { TikTokShopDataItem } from "@/types/auth";
-import { AxiosError } from "axios";
+  getTikTokShopDataService,
+  getDashboardSummaryService,
+} from "@/services/dashboardService";
+import type { TikTokShopDataItem, DashboardSummaryData } from "@/types/auth";
 
 // Helper function to format currency values
 const formatValue = (value: number | string): string => {
@@ -83,7 +82,7 @@ const getValueColor = (value: number | string, parameter: string): string => {
 // Transform TikTok Shop API data to table structure
 const transformTikTokShopData = (
   data: TikTokShopDataItem[]
-): { columns: string[]; rows: PLTableRow[]; } => {
+): { columns: string[]; rows: PLTableRow[] } => {
   if (!data || data.length === 0) {
     return { columns: [], rows: [] };
   }
@@ -113,7 +112,8 @@ const transformTikTokShopData = (
     columns.forEach((monthYear) => {
       const item = data.find((d) => d.monthYear === monthYear);
       if (item) {
-        values[monthYear] = item[metric as keyof TikTokShopDataItem] as number;
+        values[monthYear] =
+          Number(item[metric as keyof TikTokShopDataItem]) || 0;
       }
     });
 
@@ -128,12 +128,19 @@ const transformTikTokShopData = (
   return { columns, rows };
 };
 
-export const ProfitLossStatement = () => {
+export const ProfitLossStatement = ({
+  summary: externalSummary,
+}: {
+  summary?: DashboardSummaryData | null;
+}) => {
   // API data states
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [tiktokShopData, setTiktokShopData] = useState<TikTokShopDataItem[]>(
     []
+  );
+  const [summary, setSummary] = useState<DashboardSummaryData | null>(
+    externalSummary || null
   );
   const [tableColumns, setTableColumns] = useState<string[]>([]);
   const [tableRows, setTableRows] = useState<PLTableRow[]>([]);
@@ -143,10 +150,10 @@ export const ProfitLossStatement = () => {
     from: Date | undefined;
     to: Date | undefined;
   }>({
-    from: new Date(2024, 0, 1),
+    from: new Date(2025, 7, 1),
     to: new Date(),
   });
-  const [marketplace, setMarketplace] = useState<string>("all");
+  const [marketplace, setMarketplace] = useState<string>("tiktok");
   const [sku, setSku] = useState<string>("all");
   const [country, setCountry] = useState<string>("all");
   const [currency, setCurrency] = useState<string>("GBP");
@@ -154,38 +161,42 @@ export const ProfitLossStatement = () => {
   // State for expandable rows
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
-  // Fetch TikTok Shop data on component mount
+  // Fetch TikTok Shop data and Summary on component mount
   useEffect(() => {
-    const fetchTikTokShopData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await getTikTokShopDataService();
-        if (response && response.success && response.data) {
-          setTiktokShopData(response.data);
-          const transformed = transformTikTokShopData(response.data);
+
+        const [tiktokRes, summaryRes] = await Promise.all([
+          getTikTokShopDataService(),
+          !externalSummary
+            ? getDashboardSummaryService()
+            : Promise.resolve(null),
+        ]);
+
+        if (tiktokRes && tiktokRes.success && tiktokRes.data) {
+          setTiktokShopData(tiktokRes.data);
+          const transformed = transformTikTokShopData(tiktokRes.data);
           setTableColumns(transformed.columns);
           setTableRows(transformed.rows);
-        } else {
-          setError(response.message || "Failed to fetch TikTok Shop data");
+        }
+
+        if (summaryRes && summaryRes.success) {
+          setSummary(summaryRes.data);
+        } else if (externalSummary) {
+          setSummary(externalSummary);
         }
       } catch (err) {
-        console.error("Error fetching TikTok Shop data:", err);
-        if (err instanceof AxiosError) {
-          setError(
-            err.response?.data?.message ||
-            "Failed to fetch TikTok Shop data. Please try again."
-          );
-        } else {
-          setError("An unexpected error occurred. Please try again.");
-        }
+        console.error("Error fetching P&L data:", err);
+        setError("Failed to fetch data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTikTokShopData();
-  }, []);
+    fetchData();
+  }, [externalSummary]);
 
   const toggleRow = (parameter: string) => {
     setExpandedRows((prev) => {
@@ -199,21 +210,11 @@ export const ProfitLossStatement = () => {
     });
   };
 
-  // Calculate summary metrics from TikTok Shop data
-  const latestData = tiktokShopData.length > 0 ? tiktokShopData[tiktokShopData.length - 1] : null;
-
-  const totalRevenue = latestData?.["Gross Revenue (£)"] || 0;
-  const totalExpenses =
-    (latestData?.["Commission Fee (£)"] || 0) +
-    (latestData?.["Payment Fee (£)"] || 0) +
-    (latestData?.["Service Fee (£)"] || 0) +
-    (latestData?.["Ad Spend (£)"] || 0) +
-    (latestData?.["Refunds (£)"] || 0) +
-    (latestData?.["Shipping Deduction (£)"] || 0) +
-    (latestData?.["Other Deductions (£)"] || 0);
-  const grossProfit = latestData?.["Net Profit (£)"] || 0;
-  const profitMargin =
-    totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+  // Use Summary API data for main cards
+  const totalRevenue = Number(summary?.totalRevenue || 0);
+  const totalExpenses = Number(summary?.totalExpense || 0);
+  const grossProfit = Number(summary?.netProfit || 0);
+  const profitMargin = Number(summary?.profitMargin || 0);
 
   // Export handlers
   const handleExportCSV = () => {
@@ -473,8 +474,9 @@ export const ProfitLossStatement = () => {
                   Net Profit
                 </p>
                 <p
-                  className={`text-2xl font-bold ${grossProfit >= 0 ? "text-success" : "text-destructive"
-                    }`}
+                  className={`text-2xl font-bold ${
+                    grossProfit >= 0 ? "text-success" : "text-destructive"
+                  }`}
                 >
                   £{Math.round(grossProfit).toLocaleString()}
                 </p>
@@ -494,14 +496,15 @@ export const ProfitLossStatement = () => {
                   Profit Margin
                 </p>
                 <p
-                  className={`text-2xl font-bold ${profitMargin >= 20
-                    ? "text-success"
-                    : profitMargin >= 10
-                      ? "text-warning"
-                      : "text-destructive"
-                    }`}
+                  className={`text-2xl font-bold ${
+                    profitMargin >= 20
+                      ? "text-success"
+                      : profitMargin >= 10
+                        ? "text-warning"
+                        : "text-destructive"
+                  }`}
                 >
-                  {profitMargin.toFixed(1)}%
+                  {profitMargin.toFixed(2)}%
                 </p>
                 <Badge
                   variant={
@@ -555,12 +558,14 @@ export const ProfitLossStatement = () => {
                 {tableRows.map((row) => (
                   <tr
                     key={row.parameter}
-                    className={`border-b hover:bg-muted/30 transition-colors ${row.isHighlighted ? "bg-muted/20" : ""
-                      } ${row.isSubRow ? "bg-muted/10" : ""}`}
+                    className={`border-b hover:bg-muted/30 transition-colors ${
+                      row.isHighlighted ? "bg-muted/20" : ""
+                    } ${row.isSubRow ? "bg-muted/10" : ""}`}
                   >
                     <td
-                      className={`p-3 sticky left-0 bg-background ${row.isBold ? "font-semibold" : ""
-                        } ${row.isSubRow ? "pl-8" : ""}`}
+                      className={`p-3 sticky left-0 bg-background ${
+                        row.isBold ? "font-semibold" : ""
+                      } ${row.isSubRow ? "pl-8" : ""}`}
                     >
                       <div className="flex items-center gap-2">
                         {row.isExpandable && (
@@ -583,8 +588,9 @@ export const ProfitLossStatement = () => {
                       return (
                         <td
                           key={column}
-                          className={`p-3 text-right ${row.isBold ? "font-semibold" : ""
-                            } ${getValueColor(value, row.parameter)}`}
+                          className={`p-3 text-right ${
+                            row.isBold ? "font-semibold" : ""
+                          } ${getValueColor(value, row.parameter)}`}
                         >
                           {typeof value === "number"
                             ? formatValue(value)
@@ -605,13 +611,24 @@ export const ProfitLossStatement = () => {
         <CardHeader>
           <CardTitle>Profit & Loss Trend</CardTitle>
           <CardDescription>
-            Monthly revenue, expenses, and profit over time with smooth
-            gradients
+            Monthly revenue, expenses, and profit over time from your connected
+            platforms
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={monthlyPL}>
+            <AreaChart
+              data={tiktokShopData
+                .map((item) => ({
+                  month: item.monthYear.split(" ")[0],
+                  revenue: Number(item["Gross Revenue (£)"]),
+                  expenses:
+                    Number(item["Gross Revenue (£)"]) -
+                    Number(item["Net Profit (£)"]),
+                  profit: Number(item["Net Profit (£)"]),
+                }))
+                .reverse()}
+            >
               <defs>
                 <linearGradient
                   id="revenueGradient"
@@ -657,9 +674,9 @@ export const ProfitLossStatement = () => {
                   value: number | undefined,
                   name: string | undefined
                 ) => [
-                    value !== undefined ? `£${value.toLocaleString()}` : "£0",
-                    name ? name.charAt(0).toUpperCase() + name.slice(1) : "",
-                  ]}
+                  value !== undefined ? `£${value.toLocaleString()}` : "£0",
+                  name ? name.charAt(0).toUpperCase() + name.slice(1) : "",
+                ]}
                 labelFormatter={(label) => `Month: ${label}`}
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",

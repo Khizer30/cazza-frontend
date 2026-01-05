@@ -19,10 +19,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/dashboard"
-                ? "bg-primary text-primary-foreground shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
+                location.pathname === "/dashboard"
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
               asChild
             >
               <Link to="/dashboard" onClick={onNavigate}>
@@ -42,10 +43,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/ask-cazza"
-                ? "bg-primary text-primary-foreground shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
+                location.pathname === "/ask-cazza"
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
               asChild
             >
               <Link to="/ask-cazza" onClick={onNavigate}>
@@ -66,10 +68,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/channels"
-                ? "bg-primary text-primary-foreground shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
+                location.pathname === "/channels"
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
               asChild
             >
               <Link to="/channels" onClick={onNavigate}>
@@ -89,10 +92,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/platforms"
-                ? "bg-primary text-primary-foreground shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
+                location.pathname === "/platforms"
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
               asChild
             >
               <Link to="/platforms" onClick={onNavigate}>
@@ -112,11 +116,12 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${location.pathname === "/blog" ||
+              className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
+                location.pathname === "/blog" ||
                 location.pathname.startsWith("/blog/")
-                ? "bg-primary text-primary-foreground shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
               asChild
             >
               <Link to="/blog" onClick={onNavigate}>

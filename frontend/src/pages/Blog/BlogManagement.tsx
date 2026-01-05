@@ -1,13 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Calendar,
-  Edit,
-  Eye,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Calendar, Edit, Eye, Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -156,10 +150,16 @@ export const BlogManagement = () => {
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
                   <TableHead className="text-muted-foreground">Title</TableHead>
-                  <TableHead className="text-muted-foreground">Authors</TableHead>
+                  <TableHead className="text-muted-foreground">
+                    Authors
+                  </TableHead>
                   <TableHead className="text-muted-foreground">Date</TableHead>
-                  <TableHead className="text-muted-foreground">Status</TableHead>
-                  <TableHead className="text-muted-foreground text-right">Actions</TableHead>
+                  <TableHead className="text-muted-foreground">
+                    Status
+                  </TableHead>
+                  <TableHead className="text-muted-foreground text-right">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -175,7 +175,10 @@ export const BlogManagement = () => {
                             key={idx}
                             className="w-8 h-8 border-2 border-card"
                           >
-                            <AvatarImage src={author.avatar} alt={author.name} />
+                            <AvatarImage
+                              src={author.avatar}
+                              alt={author.name}
+                            />
                             <AvatarFallback
                               className={`text-xs text-white ${getAvatarColor(author.name)}`}
                             >
@@ -198,7 +201,9 @@ export const BlogManagement = () => {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={post.status === "published" ? "default" : "secondary"}
+                        variant={
+                          post.status === "published" ? "default" : "secondary"
+                        }
                         className={
                           post.status === "published"
                             ? "bg-green-500/20 text-green-500 hover:bg-green-500/30"
@@ -221,7 +226,9 @@ export const BlogManagement = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => navigate(`/manage-blogs/edit/${post.id}`)}
+                          onClick={() =>
+                            navigate(`/manage-blogs/edit/${post.id}`)
+                          }
                           className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                         >
                           <Edit className="w-4 h-4" />
@@ -238,9 +245,12 @@ export const BlogManagement = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Blog Post</AlertDialogTitle>
+                              <AlertDialogTitle>
+                                Delete Blog Post
+                              </AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to delete "{post.title}"? This action cannot be undone.
+                                Are you sure you want to delete "{post.title}"?
+                                This action cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -279,4 +289,3 @@ export const BlogManagement = () => {
     </ScrollArea>
   );
 };
-

@@ -183,7 +183,10 @@ export const useChatbot = () => {
       const res = await updateChatTitleService(chatId, payload);
       if (res && res.success && res.data) {
         if (!muteToast) {
-          showToast(res.message || "Chat title updated successfully", "success");
+          showToast(
+            res.message || "Chat title updated successfully",
+            "success"
+          );
         }
         return res.data;
       } else if (res && !res.success) {

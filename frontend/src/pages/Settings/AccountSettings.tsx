@@ -336,7 +336,7 @@ export const AccountSettings = () => {
                     <Button
                       variant="outline"
                       className="gap-2"
-                    //   disabled={uploading}
+                      //   disabled={uploading}
                     >
                       {uploading ? (
                         <>
@@ -572,8 +572,7 @@ export const AccountSettings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4">
-                </div>
+                <div className="space-y-4"></div>
 
                 <div>
                   <Label className="text-base font-medium">

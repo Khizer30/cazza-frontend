@@ -438,7 +438,7 @@ export const Channels = () => {
           },
           { merge: true }
         );
-      } catch (error) { }
+      } catch (error) {}
     },
     [selectedChannelId, loggedInUser]
   );
@@ -494,7 +494,7 @@ export const Channels = () => {
       await updateDoc(messageRef, updateData);
       setEditingMessageId(null);
       setEditingMessageText("");
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const handleDeleteMessage = async (messageId: string) => {
@@ -511,7 +511,7 @@ export const Channels = () => {
       await updateDoc(messageRef, {
         deleted: true,
       });
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const handleToggleReaction = async (messageId: string, emoji: string) => {
@@ -552,7 +552,7 @@ export const Channels = () => {
         await updateDoc(messageRef, updates);
       }
       setOpenReactionPopoverId(null);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const handleReply = (message: ChannelMessage) => {
@@ -740,7 +740,7 @@ export const Channels = () => {
 
               setTypingUsers(typingUsersList);
             },
-            () => { }
+            () => {}
           );
 
           typingUnsubscribeRef.current = typingUnsubscribe;
@@ -811,13 +811,13 @@ export const Channels = () => {
             prevChannels.map((channel) =>
               channel.id === selectedChannelId
                 ? {
-                  ...channel,
-                  members: finalMembers,
-                  userRole:
-                    (channelDetails as any).userRole ||
-                    (channelDetails as any).role,
-                  createdBy: creatorId || channel.createdBy,
-                }
+                    ...channel,
+                    members: finalMembers,
+                    userRole:
+                      (channelDetails as any).userRole ||
+                      (channelDetails as any).role,
+                    createdBy: creatorId || channel.createdBy,
+                  }
                 : channel
             )
           );
@@ -920,13 +920,13 @@ export const Channels = () => {
         channels.map((channel) =>
           channel.id === editingChannel.id
             ? {
-              ...channel,
-              name: channelName.trim(),
-              description: channelDescription.trim(),
-              icon: selectedIcon.icon,
-              iconName: selectedIcon.name,
-              color: selectedIcon.color,
-            }
+                ...channel,
+                name: channelName.trim(),
+                description: channelDescription.trim(),
+                icon: selectedIcon.icon,
+                iconName: selectedIcon.name,
+                color: selectedIcon.color,
+              }
             : channel
         )
       );
@@ -997,10 +997,10 @@ export const Channels = () => {
           prevChannels.map((channel) =>
             channel.id === channelId
               ? {
-                ...channel,
-                members: finalMembers,
-                createdBy: creatorId || channel.createdBy,
-              }
+                  ...channel,
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
+                }
               : channel
           )
         );
@@ -1045,10 +1045,10 @@ export const Channels = () => {
           prevChannels.map((channel) =>
             channel.id === channelId
               ? {
-                ...channel,
-                members: finalMembers,
-                createdBy: creatorId || channel.createdBy,
-              }
+                  ...channel,
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
+                }
               : channel
           )
         );
@@ -1095,10 +1095,10 @@ export const Channels = () => {
           prevChannels.map((channel) =>
             channel.id === channelId
               ? {
-                ...channel,
-                members: finalMembers,
-                createdBy: creatorId || channel.createdBy,
-              }
+                  ...channel,
+                  members: finalMembers,
+                  createdBy: creatorId || channel.createdBy,
+                }
               : channel
           )
         );
@@ -1394,10 +1394,11 @@ export const Channels = () => {
                                   setSelectedIcon(iconOption);
                                   setShowIconPicker(false);
                                 }}
-                                className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all hover:bg-muted ${selectedIcon.name === iconOption.name
+                                className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all hover:bg-muted ${
+                                  selectedIcon.name === iconOption.name
                                     ? "border-primary bg-primary/10"
                                     : "border-border"
-                                  }`}
+                                }`}
                               >
                                 <IconComponent
                                   className="h-6 w-6 mb-1"
@@ -1477,10 +1478,11 @@ export const Channels = () => {
                 return (
                   <div
                     key={channel.id}
-                    className={`group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${isSelected
+                    className={`group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                      isSelected
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-muted"
-                      }`}
+                    }`}
                     onClick={() => setSelectedChannelId(channel.id)}
                   >
                     <div
@@ -1501,8 +1503,9 @@ export const Channels = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <p
-                          className={`font-medium truncate ${isSelected ? "text-primary-foreground" : ""
-                            }`}
+                          className={`font-medium truncate ${
+                            isSelected ? "text-primary-foreground" : ""
+                          }`}
                         >
                           {channel.name}
                         </p>
@@ -1566,10 +1569,11 @@ export const Channels = () => {
                       </div>
                       {channel.description && (
                         <p
-                          className={`text-xs truncate mt-1 ${isSelected
+                          className={`text-xs truncate mt-1 ${
+                            isSelected
                               ? "text-primary-foreground/70"
                               : "text-muted-foreground"
-                            }`}
+                          }`}
                           title={channel.description}
                         >
                           {channel.description}
@@ -1700,8 +1704,9 @@ export const Channels = () => {
                     return (
                       <div
                         key={message.id}
-                        className={`group flex gap-3 ${isCurrentUser ? "flex-row-reverse" : ""
-                          }`}
+                        className={`group flex gap-3 ${
+                          isCurrentUser ? "flex-row-reverse" : ""
+                        }`}
                       >
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={sender.avatar || undefined} />
@@ -1710,12 +1715,14 @@ export const Channels = () => {
                           </AvatarFallback>
                         </Avatar>
                         <div
-                          className={`flex flex-col max-w-[70%] ${isCurrentUser ? "items-end" : "items-start"
-                            }`}
+                          className={`flex flex-col max-w-[70%] ${
+                            isCurrentUser ? "items-end" : "items-start"
+                          }`}
                         >
                           <div
-                            className={`flex items-center gap-2 mb-1 ${isCurrentUser ? "flex-row-reverse" : ""
-                              }`}
+                            className={`flex items-center gap-2 mb-1 ${
+                              isCurrentUser ? "flex-row-reverse" : ""
+                            }`}
                           >
                             <span className="text-sm font-medium">
                               {sender.name}
@@ -1738,17 +1745,19 @@ export const Channels = () => {
                           )}
                           <div className="relative">
                             <div
-                              className={`rounded-lg px-4 py-2 inline-block ${isCurrentUser
+                              className={`rounded-lg px-4 py-2 inline-block ${
+                                isCurrentUser
                                   ? "bg-primary text-primary-foreground"
                                   : "bg-card border border-border"
-                                }`}
+                              }`}
                             >
                               {message.deleted ? (
                                 <p
-                                  className={`text-sm italic ${isCurrentUser
+                                  className={`text-sm italic ${
+                                    isCurrentUser
                                       ? "text-primary-foreground/70"
                                       : "text-foreground/70"
-                                    }`}
+                                  }`}
                                 >
                                   This message was deleted
                                 </p>
@@ -1757,10 +1766,11 @@ export const Channels = () => {
                                   {message.text}
                                   {message.edited && (
                                     <span
-                                      className={`text-xs ml-2 ${isCurrentUser
+                                      className={`text-xs ml-2 ${
+                                        isCurrentUser
                                           ? "text-primary-foreground/70"
                                           : "text-foreground/70"
-                                        }`}
+                                      }`}
                                     >
                                       (edited)
                                     </span>
@@ -1804,10 +1814,11 @@ export const Channels = () => {
                                                 emoji
                                               )
                                             }
-                                            className={`text-lg hover:bg-muted p-1 rounded transition-colors ${hasReacted
+                                            className={`text-lg hover:bg-muted p-1 rounded transition-colors ${
+                                              hasReacted
                                                 ? "bg-primary/20 border border-primary"
                                                 : ""
-                                              }`}
+                                            }`}
                                           >
                                             {emoji}
                                           </button>
@@ -1913,12 +1924,13 @@ export const Channels = () => {
                                               emoji
                                             )
                                           }
-                                          className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${users.includes(
-                                            loggedInUser?.id || ""
-                                          )
+                                          className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                                            users.includes(
+                                              loggedInUser?.id || ""
+                                            )
                                               ? "bg-primary/20 border-primary"
                                               : "bg-muted border-border hover:bg-muted/80"
-                                            }`}
+                                          }`}
                                         >
                                           <span>{emoji}</span>
                                           <span>{users.length}</span>
@@ -2177,7 +2189,7 @@ export const Channels = () => {
                           size="sm"
                           disabled={
                             addingMemberId ===
-                            (member.id || member.userId || member.user_id) ||
+                              (member.id || member.userId || member.user_id) ||
                             !!addingMemberId
                           }
                           onClick={(e) => {
@@ -2192,15 +2204,15 @@ export const Channels = () => {
                               handleAddMember(
                                 channelId,
                                 member.id ||
-                                member.userId ||
-                                member.user_id ||
-                                ""
+                                  member.userId ||
+                                  member.user_id ||
+                                  ""
                               );
                             }
                           }}
                         >
                           {addingMemberId ===
-                            (member.id || member.userId || member.user_id) ? (
+                          (member.id || member.userId || member.user_id) ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               Adding...
@@ -2222,7 +2234,8 @@ export const Channels = () => {
                     No team members added yet
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Please add members to your team first before adding them to channels
+                    Please add members to your team first before adding them to
+                    channels
                   </p>
                 </div>
               )}
