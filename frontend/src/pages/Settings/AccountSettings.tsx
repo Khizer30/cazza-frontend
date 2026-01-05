@@ -486,11 +486,11 @@ export const AccountSettings = () => {
                         <SelectValue placeholder="Select revenue band" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="0-85k">
-                          £0 to £85,000 (Below VAT threshold)
+                        <SelectItem value="0-90k">
+                          £0 to £90,000 (Below VAT threshold)
                         </SelectItem>
-                        <SelectItem value="85k-750k">
-                          £85,000 - £750,000
+                        <SelectItem value="90k-750k">
+                          £90,000 - £750,000
                         </SelectItem>
                         <SelectItem value="750k-2m">£750,000 - £2m</SelectItem>
                         <SelectItem value="2m-5m">£2-5m</SelectItem>
