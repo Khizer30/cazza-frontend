@@ -103,9 +103,9 @@ export const LandingPage = () => {
       <nav className="border-b border-border bg-card sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <Logo size="md" />
-            </div>
+            </Link>
 
             <div className="hidden md:flex items-center space-x-8">
               <a
@@ -1421,7 +1421,9 @@ export const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div className="space-y-4">
-              <Logo size="lg" invert={true} className="text-background" />
+              <Link to="/" className="inline-block hover:opacity-80 transition-opacity">
+                <Logo size="lg" invert={true} className="text-background" />
+              </Link>
               <p className="text-sm text-background/70">
                 Cazza is developed by Social Commerce Accountants Ltd, a
                 UK-registered company

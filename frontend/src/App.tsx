@@ -31,6 +31,7 @@ import { BlogDashboard } from "./pages/Blog/BlogDashboard";
 import { BlogDetail } from "./pages/Blog/BlogDetail";
 import { BlogManagement } from "./pages/Blog/BlogManagement";
 import { BlogForm } from "./pages/Blog/BlogForm";
+import { BlogLayout } from "./layouts/BlogLayout";
 
 const App = () => {
   return (
@@ -61,6 +62,12 @@ const App = () => {
               />
             </Route>
 
+            {/* Public blog routes with conditional layout */}
+            <Route path="/blog" element={<BlogLayout />}>
+              <Route index element={<BlogDashboard />} />
+              <Route path=":slug" element={<BlogDetail />} />
+            </Route>
+
             {/* Private routes that require authentication */}
             {/* Private routes that require authentication */}
             <Route element={<PrivateRoute />}>
@@ -73,13 +80,11 @@ const App = () => {
                 <Route path="billing" element={<BillingSettings />} />
                 <Route path="support" element={<SupportSettings />} />
                 <Route path="settings" element={<AccountSettings />} />
-                <Route path="teams" element={<TeamSettings />} />
-                <Route path="invitations" element={<MyInvitations />} />
-                <Route path="blog" element={<BlogDashboard />} />
-                <Route path="blog/:slug" element={<BlogDetail />} />
-                <Route path="manage-blogs" element={<BlogManagement />} />
-                <Route path="manage-blogs/create" element={<BlogForm />} />
-                <Route path="manage-blogs/edit/:id" element={<BlogForm />} />
+              <Route path="teams" element={<TeamSettings />} />
+              <Route path="invitations" element={<MyInvitations />} />
+              <Route path="manage-blogs" element={<BlogManagement />} />
+              <Route path="manage-blogs/create" element={<BlogForm />} />
+              <Route path="manage-blogs/edit/:id" element={<BlogForm />} />
               </Route>
             </Route>
           </Routes>

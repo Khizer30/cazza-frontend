@@ -121,12 +121,6 @@ export const ClientDashboard = () => {
                   <div className="text-3xl font-bold text-foreground">
                     £{totalRevenue.toLocaleString()}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      +12.5% vs last month
-                    </span>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -143,7 +137,7 @@ export const ClientDashboard = () => {
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-foreground">
-                    £{(totalRevenue * 0.37).toLocaleString()}
+                    £{(totalRevenue * 3).toLocaleString()}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
@@ -166,7 +160,7 @@ export const ClientDashboard = () => {
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-foreground">
-                    £{(totalRevenue * 0.63).toLocaleString()}
+                    £{(totalRevenue * 3).toLocaleString()}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">

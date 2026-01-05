@@ -38,6 +38,10 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Fetch user profile error:", error);
       if (error instanceof AxiosError) {
+        const status = error.response?.status;
+        if (status === 401 || status === 403) {
+          return null;
+        }
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||

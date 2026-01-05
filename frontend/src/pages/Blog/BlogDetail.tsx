@@ -268,7 +268,7 @@ export const BlogDetail = () => {
           <p className="text-muted-foreground">
             The blog post you're looking for doesn't exist.
           </p>
-          <Button onClick={() => navigate("/client/blog")}>
+          <Button onClick={() => navigate("/blog")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Blog
           </Button>
@@ -283,7 +283,7 @@ export const BlogDetail = () => {
         <Button
           variant="ghost"
           className="mb-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 -ml-4"
-          onClick={() => navigate("/client/blog")}
+          onClick={() => navigate("/blog")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Blog

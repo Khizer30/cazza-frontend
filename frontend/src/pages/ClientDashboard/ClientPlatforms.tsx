@@ -8,47 +8,48 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PlatformConnectionModal } from "@/modals/PlatformConnectionModal";
+import { Plug2, RefreshCw } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Plug2,
-  RefreshCw,
-  ShoppingBag,
-  Package,
-  Smartphone,
-  Calculator,
-} from "lucide-react";
+  faShopify,
+  faAmazon,
+  faTiktok,
+} from "@fortawesome/free-brands-svg-icons";
+import { faMixer } from "@fortawesome/free-brands-svg-icons";
 import { useState } from "react";
+
 const analyticsData = [
   {
     id: "shopify",
     name: "Shopify",
     type: "ecommerce",
-    icon: ShoppingBag,
+    icon: faShopify,
     description: "Import orders, customers, and inventory",
-    color: "hsl(var(--chart-4))",
+    color: "#96bf48",
   },
   {
     id: "amazon",
     name: "Amazon",
     type: "marketplace",
-    icon: Package,
+    icon: faAmazon,
     description: "Connect Amazon Seller Central",
-    color: "hsl(var(--chart-5))",
+    color: "#FF9900",
   },
   {
     id: "tiktok",
     name: "TikTok Shop",
     type: "marketplace",
-    icon: Smartphone,
+    icon: faTiktok,
     description: "Sync TikTok Shop orders and products",
-    color: "hsl(var(--destructive))",
+    color: "#000000",
   },
   {
     id: "xero",
     name: "Xero",
     type: "accounting",
-    icon: Calculator,
+    icon: faMixer,
     description: "Sync accounting data and financial reports",
-    color: "hsl(var(--chart-1))",
+    color: "#13B5EA",
   },
 ];
 
@@ -88,16 +89,14 @@ export const ClientPlatforms = () => {
               size="sm"
               // onClick={handleSync}
               // disabled={isSyncing}
-              className={`flex items-center gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 focus:bg-primary/10 focus:text-primary focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all duration-200 midday-button ${
-                isSyncing
-                  ? "bg-success/10 border-success/20 text-success animate-pulse"
-                  : ""
-              } ${isSyncing ? "cursor-not-allowed" : "cursor-pointer"}`}
+              className={`flex items-center gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 focus:bg-primary/10 focus:text-primary focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all duration-200 midday-button ${isSyncing
+                ? "bg-success/10 border-success/20 text-success animate-pulse"
+                : ""
+                } ${isSyncing ? "cursor-not-allowed" : "cursor-pointer"}`}
             >
               <RefreshCw
-                className={`h-4 w-4 ${
-                  isSyncing ? "animate-spin text-success" : ""
-                }`}
+                className={`h-4 w-4 ${isSyncing ? "animate-spin text-success" : ""
+                  }`}
               />
               {isSyncing ? "Syncing..." : "Sync"}
             </Button>
@@ -143,7 +142,6 @@ export const ClientPlatforms = () => {
             {analyticsData
               .filter((platform) => platform.type === "accounting")
               .map((platform) => {
-                const Icon = platform.icon;
                 return (
                   <div
                     key={platform.id}
@@ -151,7 +149,8 @@ export const ClientPlatforms = () => {
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                        <Icon
+                        <FontAwesomeIcon
+                          icon={platform.icon}
                           className="h-5 w-5"
                           style={{ color: platform.color }}
                         />
@@ -194,7 +193,6 @@ export const ClientPlatforms = () => {
                   platform.type === "marketplace"
               )
               .map((platform) => {
-                const Icon = platform.icon;
                 return (
                   <div
                     key={platform.id}
@@ -202,7 +200,8 @@ export const ClientPlatforms = () => {
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                        <Icon
+                        <FontAwesomeIcon
+                          icon={platform.icon}
                           className="h-5 w-5"
                           style={{ color: platform.color }}
                         />
@@ -241,7 +240,7 @@ export const ClientPlatforms = () => {
           setSelectedPlatform(null);
         }}
         platform={selectedPlatform}
-        // onConnectionSuccess={handleConnectionSuccess}
+      // onConnectionSuccess={handleConnectionSuccess}
       />
     </Card>
   );
