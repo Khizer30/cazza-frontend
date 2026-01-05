@@ -111,8 +111,11 @@ export const AIChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [chatDeleteDialogOpen, setChatDeleteDialogOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingChat, setIsDeletingChat] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopy = (messageId: string, content: string) => {
@@ -174,6 +177,7 @@ export const AIChat = () => {
         const conv = conversations.find((c) => c.id === currentConversationId);
         if (conv && conv.messages.length === 0) {
           try {
+            setLoadingHistory(true);
             const historyData = await getChatHistory(currentConversationId);
             if (historyData && historyData.messages) {
               loadChatMessagesFromBackend(
@@ -183,6 +187,8 @@ export const AIChat = () => {
             }
           } catch (error) {
             console.error("Failed to load messages:", error);
+          } finally {
+            setLoadingHistory(false);
           }
         }
       }
@@ -298,15 +304,33 @@ export const AIChat = () => {
   };
 
   const handleSelectChat = (chatId: string) => {
+    // Set loading to true immediately if we know we need to fetch messages
+    // This prevents the "Welcome Card" from flashing
+    const conv = conversations.find((c) => c.id === chatId);
+    if (conv && conv.messages.length === 0) {
+      setLoadingHistory(true);
+    }
     setCurrentConversation(chatId);
   };
 
-  const handleDeleteChat = async (chatId: string) => {
+  const handleDeleteChat = (chatId: string) => {
+    setChatToDelete(chatId);
+    setChatDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDeleteChat = async () => {
+    if (!chatToDelete) return;
+
+    setIsDeletingChat(true);
     try {
-      await deleteChatAPI(chatId);
-      deleteConversation(chatId);
+      await deleteChatAPI(chatToDelete);
+      deleteConversation(chatToDelete);
+      setChatDeleteDialogOpen(false);
+      setChatToDelete(null);
     } catch (error) {
       console.error("Failed to delete chat:", error);
+    } finally {
+      setIsDeletingChat(false);
     }
   };
 
@@ -371,6 +395,7 @@ export const AIChat = () => {
       currentChatId={currentConversationId || undefined}
       isSidebarOpen={isSidebarOpen}
       onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+      isLoading={isLoadingHistory}
     >
       <div className="h-[92vh] flex flex-col bg-background">
         <div className="flex-shrink-0 p-4 border-b border-border bg-card">
@@ -381,8 +406,15 @@ export const AIChat = () => {
 
         <div className="flex-1 overflow-y-auto p-6">
           {isLoadingHistory ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="w-6 h-6 animate-spin" />
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`space-y-2 max-w-[70%] ${i % 2 === 0 ? 'items-end' : 'items-start'} flex flex-col`}>
+                    <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                    <div className={`h-20 w-64 md:w-96 bg-muted animate-pulse rounded-2xl ${i % 2 === 0 ? 'rounded-tr-none' : 'rounded-tl-none'}`} />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : messages.length > 0 ? (
             <div className="space-y-4">
@@ -541,6 +573,43 @@ export const AIChat = () => {
                 </>
               ) : (
                 "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={chatDeleteDialogOpen}
+        onOpenChange={(open) => {
+          setChatDeleteDialogOpen(open);
+          if (!open) {
+            setChatToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Conversation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this entire conversation? This action cannot
+              be undone and all messages will be lost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingChat}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDeleteChat}
+              disabled={isDeletingChat}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeletingChat ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Chat"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
