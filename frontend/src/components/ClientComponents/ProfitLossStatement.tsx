@@ -21,15 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-} from "recharts";
+
 import {
   TrendingUp,
   TrendingDown,
@@ -40,7 +32,6 @@ import {
   Download,
   FileText,
   FileSpreadsheet,
-  RefreshCw,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -130,15 +121,19 @@ const transformTikTokShopData = (
 
 export const ProfitLossStatement = ({
   summary: externalSummary,
+  tiktokShopDataProp,
+  isLoadingProp,
 }: {
   summary?: DashboardSummaryData | null;
+  tiktokShopDataProp?: TikTokShopDataItem[];
+  isLoadingProp?: boolean;
 }) => {
   // API data states
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [tiktokShopData, setTiktokShopData] = useState<TikTokShopDataItem[]>(
-    []
+  const [loading, setLoading] = useState<boolean>(
+    isLoadingProp !== undefined ? isLoadingProp : true
   );
+  const [error, setError] = useState<string | null>(null);
+
   const [summary, setSummary] = useState<DashboardSummaryData | null>(
     externalSummary || null
   );
@@ -163,6 +158,23 @@ export const ProfitLossStatement = ({
 
   // Fetch TikTok Shop data and Summary on component mount
   useEffect(() => {
+    // If parent is managing loading, sync with it
+    if (isLoadingProp !== undefined) {
+      setLoading(isLoadingProp);
+
+      // If parent is done loading and provided data, use it
+      if (!isLoadingProp && tiktokShopDataProp) {
+
+        const transformed = transformTikTokShopData(tiktokShopDataProp);
+        setTableColumns(transformed.columns);
+        setTableRows(transformed.rows);
+        if (externalSummary) {
+          setSummary(externalSummary);
+        }
+      }
+      return;
+    }
+
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -176,7 +188,7 @@ export const ProfitLossStatement = ({
         ]);
 
         if (tiktokRes && tiktokRes.success && tiktokRes.data) {
-          setTiktokShopData(tiktokRes.data);
+
           const transformed = transformTikTokShopData(tiktokRes.data);
           setTableColumns(transformed.columns);
           setTableRows(transformed.rows);
@@ -196,7 +208,7 @@ export const ProfitLossStatement = ({
     };
 
     fetchData();
-  }, [externalSummary]);
+  }, [externalSummary, tiktokShopDataProp, isLoadingProp]);
 
   const toggleRow = (parameter: string) => {
     setExpandedRows((prev) => {
@@ -227,10 +239,7 @@ export const ProfitLossStatement = ({
     // TODO: Implement PDF export API call
   };
 
-  const handleXeroSync = () => {
-    console.log("Syncing to Xero...");
-    // TODO: Implement Xero sync API call
-  };
+
 
   if (loading) {
     return (
@@ -298,10 +307,7 @@ export const ProfitLossStatement = ({
                 <FileText className="h-4 w-4 mr-2" />
                 PDF
               </Button>
-              <Button variant="outline" size="sm" onClick={handleXeroSync}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Xero Sync
-              </Button>
+
               <Button size="sm">
                 <Download className="h-4 w-4 mr-2" />
                 Download Report
@@ -438,7 +444,7 @@ export const ProfitLossStatement = ({
                   Total Revenue
                 </p>
                 <p className="text-2xl font-bold text-success">
-                  £{Math.round(totalRevenue).toLocaleString()}
+                  {formatValue(totalRevenue)}
                 </p>
               </div>
               <div className="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center">
@@ -456,7 +462,7 @@ export const ProfitLossStatement = ({
                   Total Expenses
                 </p>
                 <p className="text-2xl font-bold text-red-600">
-                  £{Math.round(totalExpenses).toLocaleString()}
+                  {formatValue(totalExpenses)}
                 </p>
               </div>
               <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -474,11 +480,10 @@ export const ProfitLossStatement = ({
                   Net Profit
                 </p>
                 <p
-                  className={`text-2xl font-bold ${
-                    grossProfit >= 0 ? "text-success" : "text-destructive"
-                  }`}
+                  className={`text-2xl font-bold ${grossProfit >= 0 ? "text-success" : "text-destructive"
+                    }`}
                 >
-                  £{Math.round(grossProfit).toLocaleString()}
+                  {formatValue(grossProfit)}
                 </p>
               </div>
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -496,13 +501,12 @@ export const ProfitLossStatement = ({
                   Profit Margin
                 </p>
                 <p
-                  className={`text-2xl font-bold ${
-                    profitMargin >= 20
-                      ? "text-success"
-                      : profitMargin >= 10
-                        ? "text-warning"
-                        : "text-destructive"
-                  }`}
+                  className={`text-2xl font-bold ${profitMargin >= 20
+                    ? "text-success"
+                    : profitMargin >= 10
+                      ? "text-warning"
+                      : "text-destructive"
+                    }`}
                 >
                   {profitMargin.toFixed(2)}%
                 </p>
@@ -558,14 +562,12 @@ export const ProfitLossStatement = ({
                 {tableRows.map((row) => (
                   <tr
                     key={row.parameter}
-                    className={`border-b hover:bg-muted/30 transition-colors ${
-                      row.isHighlighted ? "bg-muted/20" : ""
-                    } ${row.isSubRow ? "bg-muted/10" : ""}`}
+                    className={`border-b hover:bg-muted/30 transition-colors ${row.isHighlighted ? "bg-muted/20" : ""
+                      } ${row.isSubRow ? "bg-muted/10" : ""}`}
                   >
                     <td
-                      className={`p-3 sticky left-0 bg-background ${
-                        row.isBold ? "font-semibold" : ""
-                      } ${row.isSubRow ? "pl-8" : ""}`}
+                      className={`p-3 sticky left-0 bg-background ${row.isBold ? "font-semibold" : ""
+                        } ${row.isSubRow ? "pl-8" : ""}`}
                     >
                       <div className="flex items-center gap-2">
                         {row.isExpandable && (
@@ -588,9 +590,8 @@ export const ProfitLossStatement = ({
                       return (
                         <td
                           key={column}
-                          className={`p-3 text-right ${
-                            row.isBold ? "font-semibold" : ""
-                          } ${getValueColor(value, row.parameter)}`}
+                          className={`p-3 text-right ${row.isBold ? "font-semibold" : ""
+                            } ${getValueColor(value, row.parameter)}`}
                         >
                           {typeof value === "number"
                             ? formatValue(value)
@@ -603,114 +604,6 @@ export const ProfitLossStatement = ({
               </tbody>
             </table>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* P&L Chart */}
-      <Card className="midday-card">
-        <CardHeader>
-          <CardTitle>Profit & Loss Trend</CardTitle>
-          <CardDescription>
-            Monthly revenue, expenses, and profit over time from your connected
-            platforms
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <AreaChart
-              data={tiktokShopData
-                .map((item) => ({
-                  month: item.monthYear.split(" ")[0],
-                  revenue: Number(item["Gross Revenue (£)"]),
-                  expenses:
-                    Number(item["Gross Revenue (£)"]) -
-                    Number(item["Net Profit (£)"]),
-                  profit: Number(item["Net Profit (£)"]),
-                }))
-                .reverse()}
-            >
-              <defs>
-                <linearGradient
-                  id="revenueGradient"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor="#96BF47" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#96BF47" stopOpacity={0.05} />
-                </linearGradient>
-                <linearGradient
-                  id="expensesGradient"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor="#FFB3B3" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#FFB3B3" stopOpacity={0.05} />
-                </linearGradient>
-                <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4A90E2" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#4A90E2" stopOpacity={0.05} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="month"
-                stroke="var(--muted-foreground)"
-                fontSize={12}
-              />
-              <YAxis
-                tickFormatter={(value) => `£${value.toLocaleString()}`}
-                stroke="var(--muted-foreground)"
-                fontSize={12}
-              />
-              <Tooltip
-                formatter={(
-                  value: number | undefined,
-                  name: string | undefined
-                ) => [
-                  value !== undefined ? `£${value.toLocaleString()}` : "£0",
-                  name ? name.charAt(0).toUpperCase() + name.slice(1) : "",
-                ]}
-                labelFormatter={(label) => `Month: ${label}`}
-                contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 6px -1px hsl(210 11% 15% / 0.1)",
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="revenue"
-                stroke="#96BF47"
-                strokeWidth={2}
-                fill="url(#revenueGradient)"
-                name="Revenue"
-              />
-              <Area
-                type="monotone"
-                dataKey="expenses"
-                stroke="#FFB3B3"
-                strokeWidth={2}
-                fill="url(#expensesGradient)"
-                name="Expenses"
-              />
-              <Area
-                type="monotone"
-                dataKey="profit"
-                stroke="#4A90E2"
-                strokeWidth={2}
-                fill="url(#profitGradient)"
-                name="Profit"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
         </CardContent>
       </Card>
     </div>

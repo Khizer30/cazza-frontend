@@ -45,27 +45,27 @@ export const PlatformRevenueChart = ({
 
   const platformRevenue: PlatformRevenue[] = summary
     ? [
-        {
-          platform: "tiktok",
-          platform_name: "TikTok Shop",
-          total_revenue: Number(summary.revenueByPlatform.tiktok),
-        },
-        {
-          platform: "amazon",
-          platform_name: "Amazon",
-          total_revenue: Number(summary.revenueByPlatform.amazon),
-        },
-        {
-          platform: "shopify",
-          platform_name: "Shopify",
-          total_revenue: Number(summary.revenueByPlatform.shopify),
-        },
-        {
-          platform: "ebay",
-          platform_name: "eBay",
-          total_revenue: Number(summary.revenueByPlatform.ebay),
-        },
-      ]
+      {
+        platform: "tiktok",
+        platform_name: "TikTok Shop",
+        total_revenue: Number(summary.revenueByPlatform.tiktok),
+      },
+      {
+        platform: "amazon",
+        platform_name: "Amazon",
+        total_revenue: Number(summary.revenueByPlatform.amazon),
+      },
+      {
+        platform: "shopify",
+        platform_name: "Shopify",
+        total_revenue: Number(summary.revenueByPlatform.shopify),
+      },
+      {
+        platform: "ebay",
+        platform_name: "eBay",
+        total_revenue: Number(summary.revenueByPlatform.ebay),
+      },
+    ]
     : [];
 
   const totalRevenue = platformRevenue.reduce(
@@ -122,7 +122,10 @@ export const PlatformRevenueChart = ({
                   Total Revenue
                 </p>
                 <p className="text-2xl font-bold">
-                  £{totalRevenue.toLocaleString()}
+                  £{totalRevenue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               </div>
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -177,7 +180,7 @@ export const PlatformRevenueChart = ({
                           key={`cell-${index}`}
                           fill={
                             PLATFORM_COLORS[
-                              entry.platform as keyof typeof PLATFORM_COLORS
+                            entry.platform as keyof typeof PLATFORM_COLORS
                             ] || PLATFORM_COLORS.other
                           }
                         />
@@ -186,8 +189,11 @@ export const PlatformRevenueChart = ({
                     <Tooltip
                       formatter={(value: number | undefined) =>
                         value !== undefined
-                          ? `£${value.toLocaleString()}`
-                          : "£0"
+                          ? `£${value.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}`
+                          : "£0.00"
                       }
                     />
                   </PieChart>
@@ -206,7 +212,7 @@ export const PlatformRevenueChart = ({
                         style={{
                           backgroundColor:
                             PLATFORM_COLORS[
-                              platform.platform as keyof typeof PLATFORM_COLORS
+                            platform.platform as keyof typeof PLATFORM_COLORS
                             ] || PLATFORM_COLORS.other,
                         }}
                       />
@@ -218,7 +224,10 @@ export const PlatformRevenueChart = ({
                       variant="secondary"
                       className="text-sm font-semibold"
                     >
-                      £{platform.total_revenue.toLocaleString()}
+                      £{platform.total_revenue.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </Badge>
                   </div>
                 ))}

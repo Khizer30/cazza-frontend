@@ -39,6 +39,7 @@ import type { DateRange } from "react-day-picker";
 export const ClientDashboard = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [summary, setSummary] = useState<DashboardSummaryData | null>(null);
+  const [tiktokData, setTiktokData] = useState<TikTokShopDataItem[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -62,6 +63,7 @@ export const ClientDashboard = () => {
         }
 
         if (tiktokRes.success && tiktokRes.data) {
+          setTiktokData(tiktokRes.data);
           // Transform tiktok data for the chart
           // monthYear: "October 2025" -> month: "Oct"
           const transformed = tiktokRes.data
@@ -174,7 +176,10 @@ export const ClientDashboard = () => {
                     {loading ? (
                       <div className="h-9 w-24 bg-muted animate-pulse rounded" />
                     ) : (
-                      `£${Math.round(Number(summary?.totalRevenue || 0)).toLocaleString()}`
+                      `£${Number(summary?.totalRevenue || 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`
                     )}
                   </div>
                 </div>
@@ -196,7 +201,10 @@ export const ClientDashboard = () => {
                     {loading ? (
                       <div className="h-9 w-24 bg-muted animate-pulse rounded" />
                     ) : (
-                      `£${Math.round(Number(summary?.netProfit || 0)).toLocaleString()}`
+                      `£${Number(summary?.netProfit || 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -223,20 +231,23 @@ export const ClientDashboard = () => {
                     {loading ? (
                       <div className="h-9 w-24 bg-muted animate-pulse rounded" />
                     ) : (
-                      `£${Math.round(Number(summary?.totalExpense || 0)).toLocaleString()}`
+                      `£${Number(summary?.totalExpense || 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`
                     )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
                       {summary &&
-                      summary.totalRevenue &&
-                      Number(summary.totalRevenue) > 0
+                        summary.totalRevenue &&
+                        Number(summary.totalRevenue) > 0
                         ? (
-                            (Number(summary.totalExpense) /
-                              Number(summary.totalRevenue)) *
-                            100
-                          ).toFixed(1)
-                        : 0}
+                          (Number(summary.totalExpense) /
+                            Number(summary.totalRevenue)) *
+                          100
+                        ).toFixed(2)
+                        : "0.00"}
                       % of revenue
                     </span>
                   </div>
@@ -314,11 +325,11 @@ export const ClientDashboard = () => {
                         value: number | undefined,
                         name: string | undefined
                       ) => [
-                        value !== undefined
-                          ? `£${value.toLocaleString()}`
-                          : "£0",
-                        name || "",
-                      ]}
+                          value !== undefined
+                            ? `£${value.toLocaleString()}`
+                            : "£0",
+                          name || "",
+                        ]}
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
@@ -358,7 +369,7 @@ export const ClientDashboard = () => {
         </TabsContent>
 
         <TabsContent value="profit-loss" className="space-y-6">
-          <ProfitLossStatement />
+          <ProfitLossStatement summary={summary} tiktokShopDataProp={tiktokData} isLoadingProp={loading} />
         </TabsContent>
       </Tabs>
     </div>
