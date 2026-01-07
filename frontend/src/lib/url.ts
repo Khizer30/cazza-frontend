@@ -51,4 +51,8 @@ export const END_POINT = {
     summary: "/dashboard/summary",
     detail: "/dashboard/detail",
   },
+  blog: {
+    list: "/blogs",
+    detail: (blogId: string) => `/blogs/${blogId}`,
+  },
 } as const;
