@@ -65,6 +65,7 @@ export const BlogManagement = () => {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"ALL" | "PUBLISHED" | "DRAFT">("ALL");
+  const [totalBlogs, setTotalBlogs] = useState(0);
   const { showToast } = useToast();
 
   const fetchBlogs = async (status?: "PUBLISHED" | "DRAFT") => {
@@ -73,6 +74,10 @@ export const BlogManagement = () => {
       const response = await getBlogsService(status);
       if (response.success && response.data) {
         setBlogs(response.data);
+        // Track total blogs when fetching all
+        if (!status) {
+          setTotalBlogs(response.data.length);
+        }
       }
     } catch (error) {
       console.error("Error fetching blogs:", error);
@@ -161,7 +166,7 @@ export const BlogManagement = () => {
           <div className="flex items-center justify-center min-h-[400px]">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
-        ) : blogs.length === 0 ? (
+        ) : totalBlogs === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground mb-4">No blog posts yet</p>
             <Button
@@ -170,6 +175,17 @@ export const BlogManagement = () => {
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Your First Blog
+            </Button>
+          </div>
+        ) : blogs.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground mb-4">No blogs found for the selected filter</p>
+            <Button
+              onClick={() => setStatusFilter("ALL")}
+              variant="outline"
+              className="border-border"
+            >
+              Clear Filter
             </Button>
           </div>
         ) : (
