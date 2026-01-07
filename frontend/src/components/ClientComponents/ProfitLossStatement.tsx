@@ -15,13 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
 import {
   TrendingUp,
   TrendingDown,
@@ -33,14 +26,9 @@ import {
   FileText,
   FileSpreadsheet,
 } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { type PLTableRow } from "@/constants/ProfitLssStatement";
-import {
-  getTikTokShopDataService,
-  getDashboardSummaryService,
-} from "@/services/dashboardService";
-import type { TikTokShopDataItem, DashboardSummaryData } from "@/types/auth";
+import type { DashboardDetailItem, DashboardSummaryData } from "@/types/auth";
+import type { DateRange } from "react-day-picker";
 
 // Helper function to format currency values
 const formatValue = (value: number | string): string => {
@@ -70,9 +58,9 @@ const getValueColor = (value: number | string, parameter: string): string => {
   return "";
 };
 
-// Transform TikTok Shop API data to table structure
-const transformTikTokShopData = (
-  data: TikTokShopDataItem[]
+// Transform Dashboard Detail API data to table structure
+const transformDetailData = (
+  data: DashboardDetailItem[]
 ): { columns: string[]; rows: PLTableRow[] } => {
   if (!data || data.length === 0) {
     return { columns: [], rows: [] };
@@ -85,16 +73,16 @@ const transformTikTokShopData = (
   const metrics = [
     "Orders",
     "Units Sold",
-    "Gross Revenue (£)",
-    "Commission Fee (£)",
-    "Payment Fee (£)",
-    "Service Fee (£)",
-    "Ad Spend (£)",
-    "Refunds (£)",
-    "Shipping Deduction (£)",
-    "Other Deductions (£)",
-    "Payout (£)",
-    "Net Profit (£)",
+    "Gross Revenue",
+    "Commission Fee",
+    "Payment Fee",
+    "Service Fee",
+    "Ad Spend",
+    "Refunds",
+    "Shipping Deduction",
+    "Other Deductions",
+    "Payout",
+    "Net Profit",
   ];
 
   // Create rows for each metric
@@ -104,15 +92,15 @@ const transformTikTokShopData = (
       const item = data.find((d) => d.monthYear === monthYear);
       if (item) {
         values[monthYear] =
-          Number(item[metric as keyof TikTokShopDataItem]) || 0;
+          parseFloat(item[metric as keyof DashboardDetailItem] as string) || 0;
       }
     });
 
     return {
-      parameter: metric,
+      parameter: `${metric} (£)`,
       values,
-      isBold: metric === "Net Profit (£)",
-      isHighlighted: metric === "Net Profit (£)",
+      isBold: metric === "Net Profit",
+      isHighlighted: metric === "Net Profit",
     };
   });
 
@@ -121,34 +109,20 @@ const transformTikTokShopData = (
 
 export const ProfitLossStatement = ({
   summary: externalSummary,
-  tiktokShopDataProp,
+  detailData,
   isLoadingProp,
 }: {
   summary?: DashboardSummaryData | null;
-  tiktokShopDataProp?: TikTokShopDataItem[];
+  detailData?: DashboardDetailItem[];
   isLoadingProp?: boolean;
+  dateRange?: DateRange;
+  marketplace?: string;
 }) => {
-  // API data states
-  const [loading, setLoading] = useState<boolean>(
-    isLoadingProp !== undefined ? isLoadingProp : true
-  );
-  const [error, setError] = useState<string | null>(null);
-
-  const [summary, setSummary] = useState<DashboardSummaryData | null>(
-    externalSummary || null
-  );
+  // Use props directly - parent manages the state
   const [tableColumns, setTableColumns] = useState<string[]>([]);
   const [tableRows, setTableRows] = useState<PLTableRow[]>([]);
 
-  // Filter states
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
-    from: new Date(2025, 7, 1),
-    to: new Date(),
-  });
-  const [marketplace, setMarketplace] = useState<string>("tiktok");
+  // Filter states (for future use - kept non-functional as per plan)
   const [sku, setSku] = useState<string>("all");
   const [country, setCountry] = useState<string>("all");
   const [currency, setCurrency] = useState<string>("GBP");
@@ -156,59 +130,17 @@ export const ProfitLossStatement = ({
   // State for expandable rows
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
-  // Fetch TikTok Shop data and Summary on component mount
+  // Transform data when detailData changes
   useEffect(() => {
-    // If parent is managing loading, sync with it
-    if (isLoadingProp !== undefined) {
-      setLoading(isLoadingProp);
-
-      // If parent is done loading and provided data, use it
-      if (!isLoadingProp && tiktokShopDataProp) {
-
-        const transformed = transformTikTokShopData(tiktokShopDataProp);
-        setTableColumns(transformed.columns);
-        setTableRows(transformed.rows);
-        if (externalSummary) {
-          setSummary(externalSummary);
-        }
-      }
-      return;
+    if (detailData && detailData.length > 0) {
+      const transformed = transformDetailData(detailData);
+      setTableColumns(transformed.columns);
+      setTableRows(transformed.rows);
+    } else {
+      setTableColumns([]);
+      setTableRows([]);
     }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const [tiktokRes, summaryRes] = await Promise.all([
-          getTikTokShopDataService(),
-          !externalSummary
-            ? getDashboardSummaryService()
-            : Promise.resolve(null),
-        ]);
-
-        if (tiktokRes && tiktokRes.success && tiktokRes.data) {
-
-          const transformed = transformTikTokShopData(tiktokRes.data);
-          setTableColumns(transformed.columns);
-          setTableRows(transformed.rows);
-        }
-
-        if (summaryRes && summaryRes.success) {
-          setSummary(summaryRes.data);
-        } else if (externalSummary) {
-          setSummary(externalSummary);
-        }
-      } catch (err) {
-        console.error("Error fetching P&L data:", err);
-        setError("Failed to fetch data. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [externalSummary, tiktokShopDataProp, isLoadingProp]);
+  }, [detailData]);
 
   const toggleRow = (parameter: string) => {
     setExpandedRows((prev) => {
@@ -223,10 +155,10 @@ export const ProfitLossStatement = ({
   };
 
   // Use Summary API data for main cards
-  const totalRevenue = Number(summary?.totalRevenue || 0);
-  const totalExpenses = Number(summary?.totalExpense || 0);
-  const grossProfit = Number(summary?.netProfit || 0);
-  const profitMargin = Number(summary?.profitMargin || 0);
+  const totalRevenue = Number(externalSummary?.totalRevenue || 0);
+  const totalExpenses = Number(externalSummary?.totalExpense || 0);
+  const grossProfit = Number(externalSummary?.netProfit || 0);
+  const profitMargin = Number(externalSummary?.profitMargin || 0);
 
   // Export handlers
   const handleExportCSV = () => {
@@ -241,7 +173,7 @@ export const ProfitLossStatement = ({
 
 
 
-  if (loading) {
+  if (isLoadingProp) {
     return (
       <Card>
         <CardHeader>
@@ -249,19 +181,6 @@ export const ProfitLossStatement = ({
         </CardHeader>
         <CardContent>
           <div className="h-64 bg-muted animate-pulse rounded" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Error Loading P&L Statement</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="p-4 text-destructive">{error}</div>
         </CardContent>
       </Card>
     );
@@ -275,7 +194,7 @@ export const ProfitLossStatement = ({
         </CardHeader>
         <CardContent>
           <div className="p-4 text-muted-foreground">
-            No data available. Please check your TikTok Shop connection.
+            No data available for the selected filters. Try adjusting the date range or marketplace.
           </div>
         </CardContent>
       </Card>
@@ -319,70 +238,11 @@ export const ProfitLossStatement = ({
 
       {/* Filters Section */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Filters</CardTitle>
+        <CardHeader>
+          <CardTitle className="text-base">Additional Filters</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
-            {/* Date Range Picker */}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-sm text-muted-foreground">Date Range</span>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-[240px] justify-start text-left font-normal",
-                      !dateRange && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateRange?.from ? (
-                      dateRange.to ? (
-                        <>
-                          {format(dateRange.from, "LLL dd, y")} -{" "}
-                          {format(dateRange.to, "LLL dd, y")}
-                        </>
-                      ) : (
-                        format(dateRange.from, "LLL dd, y")
-                      )
-                    ) : (
-                      <span>Pick a date range</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={dateRange?.from}
-                    selected={dateRange}
-                    onSelect={(range) =>
-                      setDateRange({ from: range?.from, to: range?.to })
-                    }
-                    numberOfMonths={2}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Marketplace Filter */}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-sm text-muted-foreground">Marketplace</span>
-              <Select value={marketplace} onValueChange={setMarketplace}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Select marketplace" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Marketplaces</SelectItem>
-                  <SelectItem value="amazon">Amazon</SelectItem>
-                  <SelectItem value="ebay">eBay</SelectItem>
-                  <SelectItem value="shopify">Shopify</SelectItem>
-                  <SelectItem value="tiktok">TikTok Shop</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* SKU Filter */}
             <div className="flex flex-col gap-1.5">
               <span className="text-sm text-muted-foreground">SKU</span>

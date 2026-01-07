@@ -481,6 +481,9 @@ export interface DELETE_CHAT_RESPONSE {
   message: string;
 }
 
+/**
+ * @deprecated Use DashboardDetailItem instead. This interface is kept for backward compatibility.
+ */
 export interface TikTokShopDataItem {
   monthYear: string;
   Orders: number;
@@ -497,10 +500,35 @@ export interface TikTokShopDataItem {
   "Net Profit (£)": number;
 }
 
+/**
+ * @deprecated Use DashboardDetailResponse instead. This interface is kept for backward compatibility.
+ */
 export interface TikTokShopResponse {
   success: boolean;
   message: string;
   data: TikTokShopDataItem[];
+}
+
+export interface DashboardDetailItem {
+  monthYear: string;
+  Orders: string;
+  "Units Sold": string;
+  "Gross Revenue": string;
+  "Commission Fee": string;
+  "Payment Fee": string;
+  "Service Fee": string;
+  "Ad Spend": string;
+  Refunds: string;
+  "Shipping Deduction": string;
+  "Other Deductions": string;
+  Payout: string;
+  "Net Profit": string;
+}
+
+export interface DashboardDetailResponse {
+  success: boolean;
+  message: string;
+  data: DashboardDetailItem[];
 }
 
 export interface DashboardSummaryData {

@@ -90,6 +90,8 @@ import { useChat } from "@/hooks/useChat";
 import { useTeam } from "@/hooks/useTeam";
 import { useUserStore } from "@/store/userStore";
 import { Loader2 } from "lucide-react";
+import { MessageFormatToolbar } from "@/components/ClientComponents/MessageFormatToolbar";
+import { MarkdownMessage } from "@/components/ClientComponents/MarkdownMessage";
 import type { ChatGroup } from "@/services/chatService";
 import type { TeamMember as TeamMemberType } from "@/types/auth";
 import {
@@ -267,9 +269,10 @@ export const Channels = () => {
   const [openReactionPopoverId, setOpenReactionPopoverId] = useState<
     string | null
   >(null);
-  const messageInputRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const previousMessageCountRef = useRef<number>(0);
+  const [showFormatToolbar, setShowFormatToolbar] = useState(false);
 
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
@@ -575,6 +578,69 @@ export const Channels = () => {
   const cancelEditMessage = () => {
     setEditingMessageId(null);
     setEditingMessageText("");
+  };
+
+  const handleFormatClick = (format: string) => {
+    const inputElement = messageInputRef.current;
+    if (!inputElement) return;
+
+    const start = inputElement.selectionStart || 0;
+    const end = inputElement.selectionEnd || 0;
+    const currentText = editingMessageId ? editingMessageText : messageInput;
+    const selectedText = currentText.substring(start, end);
+
+    let formattedText = "";
+    let cursorOffset = 0;
+
+    switch (format) {
+      case "bold":
+        formattedText = `**${selectedText}**`;
+        cursorOffset = selectedText ? 0 : -2;
+        break;
+      case "italic":
+        formattedText = `*${selectedText}*`;
+        cursorOffset = selectedText ? 0 : -1;
+        break;
+      case "underline":
+        formattedText = `__${selectedText}__`;
+        cursorOffset = selectedText ? 0 : -2;
+        break;
+      case "strikethrough":
+        formattedText = `~~${selectedText}~~`;
+        cursorOffset = selectedText ? 0 : -2;
+        break;
+      case "link":
+        formattedText = `[${selectedText || "text"}](url)`;
+        cursorOffset = selectedText ? -4 : -9;
+        break;
+      case "bulletList":
+        formattedText = `- ${selectedText}`;
+        cursorOffset = 0;
+        break;
+      case "numberedList":
+        formattedText = `1. ${selectedText}`;
+        cursorOffset = 0;
+        break;
+      default:
+        return;
+    }
+
+    const newText =
+      currentText.substring(0, start) +
+      formattedText +
+      currentText.substring(end);
+
+    if (editingMessageId) {
+      setEditingMessageText(newText);
+    } else {
+      setMessageInput(newText);
+    }
+
+    setTimeout(() => {
+      const newCursorPos = start + formattedText.length + cursorOffset;
+      inputElement.focus();
+      inputElement.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
   };
 
   const commonEmojis = ["👍", "❤️", "😂", "😮", "😢", "🎉"];
@@ -1494,9 +1560,9 @@ export const Channels = () => {
                       }}
                     >
                       <IconComponent
-                        className="h-5 w-5"
+                        className={`h-5 w-5 ${isSelected ? "text-primary-foreground" : ""}`}
                         style={{
-                          color: isSelected ? "black" : channel.color,
+                          color: isSelected ? undefined : channel.color,
                         }}
                       />
                     </div>
@@ -1678,7 +1744,7 @@ export const Channels = () => {
             </div>
 
             <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-0">
-              <div className="space-y-4 p-4">
+              <div className="space-y-4 p-4 pb-12">
                 {isLoadingMessages ? (
                   <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
                     <Loader2 className="h-8 w-8 text-muted-foreground mb-4 animate-spin" />
@@ -1762,8 +1828,11 @@ export const Channels = () => {
                                   This message was deleted
                                 </p>
                               ) : (
-                                <p className="text-sm whitespace-pre-wrap">
-                                  {message.text}
+                                <div className="text-sm">
+                                  <MarkdownMessage
+                                    content={message.text}
+                                    className="whitespace-pre-wrap break-words"
+                                  />
                                   {message.edited && (
                                     <span
                                       className={`text-xs ml-2 ${
@@ -1775,7 +1844,7 @@ export const Channels = () => {
                                       (edited)
                                     </span>
                                   )}
-                                </p>
+                                </div>
                               )}
                             </div>
                             {!message.deleted && (
@@ -1987,7 +2056,7 @@ export const Channels = () => {
               </div>
             </ScrollArea>
 
-            <div className="p-4 border-t border-border bg-card">
+            <div className="p-4 border-t border-border bg-card relative">
               {replyingToMessage && (
                 <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg">
                   <div className="flex-1 min-w-0">
@@ -2038,8 +2107,13 @@ export const Channels = () => {
                     </Button>
                   </div>
                 )}
-              <div className="flex items-center gap-2">
-                <Input
+              {showFormatToolbar && (
+                <div className="absolute bottom-full left-4 right-4 mb-2">
+                  <MessageFormatToolbar onFormatClick={handleFormatClick} />
+                </div>
+              )}
+              <div className="flex items-end gap-2">
+                <Textarea
                   ref={messageInputRef}
                   placeholder={
                     editingMessageId
@@ -2061,7 +2135,17 @@ export const Channels = () => {
                       }
                     }
                   }}
-                  onBlur={editingMessageId ? undefined : handleInputBlur}
+                  onFocus={() => setShowFormatToolbar(true)}
+                  onBlur={(e) => {
+                    setTimeout(() => {
+                      if (!e.relatedTarget?.closest(".format-toolbar")) {
+                        setShowFormatToolbar(false);
+                      }
+                      if (!editingMessageId) {
+                        handleInputBlur();
+                      }
+                    }, 200);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -2074,7 +2158,16 @@ export const Channels = () => {
                       cancelEditMessage();
                     }
                   }}
-                  className="flex-1"
+                  rows={1}
+                  className="flex-1 resize-none min-h-[40px] max-h-[200px] overflow-y-auto"
+                  style={{
+                    height: 'auto',
+                  }}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = Math.min(target.scrollHeight, 200) + 'px';
+                  }}
                 />
                 <Button
                   onClick={() => {

@@ -24,6 +24,33 @@ export function DateRangePicker({
   className,
   placeholder = "Pick a date range",
 }: DateRangePickerProps) {
+  const handleSelect = (range: DateRange | undefined) => {
+    // If range is undefined or both from and to are undefined, reset
+    if (!range || (!range.from && !range.to)) {
+      onDateRangeChange(undefined);
+      return;
+    }
+
+    // If only from is selected, set it as the start date
+    if (range.from && !range.to) {
+      onDateRangeChange({ from: range.from, to: undefined });
+      return;
+    }
+
+    // If both are selected, ensure from is before to
+    if (range.from && range.to) {
+      if (range.from > range.to) {
+        onDateRangeChange({ from: range.to, to: range.from });
+      } else {
+        onDateRangeChange(range);
+      }
+      return;
+    }
+
+    // Default case
+    onDateRangeChange(range);
+  };
+
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -44,7 +71,10 @@ export function DateRangePicker({
                   {format(dateRange.to, "LLL dd, y")}
                 </>
               ) : (
-                format(dateRange.from, "LLL dd, y")
+                <>
+                  {format(dateRange.from, "LLL dd, y")}
+                  <span className="text-muted-foreground ml-2">(Select end date)</span>
+                </>
               )
             ) : (
               <span>{placeholder}</span>
@@ -55,9 +85,9 @@ export function DateRangePicker({
           <Calendar
             initialFocus
             mode="range"
-            defaultMonth={new Date()}
+            defaultMonth={dateRange?.from || new Date()}
             selected={dateRange}
-            onSelect={onDateRangeChange}
+            onSelect={handleSelect}
             numberOfMonths={2}
             className={cn("p-3 pointer-events-auto")}
           />

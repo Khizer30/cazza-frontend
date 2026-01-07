@@ -11,10 +11,17 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   getDashboardSummaryService,
-  getTikTokShopDataService,
+  getDashboardDetailService,
 } from "@/services/dashboardService";
-import type { DashboardSummaryData, TikTokShopDataItem } from "@/types/auth";
+import type { DashboardSummaryData, DashboardDetailItem } from "@/types/auth";
 import {
   BarChart3,
   Calendar,
@@ -38,56 +45,86 @@ import type { DateRange } from "react-day-picker";
 
 export const ClientDashboard = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [marketplace, setMarketplace] = useState<string>("all");
   const [summary, setSummary] = useState<DashboardSummaryData | null>(null);
-  const [tiktokData, setTiktokData] = useState<TikTokShopDataItem[]>([]);
+  const [detailData, setDetailData] = useState<DashboardDetailItem[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper function to format date for API (YYYY-MM-DD)
+  const formatDateForAPI = (date: Date | undefined): string | undefined => {
+    if (!date) return undefined;
+    return date.toISOString().split('T')[0];
+  };
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      // Calculate default date range (last 6 months)
+      const defaultToDate = new Date();
+      const defaultFromDate = new Date();
+      defaultFromDate.setMonth(defaultFromDate.getMonth() - 6);
+
+      // Use selected dates or defaults
+      const fromDate = formatDateForAPI(dateRange?.from || defaultFromDate);
+      const toDate = formatDateForAPI(dateRange?.to || defaultToDate);
+
+      // Fetch summary and detail data in parallel
+      const [summaryRes, detailRes] = await Promise.all([
+        getDashboardSummaryService(fromDate, toDate),
+        getDashboardDetailService(fromDate, toDate, marketplace),
+      ]);
+
+      if (summaryRes.success && summaryRes.data) {
+        setSummary(summaryRes.data);
+      }
+
+      if (detailRes.success && detailRes.data) {
+        setDetailData(detailRes.data);
+        // Transform detail data for the chart
+        const transformed = detailRes.data
+          .map((item: DashboardDetailItem) => {
+            const [monthStr] = item.monthYear.split(" ");
+            const revenue = parseFloat(item["Gross Revenue"]);
+            const expenses =
+              parseFloat(item["Commission Fee"]) +
+              parseFloat(item["Payment Fee"]) +
+              parseFloat(item["Service Fee"]) +
+              parseFloat(item["Ad Spend"]) +
+              parseFloat(item.Refunds) +
+              parseFloat(item["Shipping Deduction"]) +
+              parseFloat(item["Other Deductions"]);
+            return {
+              month: monthStr.slice(0, 3),
+              revenue: revenue,
+              expenses: expenses,
+            };
+          })
+          .reverse(); // Show oldest to newest
+        setChartData(transformed);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initialize default date range on mount
   useEffect(() => {
     const today = new Date();
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(today.getMonth() - 6);
     setDateRange({ from: sixMonthsAgo, to: today });
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Fetch summary and chart data in parallel
-        const [summaryRes, tiktokRes] = await Promise.all([
-          getDashboardSummaryService(),
-          getTikTokShopDataService(),
-        ]);
-
-        if (summaryRes.success && summaryRes.data) {
-          setSummary(summaryRes.data);
-        }
-
-        if (tiktokRes.success && tiktokRes.data) {
-          setTiktokData(tiktokRes.data);
-          // Transform tiktok data for the chart
-          // monthYear: "October 2025" -> month: "Oct"
-          const transformed = tiktokRes.data
-            .map((item: TikTokShopDataItem) => {
-              const [monthStr] = item.monthYear.split(" ");
-              const revenue = Number(item["Gross Revenue (£)"]);
-              const profit = Number(item["Net Profit (£)"]);
-              return {
-                month: monthStr.slice(0, 3),
-                revenue: revenue,
-                expenses: revenue - profit,
-              };
-            })
-            .reverse(); // Show oldest to newest
-          setChartData(transformed);
-        }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
   }, []);
+
+  // Fetch data when date range or marketplace changes
+  useEffect(() => {
+    if (dateRange) {
+      fetchData();
+    }
+  }, [dateRange, marketplace]);
 
   const handleReset = () => {
     const today = new Date();
@@ -121,6 +158,18 @@ export const ClientDashboard = () => {
               onDateRangeChange={setDateRange}
               placeholder="Select date range for insights"
             />
+            <Select value={marketplace} onValueChange={setMarketplace}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Select marketplace" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Marketplaces</SelectItem>
+                <SelectItem value="tiktok">TikTok</SelectItem>
+                <SelectItem value="shopify">Shopify</SelectItem>
+                <SelectItem value="amazon">Amazon</SelectItem>
+                <SelectItem value="ebay">eBay</SelectItem>
+              </SelectContent>
+            </Select>
             <Button
               variant="outline"
               onClick={handleReset}
@@ -136,6 +185,9 @@ export const ClientDashboard = () => {
                 <strong>Selected Period:</strong>{" "}
                 {dateRange.from?.toLocaleDateString()} to{" "}
                 {dateRange.to?.toLocaleDateString()}
+                {" • "}
+                <strong>Marketplace:</strong>{" "}
+                {marketplace === "all" ? "All Marketplaces" : marketplace.charAt(0).toUpperCase() + marketplace.slice(1)}
               </p>
             </div>
           )}
@@ -369,7 +421,11 @@ export const ClientDashboard = () => {
         </TabsContent>
 
         <TabsContent value="profit-loss" className="space-y-6">
-          <ProfitLossStatement summary={summary} tiktokShopDataProp={tiktokData} isLoadingProp={loading} />
+          <ProfitLossStatement
+            summary={summary}
+            detailData={detailData}
+            isLoadingProp={loading}
+          />
         </TabsContent>
       </Tabs>
     </div>

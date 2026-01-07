@@ -43,11 +43,16 @@ interface FormErrors {
 const steps = ["Business Info", "Online Marketplaces", "Tools & Tech Stack"];
 
 const availableTools = [
-  "QuickBooks",
+  "Klarna",
+  "Square",
   "Stripe",
+  "Worldpay",
+  "Braintree",
+  "Amazon Pay",
+  "Shopify Payments",
+  "Clearpay",
   "PayPal",
-  "Sage",
-  "FreeAgent",
+  "GoCardless",
   "Other",
 ];
 
