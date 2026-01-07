@@ -580,12 +580,16 @@ export const AccountSettings = () => {
                   </Label>
                   <div className="grid grid-cols-2 gap-3 mt-3">
                     {[
-                      "Stripe",
-                      "PayPal",
-                      "Square",
                       "Klarna",
-                      "Wise",
-                      "Revolut",
+                      "Square",
+                      "Stripe",
+                      "Worldpay",
+                      "Braintree",
+                      "Amazon Pay",
+                      "Shopify Payments",
+                      "Clearpay",
+                      "PayPal",
+                      "GoCardless",
                       "Other",
                     ].map((integration: string) => (
                       <div
