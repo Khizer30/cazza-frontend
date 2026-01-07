@@ -5,7 +5,6 @@ import {
   Strikethrough,
   Link as LinkIcon,
   List,
-  ListOrdered,
   Bold,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,7 +25,6 @@ export const MessageFormatToolbar = ({
     { icon: Strikethrough, format: "strikethrough", label: "Strikethrough" },
     { icon: LinkIcon, format: "link", label: "Link" },
     { icon: List, format: "bulletList", label: "Bullet List" },
-    { icon: ListOrdered, format: "numberedList", label: "Numbered List" },
   ];
 
   return (
