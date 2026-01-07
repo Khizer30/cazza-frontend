@@ -15,7 +15,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useRef, useEffect } from "react";
 import { createBlogService, getBlogDetailService, updateBlogService } from "@/services/blogService";
-import type { CreateBlogPayload, UpdateBlogPayload } from "@/types/auth";
 import { useToast } from "@/components/ToastProvider";
 import { BlogFormatToolbar } from "@/components/ClientComponents/BlogFormatToolbar";
 import { Calendar } from "@/components/ui/calendar";
