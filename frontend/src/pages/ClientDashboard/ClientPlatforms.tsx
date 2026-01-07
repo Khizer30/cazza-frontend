@@ -15,7 +15,6 @@ import {
   faAmazon,
   faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
-import { faMixer } from "@fortawesome/free-brands-svg-icons";
 import { useState } from "react";
 
 const analyticsData = [
@@ -47,7 +46,7 @@ const analyticsData = [
     id: "xero",
     name: "Xero",
     type: "accounting",
-    icon: faMixer,
+    imageUrl: "/xero-logo.svg",
     description: "Sync accounting data and financial reports",
     color: "#13B5EA",
   },
@@ -145,11 +144,19 @@ export const ClientPlatforms = () => {
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                        <FontAwesomeIcon
-                          icon={platform.icon}
-                          className="h-5 w-5"
-                          style={{ color: platform.color }}
-                        />
+                        {platform.imageUrl ? (
+                          <img
+                            src={platform.imageUrl}
+                            alt={`${platform.name} logo`}
+                            className="h-8 w-8 object-contain"
+                          />
+                        ) : (
+                          <FontAwesomeIcon
+                            icon={platform.icon}
+                            className="h-5 w-5"
+                            style={{ color: platform.color }}
+                          />
+                        )}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -196,11 +203,19 @@ export const ClientPlatforms = () => {
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                        <FontAwesomeIcon
-                          icon={platform.icon}
-                          className="h-5 w-5"
-                          style={{ color: platform.color }}
-                        />
+                        {platform.imageUrl ? (
+                          <img
+                            src={platform.imageUrl}
+                            alt={`${platform.name} logo`}
+                            className="h-8 w-8 object-contain"
+                          />
+                        ) : (
+                          <FontAwesomeIcon
+                            icon={platform.icon}
+                            className="h-5 w-5"
+                            style={{ color: platform.color }}
+                          />
+                        )}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
