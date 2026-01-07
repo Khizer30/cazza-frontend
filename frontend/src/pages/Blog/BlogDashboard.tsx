@@ -40,7 +40,7 @@ export const BlogDashboard = () => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const response = await getBlogsService();
+        const response = await getBlogsService("PUBLISHED");
         if (response.success && response.data) {
           setBlogs(response.data);
         }

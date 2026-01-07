@@ -54,5 +54,8 @@ export const END_POINT = {
   blog: {
     list: "/blogs",
     detail: (blogId: string) => `/blogs/${blogId}`,
+    create: "/blogs",
+    update: (blogId: string) => `/blogs/${blogId}`,
+    delete: (blogId: string) => `/blogs/${blogId}`,
   },
 } as const;

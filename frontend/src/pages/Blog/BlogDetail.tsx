@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { getBlogDetailService } from "@/services/blogService";
 import type { BlogDetail as BlogDetailType } from "@/types/auth";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 
 const getAuthorInitials = (name: string) => {
@@ -38,6 +39,10 @@ export const BlogDetail = () => {
   const [blog, setBlog] = useState<BlogDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   useEffect(() => {
     const fetchBlogDetail = async () => {
@@ -91,9 +96,9 @@ export const BlogDetail = () => {
           <p className="text-muted-foreground">
             The blog post you're looking for doesn't exist.
           </p>
-          <Button onClick={() => navigate("/blog")}>
+          <Button onClick={handleBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Blog
+            Back to Blogs
           </Button>
         </div>
       </div>
@@ -106,10 +111,10 @@ export const BlogDetail = () => {
         <Button
           variant="ghost"
           className="mb-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 -ml-4"
-          onClick={() => navigate("/blog")}
+          onClick={handleBack}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Blog
+          Back to Blogs
         </Button>
 
         <article className="space-y-8">
@@ -147,55 +152,8 @@ export const BlogDetail = () => {
 
           <div className="border-t border-border pt-8" />
 
-          <div className="prose prose-invert max-w-none">
-            <ReactMarkdown
-              components={{
-                h1: ({ children }) => (
-                  <h1 className="text-3xl font-bold text-foreground mb-4">{children}</h1>
-                ),
-                h2: ({ children }) => (
-                  <h2 className="text-2xl font-bold text-foreground mb-3 mt-8">{children}</h2>
-                ),
-                h3: ({ children }) => (
-                  <h3 className="text-xl font-bold text-foreground mb-2 mt-6">{children}</h3>
-                ),
-                p: ({ children }) => (
-                  <p className="text-foreground/90 leading-relaxed mb-4">{children}</p>
-                ),
-                strong: ({ children }) => (
-                  <strong className="font-bold text-foreground">{children}</strong>
-                ),
-                ul: ({ children }) => (
-                  <ul className="list-disc ml-6 mb-4 space-y-2">{children}</ul>
-                ),
-                ol: ({ children }) => (
-                  <ol className="list-decimal ml-6 mb-4 space-y-2">{children}</ol>
-                ),
-                li: ({ children }) => (
-                  <li className="text-foreground/90">{children}</li>
-                ),
-                a: ({ children, href }) => (
-                  <a
-                    href={href}
-                    className="text-primary hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {children}
-                  </a>
-                ),
-                code: ({ children }) => (
-                  <code className="bg-muted px-2 py-1 rounded text-sm text-foreground">
-                    {children}
-                  </code>
-                ),
-                pre: ({ children }) => (
-                  <pre className="bg-card border border-border rounded-lg p-4 overflow-x-auto mb-4">
-                    {children}
-                  </pre>
-                ),
-              }}
-            >
+          <div className="prose prose-invert max-w-none text-foreground/90 leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {blog.body}
             </ReactMarkdown>
           </div>

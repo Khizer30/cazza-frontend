@@ -591,3 +591,38 @@ export interface BlogDetailResponse {
   message: string;
   data: BlogDetail;
 }
+
+export interface CreateBlogPayload {
+  title: string;
+  summary: string;
+  date: string;
+  body: string;
+  status: "DRAFT" | "PUBLISHED";
+  authorName: string;
+}
+
+export interface CreateBlogResponse {
+  success: boolean;
+  message: string;
+  data?: Blog;
+}
+
+export interface UpdateBlogPayload {
+  title: string;
+  summary: string;
+  date: string;
+  body: string;
+  status: "DRAFT" | "PUBLISHED";
+  authorName: string;
+}
+
+export interface UpdateBlogResponse {
+  success: boolean;
+  message: string;
+  data?: Blog;
+}
+
+export interface DeleteBlogResponse {
+  success: boolean;
+  message: string;
+}
