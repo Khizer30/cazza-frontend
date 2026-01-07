@@ -51,10 +51,12 @@ export const ClientDashboard = () => {
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Helper function to format date for API (YYYY-MM-DD)
   const formatDateForAPI = (date: Date | undefined): string | undefined => {
     if (!date) return undefined;
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const fetchData = async () => {
@@ -72,7 +74,7 @@ export const ClientDashboard = () => {
 
       // Fetch summary and detail data in parallel
       const [summaryRes, detailRes] = await Promise.all([
-        getDashboardSummaryService(fromDate, toDate),
+        getDashboardSummaryService(fromDate, toDate, marketplace),
         getDashboardDetailService(fromDate, toDate, marketplace),
       ]);
 
@@ -164,10 +166,11 @@ export const ClientDashboard = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Marketplaces</SelectItem>
-                <SelectItem value="tiktok">TikTok</SelectItem>
-                <SelectItem value="shopify">Shopify</SelectItem>
-                <SelectItem value="amazon">Amazon</SelectItem>
-                <SelectItem value="ebay">eBay</SelectItem>
+                {summary?.connectedPlatforms?.map((platform) => (
+                  <SelectItem key={platform} value={platform.toLowerCase()}>
+                    {platform}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Button

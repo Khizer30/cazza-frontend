@@ -7,15 +7,15 @@ import type {
 
 export const getDashboardSummaryService = (
   fromDate?: string,
-  toDate?: string
+  toDate?: string,
+  marketplace: string = "all"
 ) => {
   const params = new URLSearchParams();
   if (fromDate) params.append("fromDate", fromDate);
   if (toDate) params.append("toDate", toDate);
+  if (marketplace) params.append("marketplace", marketplace);
 
-  const url = params.toString()
-    ? `${END_POINT.dashboard.summary}?${params.toString()}`
-    : END_POINT.dashboard.summary;
+  const url = `${END_POINT.dashboard.summary}?${params.toString()}`;
 
   return apiInvoker<DashboardSummaryResponse>(url, "GET");
 };
@@ -28,7 +28,7 @@ export const getDashboardDetailService = (
   const params = new URLSearchParams();
   if (fromDate) params.append("fromDate", fromDate);
   if (toDate) params.append("toDate", toDate);
-  params.append("marketplace", marketplace);
+  if (marketplace) params.append("marketplace", marketplace);
 
   const url = `${END_POINT.dashboard.detail}?${params.toString()}`;
 
