@@ -51,4 +51,11 @@ export const END_POINT = {
     summary: "/dashboard/summary",
     detail: "/dashboard/detail",
   },
+  blog: {
+    list: "/blogs",
+    detail: (blogId: string) => `/blogs/${blogId}`,
+    create: "/blogs",
+    update: (blogId: string) => `/blogs/${blogId}`,
+    delete: (blogId: string) => `/blogs/${blogId}`,
+  },
 } as const;

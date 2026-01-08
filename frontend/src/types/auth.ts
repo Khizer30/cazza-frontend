@@ -550,3 +550,79 @@ export interface DashboardSummaryResponse {
   message: string;
   data: DashboardSummaryData;
 }
+
+export interface Blog {
+  id: string;
+  title: string;
+  summary: string;
+  status: "PUBLISHED" | "DRAFT";
+  authorName: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+}
+
+export interface BlogDetail extends Blog {
+  date: string;
+  body: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
+
+export interface BlogListResponse {
+  success: boolean;
+  message: string;
+  data: Blog[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+  };
+}
+
+export interface BlogDetailResponse {
+  success: boolean;
+  message: string;
+  data: BlogDetail;
+}
+
+export interface CreateBlogPayload {
+  title: string;
+  summary: string;
+  date: string;
+  body: string;
+  status: "DRAFT" | "PUBLISHED";
+  authorName: string;
+}
+
+export interface CreateBlogResponse {
+  success: boolean;
+  message: string;
+  data?: Blog;
+}
+
+export interface UpdateBlogPayload {
+  title: string;
+  summary: string;
+  date: string;
+  body: string;
+  status: "DRAFT" | "PUBLISHED";
+  authorName: string;
+}
+
+export interface UpdateBlogResponse {
+  success: boolean;
+  message: string;
+  data?: Blog;
+}
+
+export interface DeleteBlogResponse {
+  success: boolean;
+  message: string;
+}

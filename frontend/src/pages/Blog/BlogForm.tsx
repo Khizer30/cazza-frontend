@@ -10,92 +10,84 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Trash2, Save, Image } from "lucide-react";
+import { ArrowLeft, Save, Image, Loader2, CalendarIcon, Eye, Edit3 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState, useEffect } from "react";
-
-interface BlogSection {
-  id: string;
-  heading: string;
-  body: string;
-  image: string;
-}
+import { useState, useRef, useEffect } from "react";
+import { createBlogService, getBlogDetailService, updateBlogService } from "@/services/blogService";
+import { useToast } from "@/components/ToastProvider";
+import { BlogFormatToolbar } from "@/components/ClientComponents/BlogFormatToolbar";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface BlogFormData {
   title: string;
-  excerpt: string;
-  status: "published" | "draft";
+  summary: string;
+  date: Date | undefined;
+  body: string;
+  status: "DRAFT" | "PUBLISHED";
   authorName: string;
-  authorHandle: string;
-  sections: BlogSection[];
+  image: string;
 }
-
-const existingBlogs: Record<string, BlogFormData> = {
-  "cazza-ai-launch": {
-    title: "Cazza AI Launch",
-    excerpt:
-      "Cazza AI is now available. Connect your Amazon, TikTok Shop, Shopify & Xero accounts securely and get instant financial insights powered by OpenAI.",
-    status: "published",
-    authorName: "James Wilson",
-    authorHandle: "@jameswilson",
-    sections: [
-      {
-        id: "1",
-        heading: "",
-        body: "Cazza AI focuses on providing instant financial insights for e-commerce sellers, with seamless integration to major platforms and accounting software.",
-        image: "",
-      },
-      {
-        id: "2",
-        heading: "Multi-Platform Integration",
-        body: "Cazza seamlessly connects to Amazon Seller Central, TikTok Shop, Shopify, and Xero. All connections use official APIs with bank-level encryption.",
-        image: "/after.png",
-      },
-    ],
-  },
-  "ecommerce-accounting-tips": {
-    title: "E-commerce Accounting Tips: December 2025",
-    excerpt:
-      "Essential accounting practices for e-commerce sellers. Learn how to streamline your bookkeeping and prepare for tax season with confidence.",
-    status: "published",
-    authorName: "Emma Roberts",
-    authorHandle: "@emmaroberts",
-    sections: [
-      {
-        id: "1",
-        heading: "Keep Your Records Organized",
-        body: "Maintain separate records for each sales platform. This makes reconciliation easier and ensures you can track performance across channels.",
-        image: "",
-      },
-    ],
-  },
-};
 
 export const BlogForm = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditing = Boolean(id);
+  const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
-    excerpt: "",
-    status: "draft",
+    summary: "",
+    date: undefined,
+    body: "",
+    status: "DRAFT",
     authorName: "",
-    authorHandle: "",
-    sections: [
-      {
-        id: crypto.randomUUID(),
-        heading: "",
-        body: "",
-        image: "",
-      },
-    ],
+    image: "",
   });
+  const [fetchingBlog, setFetchingBlog] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (id && existingBlogs[id]) {
-      setFormData(existingBlogs[id]);
+    if (id) {
+      const fetchBlogData = async () => {
+        try {
+          setFetchingBlog(true);
+          const response = await getBlogDetailService(id);
+          if (response.success && response.data) {
+            const blog = response.data;
+            setFormData({
+              title: blog.title,
+              summary: blog.summary,
+              date: new Date(blog.date),
+              body: blog.body,
+              status: blog.status,
+              authorName: blog.authorName,
+              image: "",
+            });
+          } else {
+            showToast("Failed to load blog data", "error");
+          }
+        } catch (error) {
+          console.error("Error fetching blog:", error);
+          showToast("Failed to load blog data", "error");
+        } finally {
+          setFetchingBlog(false);
+        }
+      };
+
+      fetchBlogData();
     }
   }, [id]);
 
@@ -103,53 +95,147 @@ export const BlogForm = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSectionChange = (
-    sectionId: string,
-    field: keyof BlogSection,
-    value: string
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      sections: prev.sections.map((section) =>
-        section.id === sectionId ? { ...section, [field]: value } : section
-      ),
-    }));
+  const handleFormatClick = (format: string) => {
+    const inputElement = bodyTextareaRef.current;
+    if (!inputElement) return;
+
+    const start = inputElement.selectionStart;
+    const end = inputElement.selectionEnd;
+    const selectedText = formData.body.substring(start, end);
+    const currentText = formData.body;
+
+    let formattedText = "";
+    let cursorOffset = 0;
+
+    switch (format) {
+      case "bold":
+        formattedText = `**${selectedText}**`;
+        cursorOffset = selectedText ? 0 : -2;
+        break;
+      case "italic":
+        formattedText = `*${selectedText}*`;
+        cursorOffset = selectedText ? 0 : -1;
+        break;
+      case "underline":
+        formattedText = `__${selectedText}__`;
+        cursorOffset = selectedText ? 0 : -2;
+        break;
+      case "strikethrough":
+        formattedText = `~~${selectedText}~~`;
+        cursorOffset = selectedText ? 0 : -2;
+        break;
+      case "link":
+        formattedText = `[${selectedText || "text"}](url)`;
+        cursorOffset = selectedText ? -4 : -9;
+        break;
+      case "bulletList":
+        formattedText = `- ${selectedText}`;
+        cursorOffset = 0;
+        break;
+      case "heading1":
+        formattedText = `# ${selectedText}`;
+        cursorOffset = 0;
+        break;
+      case "heading2":
+        formattedText = `## ${selectedText}`;
+        cursorOffset = 0;
+        break;
+      case "heading3":
+        formattedText = `### ${selectedText}`;
+        cursorOffset = 0;
+        break;
+      case "code":
+        formattedText = `\`${selectedText}\``;
+        cursorOffset = selectedText ? 0 : -1;
+        break;
+      case "codeBlock":
+        formattedText = `\`\`\`\n${selectedText}\n\`\`\``;
+        cursorOffset = selectedText ? 0 : -4;
+        break;
+      case "quote":
+        formattedText = `> ${selectedText}`;
+        cursorOffset = 0;
+        break;
+      default:
+        return;
+    }
+
+    const newText =
+      currentText.substring(0, start) +
+      formattedText +
+      currentText.substring(end);
+
+    setFormData((prev) => ({ ...prev, body: newText }));
+
+    setTimeout(() => {
+      const newCursorPos = start + formattedText.length + cursorOffset;
+      inputElement.focus();
+      inputElement.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
   };
 
-  const addSection = () => {
-    setFormData((prev) => ({
-      ...prev,
-      sections: [
-        ...prev.sections,
-        {
-          id: crypto.randomUUID(),
-          heading: "",
-          body: "",
-          image: "",
-        },
-      ],
-    }));
-  };
-
-  const removeSection = (sectionId: string) => {
-    if (formData.sections.length === 1) return;
-    setFormData((prev) => ({
-      ...prev,
-      sections: prev.sections.filter((section) => section.id !== sectionId),
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting blog:", formData);
-    navigate("/manage-blogs");
+
+    if (!formData.date) {
+      showToast("Please select a date", "error");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        title: formData.title,
+        summary: formData.summary,
+        date: format(formData.date, "yyyy-MM-dd"),
+        body: formData.body,
+        status: formData.status,
+        authorName: formData.authorName,
+      };
+
+      const response = isEditing
+        ? await updateBlogService(id!, payload)
+        : await createBlogService(payload);
+
+      if (response.success) {
+        showToast(
+          isEditing
+            ? "Blog updated successfully"
+            : formData.status === "PUBLISHED"
+            ? "Blog published successfully"
+            : "Blog saved successfully",
+          "success"
+        );
+        navigate("/manage-blogs");
+      } else {
+        showToast(
+          response.message ||
+            (isEditing ? "Failed to update blog" : "Failed to create blog"),
+          "error"
+        );
+      }
+    } catch (error) {
+      console.error(isEditing ? "Error updating blog:" : "Error creating blog:", error);
+      showToast(
+        isEditing
+          ? "Failed to update blog. Please try again."
+          : "Failed to create blog. Please try again.",
+        "error"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSaveDraft = () => {
-    setFormData((prev) => ({ ...prev, status: "draft" }));
-    console.log("Saving as draft:", { ...formData, status: "draft" });
-    navigate("/manage-blogs");
-  };
+
+  if (fetchingBlog) {
+    return (
+      <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <ScrollArea className="h-[calc(100vh-4rem)]">
@@ -192,12 +278,12 @@ export const BlogForm = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="excerpt">Excerpt / Summary</Label>
+                <Label htmlFor="summary">Summary</Label>
                 <Textarea
-                  id="excerpt"
+                  id="summary"
                   placeholder="Brief summary of the blog post"
-                  value={formData.excerpt}
-                  onChange={(e) => handleInputChange("excerpt", e.target.value)}
+                  value={formData.summary}
+                  onChange={(e) => handleInputChange("summary", e.target.value)}
                   rows={3}
                   required
                 />
@@ -218,15 +304,36 @@ export const BlogForm = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="authorHandle">Author Handle</Label>
-                  <Input
-                    id="authorHandle"
-                    placeholder="@username"
-                    value={formData.authorHandle}
-                    onChange={(e) =>
-                      handleInputChange("authorHandle", e.target.value)
-                    }
-                  />
+                  <Label htmlFor="date">Date</Label>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !formData.date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {formData.date ? (
+                          format(formData.date, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.date}
+                        onSelect={(date) => {
+                          setFormData((prev) => ({ ...prev, date }));
+                          setIsCalendarOpen(false);
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
 
@@ -234,7 +341,7 @@ export const BlogForm = () => {
                 <Label htmlFor="status">Status</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value: "published" | "draft") =>
+                  onValueChange={(value: "PUBLISHED" | "DRAFT") =>
                     handleInputChange("status", value)
                   }
                 >
@@ -242,8 +349,8 @@ export const BlogForm = () => {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="DRAFT">Draft</SelectItem>
+                    <SelectItem value="PUBLISHED">Published</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -251,126 +358,109 @@ export const BlogForm = () => {
           </Card>
 
           <Card className="border border-border">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Content Sections</CardTitle>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addSection}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Section
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {formData.sections.map((section, index) => (
-                <div
-                  key={section.id}
-                  className="p-4 border border-border rounded-lg space-y-4 bg-muted/20"
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-lg">Content</CardTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant={!isPreviewMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsPreviewMode(false)}
+                  className="flex items-center gap-2"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Section {index + 1}
-                    </span>
-                    {formData.sections.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeSection(section.id)}
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Section Heading (optional)</Label>
-                    <Input
-                      placeholder="Enter section heading"
-                      value={section.heading}
-                      onChange={(e) =>
-                        handleSectionChange(
-                          section.id,
-                          "heading",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Content</Label>
-                    <Textarea
-                      placeholder="Write your content here..."
-                      value={section.body}
-                      onChange={(e) =>
-                        handleSectionChange(section.id, "body", e.target.value)
-                      }
-                      rows={5}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Image URL (optional)</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Enter image URL"
-                        value={section.image}
-                        onChange={(e) =>
-                          handleSectionChange(
-                            section.id,
-                            "image",
-                            e.target.value
-                          )
-                        }
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="shrink-0"
-                      >
-                        <Image className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    {section.image && (
-                      <div className="mt-2 rounded-lg overflow-hidden border border-border">
-                        <img
-                          src={section.image}
-                          alt="Preview"
-                          className="w-full h-32 object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display =
-                              "none";
-                          }}
-                        />
+                  <Edit3 className="w-4 h-4" />
+                  Edit
+                </Button>
+                <Button
+                  type="button"
+                  variant={isPreviewMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsPreviewMode(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Eye className="w-4 h-4" />
+                  Preview
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="body">Blog Body</Label>
+                {!isPreviewMode && (
+                  <BlogFormatToolbar
+                    onFormatClick={handleFormatClick}
+                    className="mb-2"
+                  />
+                )}
+                {!isPreviewMode ? (
+                  <Textarea
+                    ref={bodyTextareaRef}
+                    id="body"
+                    placeholder="Write your blog content here..."
+                    value={formData.body}
+                    onChange={(e) => handleInputChange("body", e.target.value)}
+                    rows={15}
+                    className="resize-y min-h-[300px]"
+                    required
+                  />
+                ) : (
+                  <div className="border border-border rounded-md p-4 min-h-[300px] bg-background">
+                    {formData.body ? (
+                      <div className="prose prose-invert max-w-none text-foreground/90">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {formData.body}
+                        </ReactMarkdown>
                       </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center py-8">
+                        No content to preview. Start writing to see the preview.
+                      </p>
                     )}
                   </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="image">Featured Image</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="image"
+                    placeholder="Upload image"
+                    value={formData.image}
+                    onChange={(e) => handleInputChange("image", e.target.value)}
+                    disabled
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0"
+                    disabled
+                  >
+                    <Image className="w-4 h-4" />
+                  </Button>
                 </div>
-              ))}
+              </div>
             </CardContent>
           </Card>
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleSaveDraft}
-              className="flex-1 sm:flex-none"
-            >
-              Save as Draft
-            </Button>
+          <div className="flex justify-start pt-4">
             <Button
               type="submit"
-              className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90"
+              disabled={loading}
             >
-              <Save className="w-4 h-4 mr-2" />
-              {isEditing ? "Update Blog" : "Publish Blog"}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {formData.status === "PUBLISHED" ? "Publishing..." : "Saving..."}
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  {isEditing ? "Update Blog" : formData.status === "PUBLISHED" ? "Publish Blog" : "Upload Blog"}
+                </>
+              )}
             </Button>
           </div>
         </form>
