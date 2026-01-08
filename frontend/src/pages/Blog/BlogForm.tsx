@@ -10,11 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save, Image, Loader2, CalendarIcon, Eye, Edit3 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, CalendarIcon, Eye, Edit3, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useRef, useEffect } from "react";
-import { createBlogService, getBlogDetailService, updateBlogService } from "@/services/blogService";
+import { createBlogService, getBlogDetailService, updateBlogService, deleteBlogImageService } from "@/services/blogService";
 import { useToast } from "@/components/ToastProvider";
 import { BlogFormatToolbar } from "@/components/ClientComponents/BlogFormatToolbar";
 import { Calendar } from "@/components/ui/calendar";
@@ -23,6 +23,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
@@ -35,7 +45,6 @@ interface BlogFormData {
   body: string;
   status: "DRAFT" | "PUBLISHED";
   authorName: string;
-  image: string;
 }
 
 export const BlogForm = () => {
@@ -52,12 +61,22 @@ export const BlogForm = () => {
     body: "",
     status: "DRAFT",
     authorName: "",
-    image: "",
   });
+  const [blogImage, setBlogImage] = useState<File | null>(null);
+  const [blogImagePreview, setBlogImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<File[]>([]);
+  const [imagesPreview, setImagesPreview] = useState<string[]>([]);
+  const [existingBlogImage, setExistingBlogImage] = useState<string | null>(null);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [fetchingBlog, setFetchingBlog] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [deletingImage, setDeletingImage] = useState(false);
+  const [deleteBlogImageDialog, setDeleteBlogImageDialog] = useState(false);
+  const [deleteContentImageDialog, setDeleteContentImageDialog] = useState<string | null>(null);
   const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const blogImageInputRef = useRef<HTMLInputElement>(null);
+  const imagesInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (id) {
@@ -74,8 +93,13 @@ export const BlogForm = () => {
               body: blog.body,
               status: blog.status,
               authorName: blog.authorName,
-              image: "",
             });
+            if (blog.blogImage) {
+              setExistingBlogImage(blog.blogImage);
+            }
+            if (blog.images && blog.images.length > 0) {
+              setExistingImages(blog.images);
+            }
           } else {
             showToast("Failed to load blog data", "error");
           }
@@ -91,8 +115,124 @@ export const BlogForm = () => {
     }
   }, [id]);
 
+  useEffect(() => {
+    return () => {
+      if (blogImagePreview) {
+        URL.revokeObjectURL(blogImagePreview);
+      }
+      imagesPreview.forEach((preview) => {
+        URL.revokeObjectURL(preview);
+      });
+    };
+  }, [blogImagePreview, imagesPreview]);
+
   const handleInputChange = (field: keyof BlogFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleBlogImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showToast("Please select an image file", "error");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("Image size should be less than 10MB", "error");
+      return;
+    }
+
+    setBlogImage(file);
+    const url = URL.createObjectURL(file);
+    setBlogImagePreview(url);
+  };
+
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const validFiles = files.filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        showToast(`${file.name} is not an image file`, "error");
+        return false;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        showToast(`${file.name} size should be less than 10MB`, "error");
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length === 0) return;
+
+    setImages((prev) => [...prev, ...validFiles]);
+    const previews = validFiles.map((file) => URL.createObjectURL(file));
+    setImagesPreview((prev) => [...prev, ...previews]);
+  };
+
+  const handleRemoveBlogImage = () => {
+    if (blogImagePreview) {
+      URL.revokeObjectURL(blogImagePreview);
+    }
+    setBlogImage(null);
+    setBlogImagePreview(null);
+    if (blogImageInputRef.current) {
+      blogImageInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const newImages = [...images];
+    const newPreviews = [...imagesPreview];
+    URL.revokeObjectURL(newPreviews[index]);
+    newImages.splice(index, 1);
+    newPreviews.splice(index, 1);
+    setImages(newImages);
+    setImagesPreview(newPreviews);
+  };
+
+  const handleRemoveExistingImage = async (imageUrl: string) => {
+    if (!id) return;
+
+    try {
+      setDeletingImage(true);
+      const response = await deleteBlogImageService(id, imageUrl);
+      if (response.success) {
+        setExistingImages((prev) => prev.filter((url) => url !== imageUrl));
+        showToast("Image deleted successfully", "success");
+      } else {
+        showToast(response.message || "Failed to delete image", "error");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      showToast("Failed to delete image. Please try again.", "error");
+    } finally {
+      setDeletingImage(false);
+      setDeleteContentImageDialog(null);
+    }
+  };
+
+  const handleRemoveExistingBlogImage = async () => {
+    if (!id || !existingBlogImage) return;
+
+    try {
+      setDeletingImage(true);
+      const response = await deleteBlogImageService(id, existingBlogImage);
+      if (response.success) {
+        setExistingBlogImage(null);
+        showToast("Blog image deleted successfully", "success");
+      } else {
+        showToast(response.message || "Failed to delete image", "error");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      showToast("Failed to delete image. Please try again.", "error");
+    } finally {
+      setDeletingImage(false);
+      setDeleteBlogImageDialog(false);
+    }
   };
 
   const handleFormatClick = (format: string) => {
@@ -177,21 +317,60 @@ export const BlogForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.title.trim()) {
+      showToast("Please enter a title", "error");
+      return;
+    }
+
+    if (!formData.summary.trim()) {
+      showToast("Please enter a summary", "error");
+      return;
+    }
+
+    if (!formData.authorName.trim()) {
+      showToast("Please enter an author name", "error");
+      return;
+    }
+
     if (!formData.date) {
       showToast("Please select a date", "error");
+      return;
+    }
+
+    if (!formData.body.trim()) {
+      showToast("Please enter blog content", "error");
+      return;
+    }
+
+    if (!formData.status) {
+      showToast("Please select a status", "error");
+      return;
+    }
+
+    if (!blogImage && !existingBlogImage) {
+      showToast("Please upload a blog image", "error");
+      return;
+    }
+
+    if (images.length === 0 && existingImages.length === 0) {
+      showToast("Please upload at least one content image", "error");
       return;
     }
 
     try {
       setLoading(true);
 
+      const dateISO = formData.date.toISOString();
+
       const payload = {
         title: formData.title,
         summary: formData.summary,
-        date: format(formData.date, "yyyy-MM-dd"),
+        date: dateISO,
         body: formData.body,
         status: formData.status,
         authorName: formData.authorName,
+        blogImage: blogImage || undefined,
+        images: images.length > 0 ? images : undefined,
       };
 
       const response = isEditing
@@ -267,7 +446,7 @@ export const BlogForm = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">Title *</Label>
                 <Input
                   id="title"
                   placeholder="Enter blog title"
@@ -278,7 +457,7 @@ export const BlogForm = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="summary">Summary</Label>
+                <Label htmlFor="summary">Summary *</Label>
                 <Textarea
                   id="summary"
                   placeholder="Brief summary of the blog post"
@@ -291,7 +470,7 @@ export const BlogForm = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="authorName">Author Name</Label>
+                  <Label htmlFor="authorName">Author Name *</Label>
                   <Input
                     id="authorName"
                     placeholder="Enter author name"
@@ -304,10 +483,11 @@ export const BlogForm = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="date">Date</Label>
+                  <Label htmlFor="date">Date *</Label>
                   <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                     <PopoverTrigger asChild>
                       <Button
+                        type="button"
                         variant="outline"
                         className={cn(
                           "w-full justify-start text-left font-normal",
@@ -385,7 +565,7 @@ export const BlogForm = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="body">Blog Body</Label>
+                <Label htmlFor="body">Blog Body *</Label>
                 {!isPreviewMode && (
                   <BlogFormatToolbar
                     onFormatClick={handleFormatClick}
@@ -421,25 +601,180 @@ export const BlogForm = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image">Featured Image</Label>
-                <div className="flex gap-2">
+                <Label htmlFor="blogImage">Blog Image *</Label>
+                {existingBlogImage && !blogImage && (
+                  <div className="relative inline-block mb-2">
+                    <img
+                      src={existingBlogImage}
+                      alt="Current blog image"
+                      className="h-32 w-auto rounded-md border border-border object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6"
+                      onClick={() => setDeleteBlogImageDialog(true)}
+                      disabled={deletingImage}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
+                {blogImagePreview && (
+                  <div className="relative inline-block mb-2">
+                    <img
+                      src={blogImagePreview}
+                      alt="Preview"
+                      className="h-32 w-auto rounded-md border border-border object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6"
+                      onClick={handleRemoveBlogImage}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
+                {(!existingBlogImage && !blogImage) && (
                   <Input
-                    id="image"
-                    placeholder="Upload image"
-                    value={formData.image}
-                    onChange={(e) => handleInputChange("image", e.target.value)}
-                    disabled
+                    id="blogImage"
+                    type="file"
+                    accept="image/*"
+                    ref={blogImageInputRef}
+                    onChange={handleBlogImageChange}
+                    className="cursor-pointer"
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="shrink-0"
-                    disabled
+                )}
+                {existingBlogImage && !blogImage && (
+                  <AlertDialog open={deleteBlogImageDialog} onOpenChange={setDeleteBlogImageDialog}>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Blog Image</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this blog image? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel disabled={deletingImage}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleRemoveExistingBlogImage}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          disabled={deletingImage}
+                        >
+                          {deletingImage ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Deleting...
+                            </>
+                          ) : (
+                            "Delete"
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="images">Content Images *</Label>
+                {existingImages.length > 0 && images.length === 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {existingImages.map((imageUrl, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={imageUrl}
+                          alt={`Existing image ${index + 1}`}
+                          className="h-24 w-24 rounded-md border border-border object-cover"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6"
+                          onClick={() => setDeleteContentImageDialog(imageUrl)}
+                          disabled={deletingImage}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {imagesPreview.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {imagesPreview.map((preview, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="h-24 w-24 rounded-md border border-border object-cover"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6"
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="relative">
+                  <Input
+                    id="images"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    ref={imagesInputRef}
+                    onChange={handleImagesChange}
+                    className="cursor-pointer opacity-0 absolute w-full h-full z-10"
+                  />
+                  <div
+                    onClick={() => imagesInputRef.current?.click()}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer items-center"
                   >
-                    <Image className="w-4 h-4" />
-                  </Button>
+                    <span className="text-muted-foreground">
+                      {images.length > 0
+                        ? `${images.length} file${images.length > 1 ? "s" : ""} chosen`
+                        : "Choose Files"}
+                    </span>
+                  </div>
                 </div>
+                <AlertDialog open={deleteContentImageDialog !== null} onOpenChange={(open) => !open && setDeleteContentImageDialog(null)}>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Content Image</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete this content image? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={deletingImage}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => deleteContentImageDialog && handleRemoveExistingImage(deleteContentImageDialog)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        disabled={deletingImage}
+                      >
+                        {deletingImage ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Deleting...
+                          </>
+                        ) : (
+                          "Delete"
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </CardContent>
           </Card>

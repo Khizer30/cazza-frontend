@@ -57,5 +57,6 @@ export const END_POINT = {
     create: "/blogs",
     update: (blogId: string) => `/blogs/${blogId}`,
     delete: (blogId: string) => `/blogs/${blogId}`,
+    deleteImage: (blogId: string) => `/blogs/${blogId}/image`,
   },
 } as const;

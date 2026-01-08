@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Calendar, Edit, Eye, Loader2, Plus, Trash2 } from "lucide-react";
+import { Calendar, Edit, Eye, Image, Loader2, Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -194,19 +194,22 @@ export const BlogManagement = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-muted-foreground">
+                    <TableHead className="text-muted-foreground w-[100px] px-4">
+                      Image
+                    </TableHead>
+                    <TableHead className="text-muted-foreground w-[250px] px-4">
                       Title
                     </TableHead>
-                    <TableHead className="text-muted-foreground">
+                    <TableHead className="text-muted-foreground w-[180px] px-4">
                       Author
                     </TableHead>
-                    <TableHead className="text-muted-foreground">
+                    <TableHead className="text-muted-foreground w-[180px] px-4">
                       Date
                     </TableHead>
-                    <TableHead className="text-muted-foreground">
+                    <TableHead className="text-muted-foreground w-[120px] px-4">
                       Status
                     </TableHead>
-                    <TableHead className="text-muted-foreground text-right">
+                    <TableHead className="text-muted-foreground text-right w-[140px] px-4">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -214,32 +217,45 @@ export const BlogManagement = () => {
                 <TableBody>
                   {blogs.map((blog) => (
                     <TableRow key={blog.id} className="border-border">
-                      <TableCell className="font-medium text-foreground max-w-[300px]">
-                        <span className="line-clamp-1 truncate block">
+                      <TableCell className="px-4 py-4">
+                        {blog.blogImage ? (
+                          <img
+                            src={blog.blogImage}
+                            alt={blog.title}
+                            className="w-16 h-16 rounded-md object-cover border border-border"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 rounded-md bg-muted border border-border flex items-center justify-center">
+                            <Image className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium text-foreground px-4 py-4">
+                        <span className="truncate block max-w-[250px]">
                           {blog.title}
                         </span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-4 py-4">
                         <div className="flex items-center gap-2">
-                          <Avatar className="w-8 h-8 border-2 border-card">
+                          <Avatar className="w-8 h-8 border-2 border-card shrink-0">
                             <AvatarFallback
                               className={`text-xs text-white ${getAvatarColor(blog.authorName)}`}
                             >
                               {getAuthorInitials(blog.authorName)}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="text-sm text-foreground">
+                          <span className="text-sm text-foreground truncate">
                             {blog.authorName}
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-4 py-4">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(blog.createdAt)}</span>
+                          <Calendar className="w-4 h-4 shrink-0" />
+                          <span className="whitespace-nowrap">{formatDate(blog.createdAt)}</span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-4 py-4">
                         <Badge
                           variant={
                             blog.status === "PUBLISHED" ? "default" : "secondary"
@@ -253,8 +269,8 @@ export const BlogManagement = () => {
                           {blog.status === "PUBLISHED" ? "Published" : "Draft"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-2">
+                      <TableCell className="px-4 py-4">
+                        <div className="flex items-center justify-end gap-1">
                           <Button
                             variant="ghost"
                             size="sm"
