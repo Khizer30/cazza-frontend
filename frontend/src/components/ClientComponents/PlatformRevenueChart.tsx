@@ -122,10 +122,7 @@ export const PlatformRevenueChart = ({
                   Total Revenue
                 </p>
                 <p className="text-2xl font-bold">
-                  £{totalRevenue.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  £{Math.round(totalRevenue).toLocaleString("en-GB")}
                 </p>
               </div>
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -189,11 +186,8 @@ export const PlatformRevenueChart = ({
                     <Tooltip
                       formatter={(value: number | undefined) =>
                         value !== undefined
-                          ? `£${value.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}`
-                          : "£0.00"
+                          ? `£${Math.round(value).toLocaleString("en-GB")}`
+                          : "£0"
                       }
                     />
                   </PieChart>
@@ -224,10 +218,7 @@ export const PlatformRevenueChart = ({
                       variant="secondary"
                       className="text-sm font-semibold"
                     >
-                      £{platform.total_revenue.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+                      £{Math.round(platform.total_revenue).toLocaleString("en-GB")}
                     </Badge>
                   </div>
                 ))}

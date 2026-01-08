@@ -511,6 +511,7 @@ export interface TikTokShopResponse {
 
 export interface DashboardDetailItem {
   monthYear: string;
+  Sessions: string;
   Orders: string;
   "Units Sold": string;
   "Gross Revenue": string;
@@ -519,9 +520,13 @@ export interface DashboardDetailItem {
   "Service Fee": string;
   "Ad Spend": string;
   Refunds: string;
+  Discounts: string;
   "Shipping Deduction": string;
   "Other Deductions": string;
+  Shipping: string;
+  Tax: string;
   Payout: string;
+  "Net Sales": string;
   "Net Profit": string;
 }
 
