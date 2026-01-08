@@ -71,6 +71,7 @@ const transformDetailData = (
 
   // Define the metrics to display (excluding monthYear)
   const metrics = [
+    "Sessions",
     "Orders",
     "Units Sold",
     "Gross Revenue",
@@ -79,9 +80,13 @@ const transformDetailData = (
     "Service Fee",
     "Ad Spend",
     "Refunds",
+    "Discounts",
     "Shipping Deduction",
     "Other Deductions",
+    "Shipping",
+    "Tax",
     "Payout",
+    "Net Sales",
     "Net Profit",
   ];
 
@@ -304,7 +309,9 @@ export const ProfitLossStatement = ({
                   Total Revenue
                 </p>
                 <p className="text-2xl font-bold text-success">
-                  {formatValue(totalRevenue)}
+                  £{Math.round(totalRevenue).toLocaleString("en-GB", {
+                    maximumFractionDigits: 0,
+                  })}
                 </p>
               </div>
               <div className="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center">
@@ -322,7 +329,9 @@ export const ProfitLossStatement = ({
                   Total Expenses
                 </p>
                 <p className="text-2xl font-bold text-red-600">
-                  {formatValue(totalExpenses)}
+                  £{Math.round(totalExpenses).toLocaleString("en-GB", {
+                    maximumFractionDigits: 0,
+                  })}
                 </p>
               </div>
               <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -343,7 +352,9 @@ export const ProfitLossStatement = ({
                   className={`text-2xl font-bold ${grossProfit >= 0 ? "text-success" : "text-destructive"
                     }`}
                 >
-                  {formatValue(grossProfit)}
+                  £{Math.round(grossProfit).toLocaleString("en-GB", {
+                    maximumFractionDigits: 0,
+                  })}
                 </p>
               </div>
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -368,7 +379,7 @@ export const ProfitLossStatement = ({
                       : "text-destructive"
                     }`}
                 >
-                  {profitMargin.toFixed(2)}%
+                  {Math.round(profitMargin)}%
                 </p>
                 <Badge
                   variant={

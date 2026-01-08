@@ -89,9 +89,18 @@ export const BlogDashboard = () => {
             {blogs.map((blog) => (
               <Card
                 key={blog.id}
-                className="border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer group bg-card"
+                className="border border-border hover:border-primary/50 transition-colors duration-300 hover:shadow-xl cursor-pointer group bg-card overflow-hidden p-0"
                 onClick={() => navigate(`/blog/${blog.id}`)}
               >
+                {blog.blogImage && (
+                  <div className="relative w-full h-48 overflow-hidden bg-muted">
+                    <img
+                      src={blog.blogImage}
+                      alt={blog.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">

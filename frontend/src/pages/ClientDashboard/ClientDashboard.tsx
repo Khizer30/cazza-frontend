@@ -89,14 +89,8 @@ export const ClientDashboard = () => {
           .map((item: DashboardDetailItem) => {
             const [monthStr] = item.monthYear.split(" ");
             const revenue = parseFloat(item["Gross Revenue"]);
-            const expenses =
-              parseFloat(item["Commission Fee"]) +
-              parseFloat(item["Payment Fee"]) +
-              parseFloat(item["Service Fee"]) +
-              parseFloat(item["Ad Spend"]) +
-              parseFloat(item.Refunds) +
-              parseFloat(item["Shipping Deduction"]) +
-              parseFloat(item["Other Deductions"]);
+            const netSales = parseFloat(item["Net Sales"] || "0");
+            const expenses = revenue - netSales;
             return {
               month: monthStr.slice(0, 3),
               revenue: revenue,
@@ -231,9 +225,8 @@ export const ClientDashboard = () => {
                     {loading ? (
                       <div className="h-9 w-24 bg-muted animate-pulse rounded" />
                     ) : (
-                      `£${Number(summary?.totalRevenue || 0).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
+                      `£${Math.round(parseFloat(summary?.totalRevenue || "0")).toLocaleString("en-GB", {
+                        maximumFractionDigits: 0,
                       })}`
                     )}
                   </div>
@@ -256,15 +249,14 @@ export const ClientDashboard = () => {
                     {loading ? (
                       <div className="h-9 w-24 bg-muted animate-pulse rounded" />
                     ) : (
-                      `£${Number(summary?.netProfit || 0).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
+                      `£${Math.round(parseFloat(summary?.netProfit || "0")).toLocaleString("en-GB", {
+                        maximumFractionDigits: 0,
                       })}`
                     )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
-                      {summary?.profitMargin || "0"}% margin
+                      {summary?.profitMargin ? Math.round(parseFloat(summary.profitMargin)) : "0"}% margin
                     </span>
                   </div>
                 </div>
@@ -286,9 +278,8 @@ export const ClientDashboard = () => {
                     {loading ? (
                       <div className="h-9 w-24 bg-muted animate-pulse rounded" />
                     ) : (
-                      `£${Number(summary?.totalExpense || 0).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
+                      `£${Math.round(parseFloat(summary?.totalExpense || "0")).toLocaleString("en-GB", {
+                        maximumFractionDigits: 0,
                       })}`
                     )}
                   </div>
@@ -297,12 +288,12 @@ export const ClientDashboard = () => {
                       {summary &&
                         summary.totalRevenue &&
                         Number(summary.totalRevenue) > 0
-                        ? (
+                        ? Math.round(
                           (Number(summary.totalExpense) /
                             Number(summary.totalRevenue)) *
                           100
-                        ).toFixed(2)
-                        : "0.00"}
+                        )
+                        : "0"}
                       % of revenue
                     </span>
                   </div>
@@ -371,7 +362,9 @@ export const ClientDashboard = () => {
                       fontSize={12}
                     />
                     <YAxis
-                      tickFormatter={(value) => `£${value.toLocaleString()}`}
+                      tickFormatter={(value) => `£${Math.round(value).toLocaleString("en-GB", {
+                        maximumFractionDigits: 0,
+                      })}`}
                       stroke="var(--muted-foreground)"
                       fontSize={12}
                     />
@@ -381,7 +374,9 @@ export const ClientDashboard = () => {
                         name: string | undefined
                       ) => [
                           value !== undefined
-                            ? `£${value.toLocaleString()}`
+                            ? `£${Math.round(value).toLocaleString("en-GB", {
+                                maximumFractionDigits: 0,
+                              })}`
                             : "£0",
                           name || "",
                         ]}
