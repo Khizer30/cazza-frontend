@@ -15,7 +15,7 @@ export const getNotificationsService = () => {
 export const markNotificationsReadService = (notificationIds?: string[]) => {
   return apiInvoker<MARK_READ_RESPONSE>(
     END_POINT.notifications.markRead,
-    "POST",
+    "PUT",
     notificationIds ? { notificationIds } : {}
   );
 };
