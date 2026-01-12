@@ -646,3 +646,27 @@ export interface DeleteBlogImageResponse {
   success: boolean;
   message: string;
 }
+
+export interface Notification {
+  id: string;
+  subject: string;
+  message: string;
+  isRead: boolean;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NOTIFICATIONS_RESPONSE {
+  success: boolean;
+  message: string;
+  data: Notification[];
+}
+
+export interface MARK_READ_RESPONSE {
+  success: boolean;
+  message: string;
+  data: {
+    count: number;
+  };
+}
