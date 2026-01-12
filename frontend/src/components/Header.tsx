@@ -42,6 +42,7 @@ import { usePendingInvitations } from "@/hooks/usePendingInvitations";
 import { getMyInvitationsService } from "@/services/teamService";
 import { useEffect } from "react";
 import type { TeamInvitation } from "@/types/auth";
+import { NotificationBell } from "./ClientComponents/NotificationBell";
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
@@ -155,6 +156,8 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             Book a Call
           </Button>
         )}
+
+        <NotificationBell />
 
         {/* User Avatar Dropdown */}
         <DropdownMenu>

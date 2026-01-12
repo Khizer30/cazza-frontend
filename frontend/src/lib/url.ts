@@ -59,4 +59,8 @@ export const END_POINT = {
     delete: (blogId: string) => `/blogs/${blogId}`,
     deleteImage: (blogId: string) => `/blogs/${blogId}/image`,
   },
+  notifications: {
+    list: "/notifications",
+    markRead: "/notifications/mark-read",
+  },
 } as const;
