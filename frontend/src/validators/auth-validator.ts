@@ -47,7 +47,23 @@ export const signUpSchema = z
       .trim()
       .min(1, { message: "Password is required" })
       .min(8, { message: "Password must be at least 8 characters" })
-      .max(32, { message: "Password must not exceed 32 characters" }),
+      .max(32, { message: "Password must not exceed 32 characters" })
+      .refine(
+        (password) => /[A-Z]/.test(password),
+        { message: "Password must contain at least one uppercase letter" }
+      )
+      .refine(
+        (password) => /[a-z]/.test(password),
+        { message: "Password must contain at least one lowercase letter" }
+      )
+      .refine(
+        (password) => /[0-9]/.test(password),
+        { message: "Password must contain at least one number" }
+      )
+      .refine(
+        (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+        { message: "Password must contain at least one special character" }
+      ),
     confirmPassword: z
       .string()
       .trim()
@@ -70,7 +86,23 @@ export const setNewPasswordSchema = z
       .trim()
       .min(1, { message: "Password is required" })
       .min(8, { message: "Password must be at least 8 characters" })
-      .max(32, { message: "Password must not exceed 32 characters" }),
+      .max(32, { message: "Password must not exceed 32 characters" })
+      .refine(
+        (password) => /[A-Z]/.test(password),
+        { message: "Password must contain at least one uppercase letter" }
+      )
+      .refine(
+        (password) => /[a-z]/.test(password),
+        { message: "Password must contain at least one lowercase letter" }
+      )
+      .refine(
+        (password) => /[0-9]/.test(password),
+        { message: "Password must contain at least one number" }
+      )
+      .refine(
+        (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+        { message: "Password must contain at least one special character" }
+      ),
     confirmPassword: z
       .string()
       .trim()
