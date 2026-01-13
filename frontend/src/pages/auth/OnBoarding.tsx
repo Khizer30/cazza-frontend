@@ -261,7 +261,7 @@ export function Onboarding() {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium">Business Name</label>
+                    <label className="text-sm font-medium mb-2 block">Business Name</label>
                     <Input
                       placeholder="Your business or trading name"
                       value={formData.businessName}
@@ -332,7 +332,7 @@ export function Onboarding() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">
+                    <label className="text-sm font-medium mb-2 block">
                       Annual Revenue Band
                     </label>
                     <Select
