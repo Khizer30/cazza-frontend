@@ -461,14 +461,16 @@ export function Onboarding() {
             )}
           </AnimatePresence>
 
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={back}
-              disabled={step === 0 || isLoading}
-            >
-              Back
-            </Button>
+          <div className={`flex mt-8 ${step === 0 ? "justify-end" : "justify-between"}`}>
+            {step > 0 && (
+              <Button
+                variant="outline"
+                onClick={back}
+                disabled={isLoading}
+              >
+                Back
+              </Button>
+            )}
             {step < steps.length - 1 ? (
               <Button onClick={next} disabled={isLoading}>
                 Next
