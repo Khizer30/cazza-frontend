@@ -86,7 +86,8 @@ export const businessInfoSchema = z.object({
     .trim()
     .min(1, { message: "Business name is required" })
     .min(2, { message: "Business name must be at least 2 characters" })
-    .max(100, { message: "Business name must not exceed 100 characters" }),
+    .max(100, { message: "Business name must not exceed 100 characters" })
+    .regex(/^[a-zA-Z\s]+$/, { message: "Business name can only contain letters and spaces" }),
   businessEntityType: z
     .string()
     .min(1, { message: "Please select a business entity type" }),
@@ -118,7 +119,8 @@ export const onboardingSchema = z.object({
     .trim()
     .min(1, { message: "Business name is required" })
     .min(2, { message: "Business name must be at least 2 characters" })
-    .max(100, { message: "Business name must not exceed 100 characters" }),
+    .max(100, { message: "Business name must not exceed 100 characters" })
+    .regex(/^[a-zA-Z\s]+$/, { message: "Business name can only contain letters and spaces" }),
   businessEntityType: z
     .string()
     .min(1, { message: "Please select a business entity type" }),
