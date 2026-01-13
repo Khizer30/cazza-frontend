@@ -348,7 +348,7 @@ export function Onboarding() {
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select revenue band" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent side="bottom" sideOffset={4} avoidCollisions={false}>
                         <SelectItem value="0-90k">
                           £0 to £90,000 (Below VAT threshold)
                         </SelectItem>
