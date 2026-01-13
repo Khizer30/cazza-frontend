@@ -278,7 +278,6 @@ export function Onboarding() {
                         }
                       }}
                       disabled={isLoading}
-                      className={errors.businessName ? "border-red-500" : ""}
                     />
                     {errors.businessName && (
                       <Alert variant="destructive">
@@ -289,7 +288,7 @@ export function Onboarding() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">
+                    <label className="text-sm font-medium mb-2 block">
                       Business Entity Type
                     </label>
                     <Select
@@ -305,9 +304,7 @@ export function Onboarding() {
                       }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger
-                        className={`w-full ${errors.businessEntityType ? "border-red-500" : ""}`}
-                      >
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select entity type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -348,9 +345,7 @@ export function Onboarding() {
                       }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger
-                        className={`w-full ${errors.annualRevenueBand ? "border-red-500" : ""}`}
-                      >
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select revenue band" />
                       </SelectTrigger>
                       <SelectContent>
