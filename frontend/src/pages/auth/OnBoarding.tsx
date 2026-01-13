@@ -12,8 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUser } from "@/hooks/useUser";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import {
   businessInfoSchema,
   marketplacesSchema,
@@ -280,9 +281,10 @@ export function Onboarding() {
                       className={errors.businessName ? "border-red-500" : ""}
                     />
                     {errors.businessName && (
-                      <p className="text-sm text-red-500 mt-1">
-                        {errors.businessName}
-                      </p>
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{errors.businessName}</AlertDescription>
+                      </Alert>
                     )}
                   </div>
 
@@ -322,9 +324,10 @@ export function Onboarding() {
                       </SelectContent>
                     </Select>
                     {errors.businessEntityType && (
-                      <p className="text-sm text-red-500 mt-1">
-                        {errors.businessEntityType}
-                      </p>
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{errors.businessEntityType}</AlertDescription>
+                      </Alert>
                     )}
                   </div>
 
@@ -364,9 +367,10 @@ export function Onboarding() {
                       </SelectContent>
                     </Select>
                     {errors.annualRevenueBand && (
-                      <p className="text-sm text-red-500 mt-1">
-                        {errors.annualRevenueBand}
-                      </p>
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{errors.annualRevenueBand}</AlertDescription>
+                      </Alert>
                     )}
                   </div>
                 </div>
@@ -384,9 +388,10 @@ export function Onboarding() {
                   Select which online marketplaces you use:
                 </p>
                 {errors.marketplaces && (
-                  <p className="text-sm text-red-500 mb-3">
-                    {errors.marketplaces}
-                  </p>
+                  <Alert variant="destructive" className="mb-3">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{errors.marketplaces}</AlertDescription>
+                  </Alert>
                 )}
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -428,9 +433,10 @@ export function Onboarding() {
                       Select the tools you currently use:
                     </p>
                     {errors.tools && (
-                      <p className="text-sm text-red-500 mb-3">
-                        {errors.tools}
-                      </p>
+                      <Alert variant="destructive" className="mb-3">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{errors.tools}</AlertDescription>
+                      </Alert>
                     )}
                     <div className="grid grid-cols-2 gap-2">
                       {availableTools.map((tool) => (
