@@ -126,9 +126,10 @@ export const SetNewPassword = () => {
                 </button>
               </div>
               {errors.newPassword && (
-                <p className="text-sm text-destructive">
-                  {errors.newPassword.message}
-                </p>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.newPassword.message}</AlertDescription>
+                </Alert>
               )}
             </div>
 
@@ -158,9 +159,10 @@ export const SetNewPassword = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">
-                  {errors.confirmPassword.message}
-                </p>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.confirmPassword.message}</AlertDescription>
+                </Alert>
               )}
             </div>
 

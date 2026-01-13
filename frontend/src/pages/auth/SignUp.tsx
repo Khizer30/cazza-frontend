@@ -1,3 +1,4 @@
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,7 +10,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, User, Lock, Loader2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Mail, User, Lock, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
@@ -202,9 +203,10 @@ export const SignUp = () => {
                 />
               </div>
               {errors.firstName && (
-                <p className="text-sm text-destructive">
-                  {errors.firstName.message}
-                </p>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.firstName.message}</AlertDescription>
+                </Alert>
               )}
             </div>
 
@@ -222,9 +224,10 @@ export const SignUp = () => {
                 />
               </div>
               {errors.lastName && (
-                <p className="text-sm text-destructive">
-                  {errors.lastName.message}
-                </p>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.lastName.message}</AlertDescription>
+                </Alert>
               )}
             </div>
 
@@ -251,9 +254,10 @@ export const SignUp = () => {
                 )}
               </div>
               {errors.email && (
-                <p className="text-sm text-destructive">
-                  {errors.email.message}
-                </p>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.email.message}</AlertDescription>
+                </Alert>
               )}
               {isInvitedUser && !errors.email && (
                 <p className="text-xs text-muted-foreground">
@@ -288,9 +292,10 @@ export const SignUp = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-sm text-destructive">
-                  {errors.password.message}
-                </p>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.password.message}</AlertDescription>
+                </Alert>
               )}
             </div>
 
@@ -320,9 +325,10 @@ export const SignUp = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">
-                  {errors.confirmPassword.message}
-                </p>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.confirmPassword.message}</AlertDescription>
+                </Alert>
               )}
             </div>
 
@@ -362,9 +368,10 @@ export const SignUp = () => {
               </Label>
             </div>
             {errors.acceptedTerms && (
-              <p className="text-sm text-destructive">
-                {errors.acceptedTerms.message}
-              </p>
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{errors.acceptedTerms.message}</AlertDescription>
+              </Alert>
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
