@@ -44,6 +44,7 @@ export const SignUp = () => {
     setValue,
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
+    mode: "onBlur",
     defaultValues: {
       firstName: "",
       lastName: "",

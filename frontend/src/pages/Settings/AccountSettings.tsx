@@ -30,13 +30,45 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Camera, Loader2, Trash2, Upload } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Camera, Loader2, Trash2, Upload, AlertCircle } from "lucide-react";
 import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
 import { useauth } from "@/hooks/useauth";
 import { SettingsSidebar } from "@/components/SettingsSidebar";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const personalInfoSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .min(1, { message: "First name is required" })
+    .min(2, { message: "First name must be at least 2 characters" })
+    .regex(/^[a-zA-Z\s]+$/, { message: "Only alphabets are allowed" }),
+  lastName: z
+    .string()
+    .trim()
+    .min(1, { message: "Last name is required" })
+    .min(2, { message: "Last name must be at least 2 characters" })
+    .regex(/^[a-zA-Z\s]+$/, { message: "Only alphabets are allowed" }),
+});
+
+const businessInfoSchema = z.object({
+  businessName: z
+    .string()
+    .trim()
+    .min(1, { message: "Business name is required" })
+    .min(2, { message: "Business name must be at least 2 characters" })
+    .max(100, { message: "Business name must not exceed 100 characters" })
+    .regex(/^[a-zA-Z\s]+$/, { message: "Business name can only contain letters and spaces" }),
+});
+
+type PersonalInfoData = z.infer<typeof personalInfoSchema>;
+type BusinessInfoData = z.infer<typeof businessInfoSchema>;
 
 export const AccountSettings = () => {
   const navigate = useNavigate();
@@ -63,6 +95,35 @@ export const AccountSettings = () => {
   // Form and saving state
   const [savingPersonal, setSavingPersonal] = useState(false);
   const [savingBusiness, setSavingBusiness] = useState(false);
+
+  const {
+    register: registerPersonalInfo,
+    handleSubmit: handleSubmitPersonalInfo,
+    formState: { errors: personalInfoErrors },
+    setValue: setPersonalInfoValue,
+    watch: watchPersonalInfo,
+  } = useForm<PersonalInfoData>({
+    resolver: zodResolver(personalInfoSchema),
+    mode: "onBlur",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+    },
+  });
+
+  const {
+    register: registerBusinessInfo,
+    handleSubmit: handleSubmitBusinessInfo,
+    formState: { errors: businessInfoErrors },
+    setValue: setBusinessInfoValue,
+    watch: watchBusinessInfo,
+  } = useForm<BusinessInfoData>({
+    resolver: zodResolver(businessInfoSchema),
+    mode: "onBlur",
+    defaultValues: {
+      businessName: "",
+    },
+  });
 
   type AccountFormData = {
     firstName: string;
@@ -104,10 +165,13 @@ export const AccountSettings = () => {
   // Populate form when user data is available
   useEffect(() => {
     if (currentUser) {
+      const firstName = currentUser.firstName || "";
+      const lastName = currentUser.lastName || "";
+      
       // Populate form with user data
       setFormData({
-        firstName: currentUser.firstName || "",
-        lastName: currentUser.lastName || "",
+        firstName: firstName,
+        lastName: lastName,
         email: currentUser.email || "",
         marketplaces: currentUser.businessProfile?.marketplaces || [],
         accountingStack: {
@@ -130,8 +194,14 @@ export const AccountSettings = () => {
       if (currentUser.profileImage) {
         setAvatarPreview(currentUser.profileImage);
       }
+
+      setPersonalInfoValue("firstName", firstName);
+      setPersonalInfoValue("lastName", lastName);
+      
+      const businessName = currentUser.businessProfile?.businessName || "";
+      setBusinessInfoValue("businessName", businessName);
     }
-  }, [currentUser?.id]); // Only update when user ID changes
+  }, [currentUser?.id, setPersonalInfoValue, setBusinessInfoValue]); // Only update when user ID changes
 
   // Update top-level keys on formData. For nested updates pass the full object (example used in file).
   const updateFormData = useCallback((key: string, value: any) => {
@@ -185,16 +255,19 @@ export const AccountSettings = () => {
     setAvatarPreview(null);
   }, []);
 
-  const handleSavePersonalInfo = useCallback(async () => {
+  const handleSavePersonalInfo = useCallback(async (data?: PersonalInfoData) => {
     if (!currentUser) return;
+
+    const firstName = data?.firstName || watchPersonalInfo("firstName") || formData.firstName;
+    const lastName = data?.lastName || watchPersonalInfo("lastName") || formData.lastName;
 
     setSavingPersonal(true);
     try {
       // Update user profile (firstName, lastName, profileImage, role)
       // Role is managed in state but not displayed in UI
       const userUpdatePayload: any = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        firstName: firstName,
+        lastName: lastName,
         role: currentUser.role, // Include role from current user state
       };
 
@@ -204,6 +277,9 @@ export const AccountSettings = () => {
 
       await updateUser(userUpdatePayload);
 
+      // Update local form data
+      setFormData(prev => ({ ...prev, firstName, lastName }));
+
       // Clear avatar file after successful upload
       setAvatarFile(null);
     } catch (error) {
@@ -212,10 +288,12 @@ export const AccountSettings = () => {
     } finally {
       setSavingPersonal(false);
     }
-  }, [formData, avatarFile, currentUser, updateUser]);
+  }, [formData, avatarFile, currentUser, updateUser, watchPersonalInfo]);
 
-  const handleSaveBusinessInfo = useCallback(async () => {
+  const handleSaveBusinessInfo = useCallback(async (data?: BusinessInfoData) => {
     if (!currentUser || !currentUser.businessProfile) return;
+
+    const businessName = data?.businessName || watchBusinessInfo("businessName") || formData.businessName;
 
     setSavingBusiness(true);
     try {
@@ -223,7 +301,7 @@ export const AccountSettings = () => {
       const businessUpdatePayload = {
         firstName: formData.firstName || currentUser.firstName, // Required by API - use formData or fallback to currentUser
         lastName: formData.lastName || currentUser.lastName, // Required by API - use formData or fallback to currentUser
-        businessName: formData.businessName,
+        businessName: businessName,
         businessEntityType: formData.entityType,
         annualRevenueBand: formData.revenueBand,
         marketplaces: formData.marketplaces,
@@ -233,13 +311,16 @@ export const AccountSettings = () => {
       };
 
       await updateBusinessProfile(businessUpdatePayload);
+
+      // Update local form data
+      setFormData(prev => ({ ...prev, businessName }));
     } catch (error) {
       console.error("Save business info error:", error);
       // Error is already handled in the hooks
     } finally {
       setSavingBusiness(false);
     }
-  }, [formData, currentUser, updateBusinessProfile]);
+  }, [formData, currentUser, updateBusinessProfile, watchBusinessInfo]);
 
   const [deleting, setDeleting] = useState(false);
 
@@ -375,48 +456,71 @@ export const AccountSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) =>
-                      updateFormData("firstName", e.target.value)
-                    }
-                  />
+              <form onSubmit={handleSubmitPersonalInfo(handleSavePersonalInfo)}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      {...registerPersonalInfo("firstName", {
+                        onChange: (e) => {
+                          updateFormData("firstName", e.target.value);
+                        },
+                      })}
+                      disabled={savingPersonal}
+                    />
+                    {personalInfoErrors.firstName && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                          {personalInfoErrors.firstName.message}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      {...registerPersonalInfo("lastName", {
+                        onChange: (e) => {
+                          updateFormData("lastName", e.target.value);
+                        },
+                      })}
+                      disabled={savingPersonal}
+                    />
+                    {personalInfoErrors.lastName && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                          {personalInfoErrors.lastName.message}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="email">Email Address</Label>
                   <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => updateFormData("lastName", e.target.value)}
+                    id="email"
+                    type="email"
+                    value={formData.email || currentUser?.email || ""}
+                    disabled
+                    className="bg-muted cursor-not-allowed"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Email cannot be changed
+                  </p>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email || currentUser?.email || ""}
-                  disabled
-                  className="bg-muted cursor-not-allowed"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Email cannot be changed
-                </p>
-              </div>
-
-              {/* Save Personal Info Button */}
-              <div className="flex justify-end pt-4">
-                <Button
-                  onClick={handleSavePersonalInfo}
-                  disabled={savingPersonal}
-                  className="px-8"
-                >
+                {/* Save Personal Info Button */}
+                <div className="flex justify-end pt-4">
+                  <Button
+                    type="submit"
+                    disabled={savingPersonal}
+                    className="px-8"
+                  >
                   {savingPersonal ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -427,6 +531,7 @@ export const AccountSettings = () => {
                   )}
                 </Button>
               </div>
+              </form>
             </CardContent>
           </Card>
 
@@ -440,71 +545,99 @@ export const AccountSettings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="businessName">Business Name</Label>
-                    <Input
-                      id="businessName"
-                      value={formData.businessName}
-                      onChange={(e) =>
-                        updateFormData("businessName", e.target.value)
-                      }
-                      placeholder="Your business or trading name"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="businessName">Business Name</Label>
+                  <Input
+                    id="businessName"
+                    {...registerBusinessInfo("businessName", {
+                      onChange: (e) => {
+                        updateFormData("businessName", e.target.value);
+                      },
+                    })}
+                    placeholder="Your business or trading name"
+                    disabled={savingBusiness}
+                  />
+                  {businessInfoErrors.businessName && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        {businessInfoErrors.businessName.message}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="entityType">Business Entity Type</Label>
-                    <Select
-                      value={formData.entityType}
-                      onValueChange={(value) =>
-                        updateFormData("entityType", value)
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select entity type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sole-trader">Sole Trader</SelectItem>
-                        <SelectItem value="partnership">Partnership</SelectItem>
-                        <SelectItem value="limited-company">
-                          Limited Company
-                        </SelectItem>
-                        <SelectItem value="llp">
-                          Limited Liability Partnership (LLP)
-                        </SelectItem>
-                        <SelectItem value="charity">Charity</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="entityType">Business Entity Type</Label>
+                  <Select
+                    value={formData.entityType}
+                    onValueChange={(value) =>
+                      updateFormData("entityType", value)
+                    }
+                    disabled={savingBusiness}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select entity type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sole-trader">Sole Trader</SelectItem>
+                      <SelectItem value="partnership">Partnership</SelectItem>
+                      <SelectItem value="limited-company">
+                        Limited Company
+                      </SelectItem>
+                      <SelectItem value="llp">
+                        Limited Liability Partnership (LLP)
+                      </SelectItem>
+                      <SelectItem value="charity">Charity</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="revenueBand">Annual Revenue Band</Label>
-                    <Select
-                      value={formData.revenueBand}
-                      onValueChange={(value) =>
-                        updateFormData("revenueBand", value)
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select revenue band" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0-90k">
-                          £0 to £90,000 (Below VAT threshold)
-                        </SelectItem>
-                        <SelectItem value="90k-750k">
-                          £90,000 - £750,000
-                        </SelectItem>
-                        <SelectItem value="750k-2m">£750,000 - £2m</SelectItem>
-                        <SelectItem value="2m-5m">£2-5m</SelectItem>
-                        <SelectItem value="5m-10m">£5-10m</SelectItem>
-                        <SelectItem value="10m+">£10m+</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </>
+                <div className="space-y-2">
+                  <Label htmlFor="revenueBand">Annual Revenue Band</Label>
+                  <Select
+                    value={formData.revenueBand}
+                    onValueChange={(value) =>
+                      updateFormData("revenueBand", value)
+                    }
+                    disabled={savingBusiness}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select revenue band" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0-90k">
+                        £0 to £90,000 (Below VAT threshold)
+                      </SelectItem>
+                      <SelectItem value="90k-750k">
+                        £90,000 - £750,000
+                      </SelectItem>
+                      <SelectItem value="750k-2m">£750,000 - £2m</SelectItem>
+                      <SelectItem value="2m-5m">£2-5m</SelectItem>
+                      <SelectItem value="5m-10m">£5-10m</SelectItem>
+                      <SelectItem value="10m+">£10m+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Save Business Info Button */}
+                <div className="flex justify-end pt-4">
+                  <Button
+                    onClick={handleSubmitBusinessInfo(handleSaveBusinessInfo)}
+                    disabled={savingBusiness}
+                    className="px-8"
+                  >
+                    {savingBusiness ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Business Info"
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -629,25 +762,6 @@ export const AccountSettings = () => {
             </Card>
           )}
 
-          {/* Save Business Info Button - Only show if user has business profile */}
-          {currentUser?.businessProfile && (
-            <div className="flex justify-end">
-              <Button
-                onClick={handleSaveBusinessInfo}
-                disabled={savingBusiness}
-                className="px-8"
-              >
-                {savingBusiness ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Business Info"
-                )}
-              </Button>
-            </div>
-          )}
 
           <Separator />
 

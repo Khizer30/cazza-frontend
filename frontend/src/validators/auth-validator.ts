@@ -29,12 +29,14 @@ export const signUpSchema = z
       .string()
       .trim()
       .min(1, { message: "First name is required" })
-      .min(2, { message: "First name must be at least 2 characters" }),
+      .min(2, { message: "First name must be at least 2 characters" })
+      .regex(/^[a-zA-Z\s]+$/, { message: "Only alphabets are allowed" }),
     lastName: z
       .string()
       .trim()
       .min(1, { message: "Last name is required" })
-      .min(2, { message: "Last name must be at least 2 characters" }),
+      .min(2, { message: "Last name must be at least 2 characters" })
+      .regex(/^[a-zA-Z\s]+$/, { message: "Only alphabets are allowed" }),
     email: z
       .string()
       .trim()
