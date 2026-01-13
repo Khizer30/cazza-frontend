@@ -382,12 +382,6 @@ export function Onboarding() {
                 <p className="text-sm mb-3">
                   Select which online marketplaces you use:
                 </p>
-                {errors.marketplaces && (
-                  <Alert variant="destructive" className="mb-3">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{errors.marketplaces}</AlertDescription>
-                  </Alert>
-                )}
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     "Amazon",
@@ -427,12 +421,6 @@ export function Onboarding() {
                     <p className="text-sm mb-3">
                       Select the tools you currently use:
                     </p>
-                    {errors.tools && (
-                      <Alert variant="destructive" className="mb-3">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>{errors.tools}</AlertDescription>
-                      </Alert>
-                    )}
                     <div className="grid grid-cols-2 gap-2">
                       {availableTools.map((tool) => (
                         <label
@@ -455,6 +443,23 @@ export function Onboarding() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {(errors.marketplaces || errors.tools) && (
+            <div className="mt-6">
+              {errors.marketplaces && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.marketplaces}</AlertDescription>
+                </Alert>
+              )}
+              {errors.tools && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.tools}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+          )}
 
           <div className={`flex mt-8 ${step === 0 ? "justify-end" : "justify-between"}`}>
             {step > 0 && (
