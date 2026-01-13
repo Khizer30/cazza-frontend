@@ -175,6 +175,12 @@ export const SignIn = () => {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{errors.password.message}</AlertDescription>
+                </Alert>
+              )}
             </div>
 
             <Button
