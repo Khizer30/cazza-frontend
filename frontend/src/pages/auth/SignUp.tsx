@@ -42,6 +42,7 @@ export const SignUp = () => {
     formState: { errors },
     control,
     setValue,
+    reset,
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
     mode: "onBlur",
@@ -138,9 +139,13 @@ export const SignUp = () => {
           invitationId.trim() && { invitationId: invitationId.trim() }),
       };
 
-      await signUp(payload);
-      // Optionally navigate to login or show success message
-      // navigate("/login");
+      const result = await signUp(payload);
+      if (result && result.success) {
+        reset();
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      }
     } catch (err) {
       // Error is already handled in the useauth hook
       console.error("Signup error:", err);
