@@ -18,7 +18,6 @@ import { BillingSettings } from "./pages/Settings/BillingSettings";
 import { SupportSettings } from "./pages/Settings/SupportSettings";
 import { AccountSettings } from "./pages/Settings/AccountSettings";
 import { TeamSettings } from "./pages/Settings/TeamSettings";
-import { MyInvitations } from "./pages/Settings/MyInvitations";
 import { Onboarding } from "./pages/auth/OnBoarding";
 import { PrivacyPolicy } from "./pages/auth/Term and Conditions/PrivacyPolicy";
 import { TermsAndConditions } from "./pages/auth/Term and Conditions/TermsAndConditions";
@@ -82,7 +81,6 @@ const App = () => {
                 <Route path="/support" element={<SupportSettings />} />
                 <Route path="/settings" element={<AccountSettings />} />
                 <Route path="/teams" element={<TeamSettings />} />
-                <Route path="/invitations" element={<MyInvitations />} />
                 <Route path="/manage-blogs" element={<BlogManagement />} />
                 <Route path="/manage-blogs/create" element={<BlogForm />} />
                 <Route path="/manage-blogs/edit/:id" element={<BlogForm />} />

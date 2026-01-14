@@ -6,13 +6,10 @@ import {
   Users,
   Menu,
   X,
-  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { usePendingInvitations } from "@/hooks/usePendingInvitations";
 
 interface SettingsSidebarProps {
   className?: string;
@@ -21,7 +18,6 @@ interface SettingsSidebarProps {
 export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
   const location = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const pendingInvitationsCount = usePendingInvitations();
 
   const menuItems = [
     {
@@ -43,11 +39,6 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
       title: "Teams",
       path: "/teams",
       icon: Users,
-    },
-    {
-      title: "My Invitations",
-      path: "/invitations",
-      icon: Mail,
     },
   ];
 
@@ -123,19 +114,6 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
                   <Icon className="h-5 w-5" />
                   <span>{item.title}</span>
                 </div>
-                {item.path === "/invitations" &&
-                  pendingInvitationsCount > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className={cn(
-                        "h-5 min-w-5 px-1.5 text-xs flex items-center justify-center",
-                        isActive &&
-                          "bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30"
-                      )}
-                    >
-                      {pendingInvitationsCount}
-                    </Badge>
-                  )}
               </Link>
             );
           })}
