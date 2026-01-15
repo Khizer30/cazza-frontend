@@ -634,7 +634,7 @@ export const AccountSettings = () => {
                         Saving...
                       </>
                     ) : (
-                      "Save Business Info"
+                      "Save"
                     )}
                   </Button>
                 </div>
@@ -691,6 +691,24 @@ export const AccountSettings = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Save Marketplaces Button */}
+                <div className="flex justify-end pt-4">
+                  <Button
+                    onClick={handleSubmitBusinessInfo(handleSaveBusinessInfo)}
+                    disabled={savingBusiness}
+                    className="px-8"
+                  >
+                    {savingBusiness ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save"
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -758,10 +776,27 @@ export const AccountSettings = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Save Tech Stack Button */}
+                <div className="flex justify-end pt-4">
+                  <Button
+                    onClick={handleSubmitBusinessInfo(handleSaveBusinessInfo)}
+                    disabled={savingBusiness}
+                    className="px-8"
+                  >
+                    {savingBusiness ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save"
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
-
 
           <Separator />
 
