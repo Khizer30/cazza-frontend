@@ -611,15 +611,17 @@ export const TeamSettings = () => {
                                     : "Make Admin"}
                                 </Button>
                               )}
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleRemoveMember(member.id)}
-                                className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
-                                disabled={isLoading}
-                              >
-                                Remove
-                              </Button>
+                              {member.role?.toUpperCase() !== "OWNER" && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleRemoveMember(member.id)}
+                                  className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
+                                  disabled={isLoading}
+                                >
+                                  Remove
+                                </Button>
+                              )}
                             </>
                           )}
                         </div>
