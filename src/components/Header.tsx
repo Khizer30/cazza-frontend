@@ -22,7 +22,6 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Badge } from "./ui/badge";
 import { useTheme } from "./theme-provider";
 import {
   AlertDialog,
@@ -37,11 +36,6 @@ import {
 } from "./ui/alert-dialog";
 import { useauth } from "@/hooks/useauth";
 import { useUserStore } from "@/store/userStore";
-import { useTeamStore } from "@/store/teamStore";
-import { usePendingInvitations } from "@/hooks/usePendingInvitations";
-import { getMyInvitationsService } from "@/services/teamService";
-import { useEffect } from "react";
-import type { TeamInvitation } from "@/types/auth";
 import { NotificationBell } from "./ClientComponents/NotificationBell";
 
 interface HeaderProps {
@@ -53,44 +47,6 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
   const { theme, setTheme } = useTheme();
   const { logout } = useauth();
   const { user } = useUserStore();
-  const pendingInvitationsCount = usePendingInvitations();
-  const invitationsRefreshTrigger = useTeamStore(
-    (state) => state.invitationsRefreshTrigger
-  );
-  const setPendingInvitationsCount = useTeamStore(
-    (state) => state.setPendingInvitationsCount
-  );
-
-  useEffect(() => {
-    const fetchPendingInvitations = async () => {
-      try {
-        const res = await getMyInvitationsService();
-        if (res && res.success && res.data) {
-          const invitations = res.data as TeamInvitation[];
-          const pendingCount = invitations.filter((invitation) => {
-            if (
-              invitation.status &&
-              invitation.status.toUpperCase() === "ACCEPTED"
-            ) {
-              return false;
-            }
-            if (invitation.expiresAt) {
-              const expiresAt = new Date(invitation.expiresAt);
-              return expiresAt >= new Date();
-            }
-            return true;
-          }).length;
-          setPendingInvitationsCount(pendingCount);
-        }
-      } catch (error) {
-        console.error("Failed to fetch pending invitations:", error);
-      }
-    };
-
-    fetchPendingInvitations();
-    const interval = setInterval(fetchPendingInvitations, 30000);
-    return () => clearInterval(interval);
-  }, [location.pathname, invitationsRefreshTrigger]);
 
   // Get user initials for avatar fallback
   const getUserInitials = () => {
@@ -175,14 +131,6 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
-              {pendingInvitationsCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 min-w-5 px-1.5 text-xs flex items-center justify-center rounded-full"
-                >
-                  {pendingInvitationsCount}
-                </Badge>
-              )}
             </Button>
           </DropdownMenuTrigger>
 
@@ -221,14 +169,6 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             >
               <Users className="mr-2 h-4 w-4" />
               Teams
-              {pendingInvitationsCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="h-5 min-w-5 px-1.5 text-xs flex items-center justify-center ml-auto"
-                >
-                  {pendingInvitationsCount}
-                </Badge>
-              )}
             </DropdownMenuItem>
 
             {user?.role === "SUPERADMIN" && (

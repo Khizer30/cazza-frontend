@@ -1418,7 +1418,7 @@ export const Channels = () => {
                       value={channelDescription}
                       onChange={(e) => setChannelDescription(e.target.value)}
                       rows={4}
-                      className="resize-none"
+                      className="resize-none max-h-32"
                     />
                   </div>
                   <div className="grid gap-2">
