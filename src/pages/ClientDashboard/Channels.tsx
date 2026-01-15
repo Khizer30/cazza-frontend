@@ -1,90 +1,96 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import
+  {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  } from "@/components/ui/dialog";
+import
+  {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import
+  {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import
+  {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Plus,
-  Hash,
-  Users,
-  MoreVertical,
-  Edit,
-  Trash2,
-  UserPlus,
-  Search,
-  MessageSquare,
-  ShoppingBag,
-  Package,
-  Smartphone,
-  Calculator,
-  BarChart3,
-  TrendingUp,
-  DollarSign,
-  Zap,
-  Heart,
-  Star,
-  Target,
-  Briefcase,
-  Home,
-  Building2,
-  Rocket,
-  Globe,
-  Music,
-  Camera,
-  Gamepad2,
-  Book,
-  Code,
-  Palette,
-  Send,
-  Reply,
-  X,
-  Smile,
-  type LucideIcon,
-} from "lucide-react";
+import
+  {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select";
+import
+  {
+    Plus,
+    Hash,
+    Users,
+    MoreVertical,
+    Edit,
+    Trash2,
+    UserPlus,
+    Search,
+    MessageSquare,
+    ShoppingBag,
+    Package,
+    Smartphone,
+    Calculator,
+    BarChart3,
+    TrendingUp,
+    DollarSign,
+    Zap,
+    Heart,
+    Star,
+    Target,
+    Briefcase,
+    Home,
+    Building2,
+    Rocket,
+    Globe,
+    Music,
+    Camera,
+    Gamepad2,
+    Book,
+    Code,
+    Palette,
+    Send,
+    Reply,
+    X,
+    Smile,
+    type LucideIcon,
+  } from "lucide-react";
 import { format } from "date-fns";
 import { useChat } from "@/hooks/useChat";
 import { useTeam } from "@/hooks/useTeam";
@@ -94,29 +100,32 @@ import { MessageFormatToolbar } from "@/components/ClientComponents/MessageForma
 import { MarkdownMessage } from "@/components/ClientComponents/MarkdownMessage";
 import type { ChatGroup } from "@/services/chatService";
 import type { TeamMember as TeamMemberType } from "@/types/auth";
-import {
-  signInWithCustomToken,
-  signOut,
-  onAuthStateChanged,
-} from "firebase/auth";
-import {
-  collection,
-  query,
-  onSnapshot,
-  addDoc,
-  serverTimestamp,
-  limit,
-  Timestamp,
-  doc,
-  setDoc,
-  where,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
-} from "firebase/firestore";
+import
+  {
+    signInWithCustomToken,
+    signOut,
+    onAuthStateChanged,
+  } from "firebase/auth";
+import
+  {
+    collection,
+    query,
+    onSnapshot,
+    addDoc,
+    serverTimestamp,
+    limit,
+    Timestamp,
+    doc,
+    setDoc,
+    where,
+    updateDoc,
+    arrayUnion,
+    arrayRemove,
+  } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
-interface TeamMember {
+interface TeamMember
+{
   id: string;
   name: string;
   email: string;
@@ -124,7 +133,8 @@ interface TeamMember {
   role: "MEMBER" | "ADMIN";
 }
 
-interface ChannelMessage {
+interface ChannelMessage
+{
   id: string;
   channelId: string;
   senderId: string;
@@ -144,7 +154,8 @@ interface ChannelMessage {
   attachments: any[];
 }
 
-interface Channel {
+interface Channel
+{
   id: string;
   name: string;
   description: string;
@@ -158,34 +169,35 @@ interface Channel {
   createdBy?: string;
 }
 
-const availableIcons: { name: string; icon: LucideIcon; color: string }[] = [
+const availableIcons: { name: string; icon: LucideIcon; color: string; }[] = [
   { name: "Hash", icon: Hash, color: "hsl(var(--primary))" },
-  { name: "MessageSquare", icon: MessageSquare, color: "hsl(var(--chart-1))" },
-  { name: "ShoppingBag", icon: ShoppingBag, color: "hsl(var(--chart-4))" },
+  { name: "Message", icon: MessageSquare, color: "hsl(var(--chart-1))" },
+  { name: "Shop", icon: ShoppingBag, color: "hsl(var(--chart-4))" },
   { name: "Package", icon: Package, color: "hsl(var(--chart-5))" },
-  { name: "Smartphone", icon: Smartphone, color: "hsl(var(--destructive))" },
-  { name: "Calculator", icon: Calculator, color: "hsl(var(--chart-1))" },
-  { name: "BarChart3", icon: BarChart3, color: "hsl(var(--chart-2))" },
-  { name: "TrendingUp", icon: TrendingUp, color: "hsl(var(--chart-3))" },
-  { name: "DollarSign", icon: DollarSign, color: "hsl(var(--success))" },
+  { name: "Phone", icon: Smartphone, color: "hsl(var(--destructive))" },
+  { name: "Calc", icon: Calculator, color: "hsl(var(--chart-1))" },
+  { name: "Chart", icon: BarChart3, color: "hsl(var(--chart-2))" },
+  { name: "Trending", icon: TrendingUp, color: "hsl(var(--chart-3))" },
+  { name: "Dollar", icon: DollarSign, color: "hsl(var(--success))" },
   { name: "Zap", icon: Zap, color: "hsl(var(--warning))" },
   { name: "Heart", icon: Heart, color: "hsl(var(--destructive))" },
   { name: "Star", icon: Star, color: "hsl(var(--chart-4))" },
   { name: "Target", icon: Target, color: "hsl(var(--chart-5))" },
-  { name: "Briefcase", icon: Briefcase, color: "hsl(var(--chart-1))" },
+  { name: "Work", icon: Briefcase, color: "hsl(var(--chart-1))" },
   { name: "Home", icon: Home, color: "hsl(var(--chart-2))" },
-  { name: "Building2", icon: Building2, color: "hsl(var(--chart-3))" },
+  { name: "Building", icon: Building2, color: "hsl(var(--chart-3))" },
   { name: "Rocket", icon: Rocket, color: "hsl(var(--primary))" },
   { name: "Globe", icon: Globe, color: "hsl(var(--chart-4))" },
   { name: "Music", icon: Music, color: "hsl(var(--chart-5))" },
   { name: "Camera", icon: Camera, color: "hsl(var(--destructive))" },
-  { name: "Gamepad2", icon: Gamepad2, color: "hsl(var(--chart-1))" },
+  { name: "Game", icon: Gamepad2, color: "hsl(var(--chart-1))" },
   { name: "Book", icon: Book, color: "hsl(var(--chart-2))" },
   { name: "Code", icon: Code, color: "hsl(var(--chart-3))" },
   { name: "Palette", icon: Palette, color: "hsl(var(--chart-4))" },
 ];
 
-export const Channels = () => {
+export const Channels = () =>
+{
   const {
     getUserChatGroups,
     createChatGroup,
@@ -219,7 +231,8 @@ export const Channels = () => {
   const [isLoadingChannelDetails, setIsLoadingChannelDetails] = useState(false);
 
   const convertChatGroupToChannel = useCallback(
-    (chatGroup: ChatGroup): Channel => {
+    (chatGroup: ChatGroup): Channel =>
+    {
       const defaultIcon = availableIcons[0];
       const iconFromApi = chatGroup.icon
         ? availableIcons.find((i) => i.name === chatGroup.icon)
@@ -258,7 +271,7 @@ export const Channels = () => {
   const isInitializingRef = useRef(false);
   const addMemberDialogChannelIdRef = useRef<string | null>(null);
   const [typingUsers, setTypingUsers] = useState<
-    Array<{ userId: string; userName: string }>
+    Array<{ userId: string; userName: string; }>
   >([]);
 
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
@@ -287,10 +300,12 @@ export const Channels = () => {
 
   const getCurrentUserRole = (
     channel: Channel | undefined
-  ): "ADMIN" | "MEMBER" | null => {
+  ): "ADMIN" | "MEMBER" | null =>
+  {
     if (!channel || !loggedInUser) return null;
 
-    if (channel.userRole) {
+    if (channel.userRole)
+    {
       return channel.userRole;
     }
 
@@ -299,29 +314,34 @@ export const Channels = () => {
         m.id === loggedInUser.id || String(m.id) === String(loggedInUser.id)
     );
 
-    if (userMember) {
+    if (userMember)
+    {
       return userMember.role;
     }
 
     return null;
   };
 
-  const isCreatorOrAdmin = (channel: Channel | undefined): boolean => {
+  const isCreatorOrAdmin = (channel: Channel | undefined): boolean =>
+  {
     if (!channel || !loggedInUser) return false;
 
     if (
       channel.createdBy &&
       (channel.createdBy === loggedInUser.id ||
         String(channel.createdBy) === String(loggedInUser.id))
-    ) {
+    )
+    {
       return true;
     }
 
     return getCurrentUserRole(channel) === "ADMIN";
   };
 
-  const processMemberFromAPI = (member: any, creatorId: string | null) => {
-    if (!member.user) {
+  const processMemberFromAPI = (member: any, creatorId: string | null) =>
+  {
+    if (!member.user)
+    {
       return {
         id: member.userId,
         name: "User",
@@ -340,11 +360,14 @@ export const Channels = () => {
         userData.id === creatorId ||
         String(userData.id) === String(creatorId));
 
-    const getDisplayName = () => {
-      if (userData.firstName && userData.lastName) {
-        return `${userData.firstName} ${userData.lastName}`;
+    const getDisplayName = () =>
+    {
+      if (userData.firstName && userData.lastName)
+      {
+        return `${ userData.firstName } ${ userData.lastName }`;
       }
-      if (userData.firstName) {
+      if (userData.firstName)
+      {
         return userData.firstName;
       }
       return userData.email || "User";
@@ -360,35 +383,46 @@ export const Channels = () => {
     };
   };
 
-  useEffect(() => {
-    const loadChatGroups = async () => {
-      try {
+  useEffect(() =>
+  {
+    const loadChatGroups = async () =>
+    {
+      try
+      {
         setIsLoading(true);
         const chatGroups = await getUserChatGroups();
 
-        if (chatGroups && Array.isArray(chatGroups) && chatGroups.length > 0) {
+        if (chatGroups && Array.isArray(chatGroups) && chatGroups.length > 0)
+        {
           const convertedChannels = chatGroups
             .filter((group) => group && group.id && group.name)
             .map(convertChatGroupToChannel);
 
-          if (convertedChannels.length > 0) {
+          if (convertedChannels.length > 0)
+          {
             setChannels(convertedChannels);
 
-            setSelectedChannelId((prev) => {
-              if (!prev) {
+            setSelectedChannelId((prev) =>
+            {
+              if (!prev)
+              {
                 return convertedChannels[0].id;
               }
               return prev;
             });
-          } else {
+          } else
+          {
             setChannels([]);
           }
-        } else {
+        } else
+        {
           setChannels([]);
         }
-      } catch (error) {
+      } catch (error)
+      {
         setChannels([]);
-      } finally {
+      } finally
+      {
         setIsLoading(false);
       }
     };
@@ -396,16 +430,22 @@ export const Channels = () => {
     loadChatGroups();
   }, []);
 
-  useEffect(() => {
-    const loadTeamMembers = async () => {
-      try {
+  useEffect(() =>
+  {
+    const loadTeamMembers = async () =>
+    {
+      try
+      {
         setIsLoadingMembers(true);
         const members = await fetchTeamMembers();
-        if (members && members.length > 0) {
+        if (members && members.length > 0)
+        {
           setTeamMembers(members);
         }
-      } catch (error) {
-      } finally {
+      } catch (error)
+      {
+      } finally
+      {
         setIsLoadingMembers(false);
       }
     };
@@ -414,10 +454,12 @@ export const Channels = () => {
   }, []);
 
   const updateTypingStatus = useCallback(
-    async (isTyping: boolean) => {
+    async (isTyping: boolean) =>
+    {
       if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
 
-      try {
+      try
+      {
         const typingRef = doc(
           db,
           "chatGroups",
@@ -428,7 +470,7 @@ export const Channels = () => {
 
         const senderName =
           loggedInUser.firstName && loggedInUser.lastName
-            ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+            ? `${ loggedInUser.firstName } ${ loggedInUser.lastName }`
             : loggedInUser.firstName || loggedInUser.email || "User";
 
         await setDoc(
@@ -446,17 +488,20 @@ export const Channels = () => {
     [selectedChannelId, loggedInUser]
   );
 
-  const handleTyping = useCallback(() => {
+  const handleTyping = useCallback(() =>
+  {
     if (!selectedChannelId || !loggedInUser) return;
     updateTypingStatus(true);
   }, [selectedChannelId, loggedInUser, updateTypingStatus]);
 
-  const handleInputBlur = useCallback(() => {
+  const handleInputBlur = useCallback(() =>
+  {
     if (!selectedChannelId || !loggedInUser) return;
     updateTypingStatus(false);
   }, [selectedChannelId, loggedInUser, updateTypingStatus]);
 
-  const handleEditMessage = async (messageId: string, newText: string) => {
+  const handleEditMessage = async (messageId: string, newText: string) =>
+  {
     if (
       !selectedChannelId ||
       !loggedInUser ||
@@ -465,14 +510,16 @@ export const Channels = () => {
     )
       return;
 
-    try {
+    try
+    {
       const message = selectedChannel?.messages.find((m) => m.id === messageId);
       if (!message) return;
 
       const trimmedNewText = newText.trim();
       const originalText = message.text.trim();
 
-      if (trimmedNewText === originalText) {
+      if (trimmedNewText === originalText)
+      {
         setEditingMessageId(null);
         setEditingMessageText("");
         return;
@@ -489,7 +536,8 @@ export const Channels = () => {
         text: trimmedNewText,
       };
 
-      if (trimmedNewText !== originalText) {
+      if (trimmedNewText !== originalText)
+      {
         updateData.edited = true;
         updateData.editedAt = serverTimestamp();
       }
@@ -500,10 +548,12 @@ export const Channels = () => {
     } catch (error) {}
   };
 
-  const handleDeleteMessage = async (messageId: string) => {
+  const handleDeleteMessage = async (messageId: string) =>
+  {
     if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
 
-    try {
+    try
+    {
       const messageRef = doc(
         db,
         "chatGroups",
@@ -517,10 +567,12 @@ export const Channels = () => {
     } catch (error) {}
   };
 
-  const handleToggleReaction = async (messageId: string, emoji: string) => {
+  const handleToggleReaction = async (messageId: string, emoji: string) =>
+  {
     if (!selectedChannelId || !loggedInUser || !auth.currentUser) return;
 
-    try {
+    try
+    {
       const messageRef = doc(
         db,
         "chatGroups",
@@ -532,25 +584,30 @@ export const Channels = () => {
       const currentReactions = message?.reactions || {};
       const usersWithReaction = currentReactions[emoji] || [];
 
-      if (usersWithReaction.includes(loggedInUser.id)) {
+      if (usersWithReaction.includes(loggedInUser.id))
+      {
         await updateDoc(messageRef, {
-          [`reactions.${emoji}`]: arrayRemove(loggedInUser.id),
+          [`reactions.${ emoji }`]: arrayRemove(loggedInUser.id),
         });
-      } else {
+      } else
+      {
         const updates: any = {};
 
-        Object.keys(currentReactions).forEach((existingEmoji) => {
-          if (existingEmoji !== emoji) {
+        Object.keys(currentReactions).forEach((existingEmoji) =>
+        {
+          if (existingEmoji !== emoji)
+          {
             const existingUsers = currentReactions[existingEmoji] || [];
-            if (existingUsers.includes(loggedInUser.id)) {
-              updates[`reactions.${existingEmoji}`] = arrayRemove(
+            if (existingUsers.includes(loggedInUser.id))
+            {
+              updates[`reactions.${ existingEmoji }`] = arrayRemove(
                 loggedInUser.id
               );
             }
           }
         });
 
-        updates[`reactions.${emoji}`] = arrayUnion(loggedInUser.id);
+        updates[`reactions.${ emoji }`] = arrayUnion(loggedInUser.id);
 
         await updateDoc(messageRef, updates);
       }
@@ -558,29 +615,35 @@ export const Channels = () => {
     } catch (error) {}
   };
 
-  const handleReply = (message: ChannelMessage) => {
+  const handleReply = (message: ChannelMessage) =>
+  {
     setReplyingToMessage(message);
     messageInputRef.current?.focus();
   };
 
-  const cancelReply = () => {
+  const cancelReply = () =>
+  {
     setReplyingToMessage(null);
   };
 
-  const startEditMessage = (message: ChannelMessage) => {
+  const startEditMessage = (message: ChannelMessage) =>
+  {
     setEditingMessageId(message.id);
     setEditingMessageText(message.text);
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       messageInputRef.current?.focus();
     }, 100);
   };
 
-  const cancelEditMessage = () => {
+  const cancelEditMessage = () =>
+  {
     setEditingMessageId(null);
     setEditingMessageText("");
   };
 
-  const handleFormatClick = (format: string) => {
+  const handleFormatClick = (format: string) =>
+  {
     const inputElement = messageInputRef.current;
     if (!inputElement) return;
 
@@ -592,33 +655,34 @@ export const Channels = () => {
     let formattedText = "";
     let cursorOffset = 0;
 
-    switch (format) {
+    switch (format)
+    {
       case "bold":
-        formattedText = `**${selectedText}**`;
+        formattedText = `**${ selectedText }**`;
         cursorOffset = selectedText ? 0 : -2;
         break;
       case "italic":
-        formattedText = `*${selectedText}*`;
+        formattedText = `*${ selectedText }*`;
         cursorOffset = selectedText ? 0 : -1;
         break;
       case "underline":
-        formattedText = `__${selectedText}__`;
+        formattedText = `__${ selectedText }__`;
         cursorOffset = selectedText ? 0 : -2;
         break;
       case "strikethrough":
-        formattedText = `~~${selectedText}~~`;
+        formattedText = `~~${ selectedText }~~`;
         cursorOffset = selectedText ? 0 : -2;
         break;
       case "link":
-        formattedText = `[${selectedText || "text"}](url)`;
+        formattedText = `[${ selectedText || "text" }](url)`;
         cursorOffset = selectedText ? -4 : -9;
         break;
       case "bulletList":
-        formattedText = `- ${selectedText}`;
+        formattedText = `- ${ selectedText }`;
         cursorOffset = 0;
         break;
       case "numberedList":
-        formattedText = `1. ${selectedText}`;
+        formattedText = `1. ${ selectedText }`;
         cursorOffset = 0;
         break;
       default:
@@ -630,13 +694,16 @@ export const Channels = () => {
       formattedText +
       currentText.substring(end);
 
-    if (editingMessageId) {
+    if (editingMessageId)
+    {
       setEditingMessageText(newText);
-    } else {
+    } else
+    {
       setMessageInput(newText);
     }
 
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       const newCursorPos = start + formattedText.length + cursorOffset;
       inputElement.focus();
       inputElement.setSelectionRange(newCursorPos, newCursorPos);
@@ -645,13 +712,17 @@ export const Channels = () => {
 
   const commonEmojis = ["👍", "❤️", "😂", "😮", "😢", "🎉"];
 
-  useEffect(() => {
-    if (!selectedChannelId) {
-      if (unsubscribeRef.current) {
+  useEffect(() =>
+  {
+    if (!selectedChannelId)
+    {
+      if (unsubscribeRef.current)
+      {
         unsubscribeRef.current();
         unsubscribeRef.current = null;
       }
-      if (typingUnsubscribeRef.current) {
+      if (typingUnsubscribeRef.current)
+      {
         typingUnsubscribeRef.current();
         typingUnsubscribeRef.current = null;
       }
@@ -660,56 +731,68 @@ export const Channels = () => {
       return;
     }
 
-    if (isInitializingRef.current) {
+    if (isInitializingRef.current)
+    {
       return;
     }
 
-    const initializeFirebaseAndLoadMessages = async () => {
+    const initializeFirebaseAndLoadMessages = async () =>
+    {
       isInitializingRef.current = true;
       setIsLoadingMessages(true);
 
-      try {
+      try
+      {
         const customToken = await getFirebaseToken(selectedChannelId);
 
         if (
           !customToken ||
           typeof customToken !== "string" ||
           customToken.trim() === ""
-        ) {
+        )
+        {
           isInitializingRef.current = false;
           setIsLoadingMessages(false);
           return;
         }
 
-        try {
-          if (auth.currentUser) {
+        try
+        {
+          if (auth.currentUser)
+          {
             await signOut(auth);
           }
 
           await signInWithCustomToken(auth, customToken);
 
-          await new Promise<void>((resolve, reject) => {
+          await new Promise<void>((resolve, reject) =>
+          {
             const unsubscribe = onAuthStateChanged(
               auth,
-              (user) => {
-                if (user) {
+              (user) =>
+              {
+                if (user)
+                {
                   unsubscribe();
                   resolve();
                 }
               },
-              (error) => {
+              (error) =>
+              {
                 unsubscribe();
                 reject(error);
               }
             );
 
-            setTimeout(() => {
+            setTimeout(() =>
+            {
               unsubscribe();
               reject(new Error("Auth state change timeout"));
             }, 5000);
           });
 
-          if (!auth.currentUser) {
+          if (!auth.currentUser)
+          {
             isInitializingRef.current = false;
             setIsLoadingMessages(false);
             return;
@@ -728,9 +811,11 @@ export const Channels = () => {
 
           const unsubscribe = onSnapshot(
             messagesQuery,
-            (snapshot) => {
+            (snapshot) =>
+            {
               const firebaseMessages: ChannelMessage[] = snapshot.docs
-                .map((docSnapshot) => {
+                .map((docSnapshot) =>
+                {
                   const data = docSnapshot.data();
                   const timestamp = data.timestamp as Timestamp;
                   const createdAt = data.createdAt as Timestamp;
@@ -762,8 +847,10 @@ export const Channels = () => {
               );
               setIsLoadingMessages(false);
             },
-            (error: any) => {
-              if (error?.code === "permission-denied") {
+            (error: any) =>
+            {
+              if (error?.code === "permission-denied")
+              {
                 isInitializingRef.current = false;
                 setIsLoadingMessages(false);
               }
@@ -782,13 +869,15 @@ export const Channels = () => {
 
           const typingUnsubscribe = onSnapshot(
             typingQuery,
-            (snapshot) => {
+            (snapshot) =>
+            {
               const typingUsersList: Array<{
                 userId: string;
                 userName: string;
               }> = [];
 
-              snapshot.forEach((docSnapshot) => {
+              snapshot.forEach((docSnapshot) =>
+              {
                 const data = docSnapshot.data();
                 const userId = docSnapshot.id;
                 if (
@@ -796,7 +885,8 @@ export const Channels = () => {
                   loggedInUser &&
                   userId !== loggedInUser.id &&
                   String(userId) !== String(loggedInUser.id)
-                ) {
+                )
+                {
                   typingUsersList.push({
                     userId: userId,
                     userName: data.name || "User",
@@ -811,11 +901,13 @@ export const Channels = () => {
 
           typingUnsubscribeRef.current = typingUnsubscribe;
           isInitializingRef.current = false;
-        } catch (authError: any) {
+        } catch (authError: any)
+        {
           isInitializingRef.current = false;
           setIsLoadingMessages(false);
         }
-      } catch (error) {
+      } catch (error)
+      {
         isInitializingRef.current = false;
         setIsLoadingMessages(false);
       }
@@ -823,16 +915,20 @@ export const Channels = () => {
 
     initializeFirebaseAndLoadMessages();
 
-    return () => {
-      if (unsubscribeRef.current) {
+    return () =>
+    {
+      if (unsubscribeRef.current)
+      {
         unsubscribeRef.current();
         unsubscribeRef.current = null;
       }
-      if (typingUnsubscribeRef.current) {
+      if (typingUnsubscribeRef.current)
+      {
         typingUnsubscribeRef.current();
         typingUnsubscribeRef.current = null;
       }
-      if (selectedChannelId && loggedInUser && auth.currentUser) {
+      if (selectedChannelId && loggedInUser && auth.currentUser)
+      {
         updateTypingStatus(false);
       }
       setTypingUsers([]);
@@ -841,23 +937,29 @@ export const Channels = () => {
     };
   }, [selectedChannelId, loggedInUser, updateTypingStatus]);
 
-  useEffect(() => {
-    if (!selectedChannelId) {
+  useEffect(() =>
+  {
+    if (!selectedChannelId)
+    {
       setIsLoadingChannelDetails(false);
       return;
     }
 
-    const loadChannelDetails = async () => {
-      try {
+    const loadChannelDetails = async () =>
+    {
+      try
+      {
         setIsLoadingChannelDetails(true);
         const channelDetails = await getChatGroupById(selectedChannelId);
-        if (channelDetails) {
+        if (channelDetails)
+        {
           const creatorId = (channelDetails as any).createdBy;
 
           const processedMembers =
             channelDetails.members
               ?.map((member: any) => processMemberFromAPI(member, creatorId))
-              .sort((a: any, b: any) => {
+              .sort((a: any, b: any) =>
+              {
                 if (a.isCreator) return -1;
                 if (b.isCreator) return 1;
                 return 0;
@@ -877,19 +979,21 @@ export const Channels = () => {
             prevChannels.map((channel) =>
               channel.id === selectedChannelId
                 ? {
-                    ...channel,
-                    members: finalMembers,
-                    userRole:
-                      (channelDetails as any).userRole ||
-                      (channelDetails as any).role,
-                    createdBy: creatorId || channel.createdBy,
-                  }
+                  ...channel,
+                  members: finalMembers,
+                  userRole:
+                    (channelDetails as any).userRole ||
+                    (channelDetails as any).role,
+                  createdBy: creatorId || channel.createdBy,
+                }
                 : channel
             )
           );
         }
-      } catch (error) {
-      } finally {
+      } catch (error)
+      {
+      } finally
+      {
         setIsLoadingChannelDetails(false);
       }
     };
@@ -897,42 +1001,53 @@ export const Channels = () => {
     loadChannelDetails();
   }, [selectedChannelId, teamMembers, loggedInUser]);
 
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
-    if (scrollAreaRef.current) {
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") =>
+  {
+    if (scrollAreaRef.current)
+    {
       const scrollContainer = scrollAreaRef.current.querySelector(
         "[data-radix-scroll-area-viewport]"
       );
-      if (scrollContainer) {
+      if (scrollContainer)
+      {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
     }
     messagesEndRef.current?.scrollIntoView({ behavior });
   }, []);
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     previousMessageCountRef.current = 0;
   }, [selectedChannelId]);
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     const currentMessageCount = selectedChannel?.messages.length || 0;
     const previousCount = previousMessageCountRef.current;
 
-    if (currentMessageCount > previousCount) {
+    if (currentMessageCount > previousCount)
+    {
       scrollToBottom("smooth");
     }
 
     previousMessageCountRef.current = currentMessageCount;
   }, [selectedChannel?.messages, scrollToBottom]);
 
-  useEffect(() => {
-    if (selectedChannelId && !isLoadingMessages) {
+  useEffect(() =>
+  {
+    if (selectedChannelId && !isLoadingMessages)
+    {
       setTimeout(() => scrollToBottom("instant"), 100);
     }
   }, [selectedChannelId, isLoadingMessages, scrollToBottom]);
 
-  useEffect(() => {
-    return () => {
-      if (selectedChannelId && loggedInUser && auth.currentUser) {
+  useEffect(() =>
+  {
+    return () =>
+    {
+      if (selectedChannelId && loggedInUser && auth.currentUser)
+      {
         updateTypingStatus(false);
       }
     };
@@ -944,10 +1059,12 @@ export const Channels = () => {
       channel.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCreateChannel = async () => {
+  const handleCreateChannel = async () =>
+  {
     if (!channelName.trim() || isCreating) return;
 
-    try {
+    try
+    {
       setIsCreating(true);
       const createdGroup = await createChatGroup({
         name: channelName.trim(),
@@ -955,7 +1072,8 @@ export const Channels = () => {
         icon: selectedIcon.name,
       });
 
-      if (createdGroup) {
+      if (createdGroup)
+      {
         const newChannel = convertChatGroupToChannel(createdGroup);
         setChannels([newChannel, ...channels]);
         setSelectedChannelId(newChannel.id);
@@ -965,16 +1083,20 @@ export const Channels = () => {
       setChannelDescription("");
       setSelectedIcon(availableIcons[0]);
       setShowCreateDialog(false);
-    } catch (error) {
-    } finally {
+    } catch (error)
+    {
+    } finally
+    {
       setIsCreating(false);
     }
   };
 
-  const handleEditChannel = async () => {
+  const handleEditChannel = async () =>
+  {
     if (!editingChannel || !channelName.trim() || isUpdating) return;
 
-    try {
+    try
+    {
       setIsUpdating(true);
       await updateChatGroup(editingChannel.id, {
         name: channelName.trim(),
@@ -986,13 +1108,13 @@ export const Channels = () => {
         channels.map((channel) =>
           channel.id === editingChannel.id
             ? {
-                ...channel,
-                name: channelName.trim(),
-                description: channelDescription.trim(),
-                icon: selectedIcon.icon,
-                iconName: selectedIcon.name,
-                color: selectedIcon.color,
-              }
+              ...channel,
+              name: channelName.trim(),
+              description: channelDescription.trim(),
+              icon: selectedIcon.icon,
+              iconName: selectedIcon.name,
+              color: selectedIcon.color,
+            }
             : channel
         )
       );
@@ -1002,16 +1124,20 @@ export const Channels = () => {
       setChannelDescription("");
       setSelectedIcon(availableIcons[0]);
       setShowCreateDialog(false);
-    } catch (error) {
-    } finally {
+    } catch (error)
+    {
+    } finally
+    {
       setIsUpdating(false);
     }
   };
 
-  const handleDeleteChannel = async (channelId: string) => {
+  const handleDeleteChannel = async (channelId: string) =>
+  {
     if (isDeleting === channelId) return;
 
-    try {
+    try
+    {
       setIsDeleting(channelId);
       await deleteChatGroup(channelId);
 
@@ -1020,30 +1146,37 @@ export const Channels = () => {
       );
       setChannels(updatedChannels);
 
-      if (selectedChannelId === channelId) {
+      if (selectedChannelId === channelId)
+      {
         setSelectedChannelId(updatedChannels[0]?.id || null);
       }
-    } catch (error) {
-    } finally {
+    } catch (error)
+    {
+    } finally
+    {
       setIsDeleting(null);
     }
   };
 
-  const handleAddMember = async (channelId: string, memberId: string) => {
-    try {
+  const handleAddMember = async (channelId: string, memberId: string) =>
+  {
+    try
+    {
       setAddingMemberId(memberId);
       await addMemberToGroup(channelId, memberId, "MEMBER");
 
       setShowAddMemberDialog(null);
 
       const channelDetails = await getChatGroupById(channelId);
-      if (channelDetails) {
+      if (channelDetails)
+      {
         const creatorId = (channelDetails as any).createdBy;
 
         const processedMembers =
           channelDetails.members
             ?.map((member: any) => processMemberFromAPI(member, creatorId))
-            .sort((a: any, b: any) => {
+            .sort((a: any, b: any) =>
+            {
               if (a.isCreator) return -1;
               if (b.isCreator) return 1;
               return 0;
@@ -1063,35 +1196,41 @@ export const Channels = () => {
           prevChannels.map((channel) =>
             channel.id === channelId
               ? {
-                  ...channel,
-                  members: finalMembers,
-                  createdBy: creatorId || channel.createdBy,
-                }
+                ...channel,
+                members: finalMembers,
+                createdBy: creatorId || channel.createdBy,
+              }
               : channel
           )
         );
       }
-    } catch (error) {
-    } finally {
+    } catch (error)
+    {
+    } finally
+    {
       setAddingMemberId(null);
     }
   };
 
-  const handleRemoveMember = async (channelId: string, userId: string) => {
-    try {
+  const handleRemoveMember = async (channelId: string, userId: string) =>
+  {
+    try
+    {
       setRemovingMemberId(userId);
       await removeMemberFromGroup(channelId, userId);
 
       setShowRemoveMemberDialog(null);
 
       const channelDetails = await getChatGroupById(channelId);
-      if (channelDetails) {
+      if (channelDetails)
+      {
         const creatorId = (channelDetails as any).createdBy;
 
         const processedMembers =
           channelDetails.members
             ?.map((member: any) => processMemberFromAPI(member, creatorId))
-            .sort((a: any, b: any) => {
+            .sort((a: any, b: any) =>
+            {
               if (a.isCreator) return -1;
               if (b.isCreator) return 1;
               return 0;
@@ -1111,16 +1250,18 @@ export const Channels = () => {
           prevChannels.map((channel) =>
             channel.id === channelId
               ? {
-                  ...channel,
-                  members: finalMembers,
-                  createdBy: creatorId || channel.createdBy,
-                }
+                ...channel,
+                members: finalMembers,
+                createdBy: creatorId || channel.createdBy,
+              }
               : channel
           )
         );
       }
-    } catch (error) {
-    } finally {
+    } catch (error)
+    {
+    } finally
+    {
       setRemovingMemberId(null);
     }
   };
@@ -1129,19 +1270,23 @@ export const Channels = () => {
     channelId: string,
     userId: string,
     newRole: "ADMIN" | "MEMBER"
-  ) => {
-    try {
+  ) =>
+  {
+    try
+    {
       setChangingRoleMemberId(userId);
       await updateMemberRole(channelId, userId, newRole);
 
       const channelDetails = await getChatGroupById(channelId);
-      if (channelDetails) {
+      if (channelDetails)
+      {
         const creatorId = (channelDetails as any).createdBy;
 
         const processedMembers =
           channelDetails.members
             ?.map((member: any) => processMemberFromAPI(member, creatorId))
-            .sort((a: any, b: any) => {
+            .sort((a: any, b: any) =>
+            {
               if (a.isCreator) return -1;
               if (b.isCreator) return 1;
               return 0;
@@ -1161,21 +1306,24 @@ export const Channels = () => {
           prevChannels.map((channel) =>
             channel.id === channelId
               ? {
-                  ...channel,
-                  members: finalMembers,
-                  createdBy: creatorId || channel.createdBy,
-                }
+                ...channel,
+                members: finalMembers,
+                createdBy: creatorId || channel.createdBy,
+              }
               : channel
           )
         );
       }
-    } catch (error) {
-    } finally {
+    } catch (error)
+    {
+    } finally
+    {
       setChangingRoleMemberId(null);
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async () =>
+  {
     if (
       !messageInput.trim() ||
       !selectedChannelId ||
@@ -1184,13 +1332,16 @@ export const Channels = () => {
     )
       return;
 
-    try {
+    try
+    {
       setIsSendingMessage(true);
-      if (!auth.currentUser) {
+      if (!auth.currentUser)
+      {
         return;
       }
 
-      if (selectedChannelId && loggedInUser) {
+      if (selectedChannelId && loggedInUser)
+      {
         await updateTypingStatus(false);
       }
 
@@ -1202,7 +1353,7 @@ export const Channels = () => {
       );
       const senderName =
         loggedInUser.firstName && loggedInUser.lastName
-          ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+          ? `${ loggedInUser.firstName } ${ loggedInUser.lastName }`
           : loggedInUser.firstName || loggedInUser.email || "User";
 
       const messageData: any = {
@@ -1217,7 +1368,8 @@ export const Channels = () => {
         attachments: [],
       };
 
-      if (replyingToMessage) {
+      if (replyingToMessage)
+      {
         messageData.replyTo = {
           messageId: replyingToMessage.id,
           senderName: replyingToMessage.senderName,
@@ -1229,13 +1381,16 @@ export const Channels = () => {
 
       setMessageInput("");
       setReplyingToMessage(null);
-    } catch (error: any) {
-    } finally {
+    } catch (error: any)
+    {
+    } finally
+    {
       setIsSendingMessage(false);
     }
   };
 
-  const openEditDialog = (channel: Channel) => {
+  const openEditDialog = (channel: Channel) =>
+  {
     setEditingChannel(channel);
     setChannelName(channel.name);
     setChannelDescription(channel.description);
@@ -1244,7 +1399,8 @@ export const Channels = () => {
     setShowCreateDialog(true);
   };
 
-  const closeDialog = () => {
+  const closeDialog = () =>
+  {
     setShowCreateDialog(false);
     setEditingChannel(null);
     setChannelName("");
@@ -1253,7 +1409,8 @@ export const Channels = () => {
     setShowIconPicker(false);
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string) =>
+  {
     return name
       .split(" ")
       .map((n) => n[0])
@@ -1262,15 +1419,18 @@ export const Channels = () => {
       .slice(0, 2);
   };
 
-  const getSender = (senderId: string, message?: ChannelMessage) => {
+  const getSender = (senderId: string, message?: ChannelMessage) =>
+  {
     const channel = channels.find((c) => c.id === selectedChannelId);
 
-    if (channel) {
+    if (channel)
+    {
       const channelMember = channel.members.find(
         (m) => m.id === senderId || String(m.id) === String(senderId)
       );
 
-      if (channelMember) {
+      if (channelMember)
+      {
         return {
           id: channelMember.id,
           name: channelMember.name,
@@ -1285,12 +1445,16 @@ export const Channels = () => {
       loggedInUser &&
       (loggedInUser.id === senderId ||
         String(loggedInUser.id) === String(senderId))
-    ) {
-      const getDisplayName = () => {
-        if (loggedInUser.firstName && loggedInUser.lastName) {
-          return `${loggedInUser.firstName} ${loggedInUser.lastName}`;
+    )
+    {
+      const getDisplayName = () =>
+      {
+        if (loggedInUser.firstName && loggedInUser.lastName)
+        {
+          return `${ loggedInUser.firstName } ${ loggedInUser.lastName }`;
         }
-        if (loggedInUser.firstName) {
+        if (loggedInUser.firstName)
+        {
           return loggedInUser.firstName;
         }
         return loggedInUser.email || "User";
@@ -1314,20 +1478,25 @@ export const Channels = () => {
     };
   };
 
-  const formatMessageTime = (date: Date) => {
+  const formatMessageTime = (date: Date) =>
+  {
     return format(date, "h:mm a");
   };
 
-  const getReactionUserNames = (userIds: string[]): string[] => {
+  const getReactionUserNames = (userIds: string[]): string[] =>
+  {
     const channel = channels.find((c) => c.id === selectedChannelId);
     const names: string[] = [];
 
-    userIds.forEach((userId) => {
-      if (channel) {
+    userIds.forEach((userId) =>
+    {
+      if (channel)
+      {
         const channelMember = channel.members.find(
           (m) => m.id === userId || String(m.id) === String(userId)
         );
-        if (channelMember) {
+        if (channelMember)
+        {
           names.push(channelMember.name);
           return;
         }
@@ -1337,10 +1506,11 @@ export const Channels = () => {
         loggedInUser &&
         (loggedInUser.id === userId ||
           String(loggedInUser.id) === String(userId))
-      ) {
+      )
+      {
         const displayName =
           loggedInUser.firstName && loggedInUser.lastName
-            ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+            ? `${ loggedInUser.firstName } ${ loggedInUser.lastName }`
             : loggedInUser.firstName || loggedInUser.email || "User";
         names.push(displayName);
         return;
@@ -1359,12 +1529,16 @@ export const Channels = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Channels</h2>
             <Dialog
-              open={showCreateDialog}
-              onOpenChange={(open) => {
-                if (!open) {
+              open={ showCreateDialog }
+              onOpenChange={ (open) =>
+              {
+                if (!open)
+                {
                   closeDialog();
-                } else {
-                  if (!editingChannel) {
+                } else
+                {
+                  if (!editingChannel)
+                  {
                     setEditingChannel(null);
                     setChannelName("");
                     setChannelDescription("");
@@ -1372,19 +1546,20 @@ export const Channels = () => {
                   }
                   setShowCreateDialog(true);
                 }
-              }}
+              } }
             >
               <DialogTrigger asChild>
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={() => {
+                  onClick={ () =>
+                  {
                     setEditingChannel(null);
                     setChannelName("");
                     setChannelDescription("");
                     setSelectedIcon(availableIcons[0]);
                     setShowCreateDialog(true);
-                  }}
+                  } }
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -1392,12 +1567,12 @@ export const Channels = () => {
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                   <DialogTitle>
-                    {editingChannel ? "Edit Channel" : "Create New Channel"}
+                    { editingChannel ? "Edit Channel" : "Create New Channel" }
                   </DialogTitle>
                   <DialogDescription>
-                    {editingChannel
+                    { editingChannel
                       ? "Update your channel details and icon"
-                      : "Create a new channel for your team to collaborate"}
+                      : "Create a new channel for your team to collaborate" }
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -1406,8 +1581,8 @@ export const Channels = () => {
                     <Input
                       id="name"
                       placeholder="e.g., Sales Team"
-                      value={channelName}
-                      onChange={(e) => setChannelName(e.target.value)}
+                      value={ channelName }
+                      onChange={ (e) => setChannelName(e.target.value) }
                     />
                   </div>
                   <div className="grid gap-2">
@@ -1415,17 +1590,17 @@ export const Channels = () => {
                     <Textarea
                       id="description"
                       placeholder="What is this channel about? (Optional)"
-                      value={channelDescription}
-                      onChange={(e) => setChannelDescription(e.target.value)}
-                      rows={4}
+                      value={ channelDescription }
+                      onChange={ (e) => setChannelDescription(e.target.value) }
+                      rows={ 4 }
                       className="resize-none max-h-32"
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label>Channel Icon</Label>
                     <Dialog
-                      open={showIconPicker}
-                      onOpenChange={setShowIconPicker}
+                      open={ showIconPicker }
+                      onOpenChange={ setShowIconPicker }
                     >
                       <DialogTrigger asChild>
                         <Button
@@ -1433,16 +1608,17 @@ export const Channels = () => {
                           className="w-full justify-start"
                           type="button"
                         >
-                          {(() => {
+                          { (() =>
+                          {
                             const IconComponent = selectedIcon.icon;
                             return (
                               <IconComponent
                                 className="mr-2 h-4 w-4"
-                                style={{ color: selectedIcon.color }}
+                                style={ { color: selectedIcon.color } }
                               />
                             );
-                          })()}
-                          {selectedIcon.name}
+                          })() }
+                          { selectedIcon.name }
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[400px]">
@@ -1450,39 +1626,40 @@ export const Channels = () => {
                           <DialogTitle>Select Icon</DialogTitle>
                         </DialogHeader>
                         <div className="grid grid-cols-4 gap-2 py-4">
-                          {availableIcons.map((iconOption) => {
+                          { availableIcons.map((iconOption) =>
+                          {
                             const IconComponent = iconOption.icon;
                             return (
                               <button
-                                key={iconOption.name}
+                                key={ iconOption.name }
                                 type="button"
-                                onClick={() => {
+                                onClick={ () =>
+                                {
                                   setSelectedIcon(iconOption);
                                   setShowIconPicker(false);
-                                }}
-                                className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all hover:bg-muted ${
-                                  selectedIcon.name === iconOption.name
+                                } }
+                                className={ `flex flex-col items-center justify-center p-6 rounded-lg border transition-all hover:bg-muted ${ selectedIcon.name === iconOption.name
                                     ? "border-primary bg-primary/10"
                                     : "border-border"
-                                }`}
+                                  }` }
                               >
                                 <IconComponent
                                   className="h-6 w-6 mb-1"
-                                  style={{ color: iconOption.color }}
+                                  style={ { color: iconOption.color } }
                                 />
-                                <span className="text-xs">
-                                  {iconOption.name}
+                                <span className="text-xs text-center">
+                                  { iconOption.name }
                                 </span>
                               </button>
                             );
-                          })}
+                          }) }
                         </div>
                       </DialogContent>
                     </Dialog>
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={closeDialog}>
+                  <Button variant="outline" onClick={ closeDialog }>
                     Cancel
                   </Button>
                   <Button
@@ -1494,7 +1671,7 @@ export const Channels = () => {
                       (editingChannel ? isUpdating : isCreating)
                     }
                   >
-                    {editingChannel ? (
+                    { editingChannel ? (
                       isUpdating ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1510,7 +1687,7 @@ export const Channels = () => {
                       </>
                     ) : (
                       "Create Channel"
-                    )}
+                    ) }
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -1520,8 +1697,8 @@ export const Channels = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search channels..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={ searchQuery }
+              onChange={ (e) => setSearchQuery(e.target.value) }
               className="pl-10"
             />
           </div>
@@ -1529,7 +1706,7 @@ export const Channels = () => {
 
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {isLoading ? (
+            { isLoading ? (
               <div className="flex items-center justify-center p-8">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
@@ -1538,86 +1715,88 @@ export const Channels = () => {
                 No channels found
               </div>
             ) : (
-              filteredChannels.map((channel) => {
+              filteredChannels.map((channel) =>
+              {
                 const IconComponent = channel.icon;
                 const isSelected = channel.id === selectedChannelId;
                 return (
                   <div
-                    key={channel.id}
-                    className={`group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                      isSelected
+                    key={ channel.id }
+                    className={ `group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${ isSelected
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-muted"
-                    }`}
-                    onClick={() => setSelectedChannelId(channel.id)}
+                      }` }
+                    onClick={ () => setSelectedChannelId(channel.id) }
                   >
                     <div
                       className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{
+                      style={ {
                         backgroundColor: isSelected
                           ? "rgba(255, 255, 255, 0.2)"
-                          : `${channel.color}20`,
-                      }}
+                          : `${ channel.color }20`,
+                      } }
                     >
                       <IconComponent
-                        className={`h-5 w-5 ${isSelected ? "text-primary-foreground" : ""}`}
-                        style={{
+                        className={ `h-5 w-5 ${ isSelected ? "text-primary-foreground" : "" }` }
+                        style={ {
                           color: isSelected ? undefined : channel.color,
-                        }}
+                        } }
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <p
-                          className={`font-medium truncate ${
-                            isSelected ? "text-primary-foreground" : ""
-                          }`}
+                          className={ `font-medium truncate ${ isSelected ? "text-primary-foreground" : ""
+                            }` }
                         >
-                          {channel.name}
+                          { channel.name }
                         </p>
-                        {isCreatorOrAdmin(channel) && (
+                        { isCreatorOrAdmin(channel) && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="h-6 w-6 opacity-0 group-hover:opacity-100 flex-shrink-0"
-                                onClick={(e) => e.stopPropagation()}
+                                onClick={ (e) => e.stopPropagation() }
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
-                                onClick={(e) => {
+                                onClick={ (e) =>
+                                {
                                   e.stopPropagation();
                                   openEditDialog(channel);
-                                }}
+                                } }
                               >
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit Channel
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={(e) => {
+                                onClick={ (e) =>
+                                {
                                   e.stopPropagation();
                                   addMemberDialogChannelIdRef.current =
                                     channel.id;
                                   setShowAddMemberDialog(channel.id);
-                                }}
+                                } }
                               >
                                 <UserPlus className="mr-2 h-4 w-4" />
                                 Add Members
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onClick={(e) => {
+                                onClick={ (e) =>
+                                {
                                   e.stopPropagation();
                                   handleDeleteChannel(channel.id);
-                                }}
+                                } }
                                 className="text-destructive"
-                                disabled={isDeleting === channel.id}
+                                disabled={ isDeleting === channel.id }
                               >
-                                {isDeleting === channel.id ? (
+                                { isDeleting === channel.id ? (
                                   <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Deleting...
@@ -1627,82 +1806,83 @@ export const Channels = () => {
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Delete Channel
                                   </>
-                                )}
+                                ) }
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
-                        )}
+                        ) }
                       </div>
-                      {channel.description && (
+                      { channel.description && (
                         <p
-                          className={`text-xs truncate mt-1 ${
-                            isSelected
+                          className={ `text-xs truncate mt-1 ${ isSelected
                               ? "text-primary-foreground/70"
                               : "text-muted-foreground"
-                          }`}
-                          title={channel.description}
+                            }` }
+                          title={ channel.description }
                         >
-                          {channel.description}
+                          { channel.description }
                         </p>
-                      )}
+                      ) }
                     </div>
                   </div>
                 );
               })
-            )}
+            ) }
           </div>
         </ScrollArea>
       </div>
 
       <div className="flex-1 flex flex-col bg-background min-h-0 overflow-hidden">
-        {selectedChannel ? (
+        { selectedChannel ? (
           <>
             <div className="p-4 border-b border-border bg-card">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {(() => {
+                  { (() =>
+                  {
                     const IconComponent = selectedChannel.icon;
                     return (
                       <div
                         className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{
-                          backgroundColor: `${selectedChannel.color}20`,
-                        }}
+                        style={ {
+                          backgroundColor: `${ selectedChannel.color }20`,
+                        } }
                       >
                         <IconComponent
                           className="h-5 w-5"
-                          style={{ color: selectedChannel.color }}
+                          style={ { color: selectedChannel.color } }
                         />
                       </div>
                     );
-                  })()}
+                  })() }
                   <div>
-                    <h2 className="font-semibold">{selectedChannel.name}</h2>
+                    <h2 className="font-semibold">{ selectedChannel.name }</h2>
                     <p className="text-sm text-muted-foreground">
-                      {selectedChannel.description}
+                      { selectedChannel.description }
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="gap-1">
                     <Users className="h-3 w-3" />
-                    {isLoadingChannelDetails ? (
+                    { isLoadingChannelDetails ? (
                       <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
                       selectedChannel.members.length
-                    )}
+                    ) }
                   </Badge>
-                  {isCreatorOrAdmin(selectedChannel) && (
+                  { isCreatorOrAdmin(selectedChannel) && (
                     <>
                       <Button
                         variant="ghost"
                         size="icon"
-                        disabled={isLoadingChannelDetails}
-                        onClick={() => {
+                        disabled={ isLoadingChannelDetails }
+                        onClick={ () =>
+                        {
                           addMemberDialogChannelIdRef.current =
                             selectedChannel.id;
                           setShowAddMemberDialog(selectedChannel.id);
-                        }}
+                        } }
                         title="Add Members"
                       >
                         <UserPlus className="h-4 w-4" />
@@ -1714,7 +1894,7 @@ export const Channels = () => {
                           isLoadingChannelDetails ||
                           selectedChannel.members.length === 0
                         }
-                        onClick={() =>
+                        onClick={ () =>
                           setShowRemoveMemberDialog(selectedChannel.id)
                         }
                         title="Manage Members"
@@ -1722,8 +1902,8 @@ export const Channels = () => {
                         <Users className="h-4 w-4" />
                       </Button>
                     </>
-                  )}
-                  {!isCreatorOrAdmin(selectedChannel) && (
+                  ) }
+                  { !isCreatorOrAdmin(selectedChannel) && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -1731,21 +1911,21 @@ export const Channels = () => {
                         isLoadingChannelDetails ||
                         selectedChannel.members.length === 0
                       }
-                      onClick={() =>
+                      onClick={ () =>
                         setShowRemoveMemberDialog(selectedChannel.id)
                       }
                       title="View Members"
                     >
                       <Users className="h-4 w-4" />
                     </Button>
-                  )}
+                  ) }
                 </div>
               </div>
             </div>
 
-            <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-0">
+            <ScrollArea ref={ scrollAreaRef } className="flex-1 min-h-0">
               <div className="space-y-4 p-4 pb-12">
-                {isLoadingMessages ? (
+                { isLoadingMessages ? (
                   <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
                     <Loader2 className="h-8 w-8 text-muted-foreground mb-4 animate-spin" />
                     <p className="text-muted-foreground">Loading messages...</p>
@@ -1761,7 +1941,8 @@ export const Channels = () => {
                     </p>
                   </div>
                 ) : (
-                  selectedChannel.messages.map((message) => {
+                  selectedChannel.messages.map((message) =>
+                  {
                     const sender = getSender(message.senderId, message);
                     const isCurrentUser =
                       loggedInUser &&
@@ -1769,91 +1950,85 @@ export const Channels = () => {
                         String(message.senderId) === String(loggedInUser.id));
                     return (
                       <div
-                        key={message.id}
-                        className={`group flex gap-3 ${
-                          isCurrentUser ? "flex-row-reverse" : ""
-                        }`}
+                        key={ message.id }
+                        className={ `group flex gap-3 ${ isCurrentUser ? "flex-row-reverse" : ""
+                          }` }
                       >
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={sender.avatar || undefined} />
+                          <AvatarImage src={ sender.avatar || undefined } />
                           <AvatarFallback className="text-xs">
-                            {getInitials(sender.name)}
+                            { getInitials(sender.name) }
                           </AvatarFallback>
                         </Avatar>
                         <div
-                          className={`flex flex-col max-w-[70%] ${
-                            isCurrentUser ? "items-end" : "items-start"
-                          }`}
+                          className={ `flex flex-col max-w-[70%] ${ isCurrentUser ? "items-end" : "items-start"
+                            }` }
                         >
                           <div
-                            className={`flex items-center gap-2 mb-1 ${
-                              isCurrentUser ? "flex-row-reverse" : ""
-                            }`}
+                            className={ `flex items-center gap-2 mb-1 ${ isCurrentUser ? "flex-row-reverse" : ""
+                              }` }
                           >
                             <span className="text-sm font-medium">
-                              {sender.name}
+                              { sender.name }
                             </span>
                             <span className="text-xs text-muted-foreground">
-                              {formatMessageTime(message.timestamp)}
+                              { formatMessageTime(message.timestamp) }
                             </span>
                           </div>
-                          {message.replyTo && !message.deleted && (
+                          { message.replyTo && !message.deleted && (
                             <div
-                              className={`text-xs text-muted-foreground mb-1 px-2 py-1 rounded bg-muted/50 ${isCurrentUser ? "text-right" : "text-left"}`}
+                              className={ `text-xs text-muted-foreground mb-1 px-2 py-1 rounded bg-muted/50 ${ isCurrentUser ? "text-right" : "text-left" }` }
                             >
                               <span className="font-medium">
-                                {message.replyTo.senderName}
+                                { message.replyTo.senderName }
                               </span>
                               <p className="truncate max-w-[200px]">
-                                {message.replyTo.text}
+                                { message.replyTo.text }
                               </p>
                             </div>
-                          )}
+                          ) }
                           <div className="relative">
                             <div
-                              className={`rounded-lg px-4 py-2 inline-block ${
-                                isCurrentUser
+                              className={ `rounded-lg px-4 py-2 inline-block ${ isCurrentUser
                                   ? "bg-primary text-primary-foreground"
                                   : "bg-card border border-border"
-                              }`}
+                                }` }
                             >
-                              {message.deleted ? (
+                              { message.deleted ? (
                                 <p
-                                  className={`text-sm italic ${
-                                    isCurrentUser
+                                  className={ `text-sm italic ${ isCurrentUser
                                       ? "text-primary-foreground/70"
                                       : "text-foreground/70"
-                                  }`}
+                                    }` }
                                 >
                                   This message was deleted
                                 </p>
                               ) : (
                                 <div className="text-sm">
                                   <MarkdownMessage
-                                    content={message.text}
+                                    content={ message.text }
                                     className="whitespace-pre-wrap break-words"
                                   />
-                                  {message.edited && (
+                                  { message.edited && (
                                     <span
-                                      className={`text-xs ml-2 ${
-                                        isCurrentUser
+                                      className={ `text-xs ml-2 ${ isCurrentUser
                                           ? "text-primary-foreground/70"
                                           : "text-foreground/70"
-                                      }`}
+                                        }` }
                                     >
                                       (edited)
                                     </span>
-                                  )}
+                                  ) }
                                 </div>
-                              )}
+                              ) }
                             </div>
-                            {!message.deleted && (
+                            { !message.deleted && (
                               <div
-                                className={`absolute top-0 ${isCurrentUser ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1`}
+                                className={ `absolute top-0 ${ isCurrentUser ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1" } opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1` }
                               >
                                 <Popover
-                                  open={openReactionPopoverId === message.id}
-                                  onOpenChange={(open) =>
+                                  open={ openReactionPopoverId === message.id }
+                                  onOpenChange={ (open) =>
                                     setOpenReactionPopoverId(
                                       open ? message.id : null
                                     )
@@ -1870,29 +2045,29 @@ export const Channels = () => {
                                   </PopoverTrigger>
                                   <PopoverContent className="w-auto p-2">
                                     <div className="flex gap-1">
-                                      {commonEmojis.map((emoji) => {
+                                      { commonEmojis.map((emoji) =>
+                                      {
                                         const hasReacted = message.reactions?.[
                                           emoji
                                         ]?.includes(loggedInUser?.id || "");
                                         return (
                                           <button
-                                            key={emoji}
-                                            onClick={() =>
+                                            key={ emoji }
+                                            onClick={ () =>
                                               handleToggleReaction(
                                                 message.id,
                                                 emoji
                                               )
                                             }
-                                            className={`text-lg hover:bg-muted p-1 rounded transition-colors ${
-                                              hasReacted
+                                            className={ `text-lg hover:bg-muted p-1 rounded transition-colors ${ hasReacted
                                                 ? "bg-primary/20 border border-primary"
                                                 : ""
-                                            }`}
+                                              }` }
                                           >
-                                            {emoji}
+                                            { emoji }
                                           </button>
                                         );
-                                      })}
+                                      }) }
                                     </div>
                                   </PopoverContent>
                                 </Popover>
@@ -1900,23 +2075,23 @@ export const Channels = () => {
                                   size="icon"
                                   variant="ghost"
                                   className="h-6 w-6"
-                                  onClick={() => handleReply(message)}
+                                  onClick={ () => handleReply(message) }
                                 >
                                   <Reply className="h-3 w-3" />
                                 </Button>
-                                {isCurrentUser && (
+                                { isCurrentUser && (
                                   <>
                                     <Button
                                       size="icon"
                                       variant="ghost"
                                       className="h-6 w-6"
-                                      onClick={() => startEditMessage(message)}
+                                      onClick={ () => startEditMessage(message) }
                                     >
                                       <Edit className="h-3 w-3" />
                                     </Button>
                                     <AlertDialog
-                                      open={deleteMessageId === message.id}
-                                      onOpenChange={(open) =>
+                                      open={ deleteMessageId === message.id }
+                                      onOpenChange={ (open) =>
                                         setDeleteMessageId(
                                           open ? message.id : null
                                         )
@@ -1944,21 +2119,23 @@ export const Channels = () => {
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                           <AlertDialogCancel
-                                            onClick={() =>
+                                            onClick={ () =>
                                               setDeleteMessageId(null)
                                             }
                                           >
                                             Cancel
                                           </AlertDialogCancel>
                                           <AlertDialogAction
-                                            onClick={() => {
-                                              if (deleteMessageId) {
+                                            onClick={ () =>
+                                            {
+                                              if (deleteMessageId)
+                                              {
                                                 handleDeleteMessage(
                                                   deleteMessageId
                                                 );
                                                 setDeleteMessageId(null);
                                               }
-                                            }}
+                                            } }
                                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                           >
                                             Delete
@@ -1967,120 +2144,120 @@ export const Channels = () => {
                                       </AlertDialogContent>
                                     </AlertDialog>
                                   </>
-                                )}
+                                ) }
                               </div>
-                            )}
+                            ) }
                           </div>
-                          {Object.keys(message.reactions || {}).length > 0 &&
+                          { Object.keys(message.reactions || {}).length > 0 &&
                             !message.deleted && (
                               <div
-                                className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? "justify-end" : "justify-start"}`}
+                                className={ `flex flex-wrap gap-1 mt-1 ${ isCurrentUser ? "justify-end" : "justify-start" }` }
                               >
-                                {Object.entries(message.reactions).map(
-                                  ([emoji, users]) => {
+                                { Object.entries(message.reactions).map(
+                                  ([emoji, users]) =>
+                                  {
                                     if (users.length === 0) return null;
                                     const userNames =
                                       getReactionUserNames(users);
                                     return (
                                       <div
-                                        key={emoji}
+                                        key={ emoji }
                                         className="relative inline-block group/reaction"
                                       >
                                         <button
-                                          onClick={() =>
+                                          onClick={ () =>
                                             handleToggleReaction(
                                               message.id,
                                               emoji
                                             )
                                           }
-                                          className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${
-                                            users.includes(
-                                              loggedInUser?.id || ""
-                                            )
+                                          className={ `text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${ users.includes(
+                                            loggedInUser?.id || ""
+                                          )
                                               ? "bg-primary/20 border-primary"
                                               : "bg-muted border-border hover:bg-muted/80"
-                                          }`}
+                                            }` }
                                         >
-                                          <span>{emoji}</span>
-                                          <span>{users.length}</span>
+                                          <span>{ emoji }</span>
+                                          <span>{ users.length }</span>
                                         </button>
                                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover border border-border rounded-md shadow-md text-xs opacity-0 invisible group-hover/reaction:opacity-100 group-hover/reaction:visible transition-all duration-200 z-[100] pointer-events-none min-w-[120px]">
                                           <p className="font-medium mb-1 text-foreground">
                                             Reacted by:
                                           </p>
                                           <div className="space-y-0.5">
-                                            {userNames.map((name, index) => (
+                                            { userNames.map((name, index) => (
                                               <p
-                                                key={index}
+                                                key={ index }
                                                 className="text-muted-foreground"
                                               >
-                                                {name}
+                                                { name }
                                               </p>
-                                            ))}
+                                            )) }
                                           </div>
                                         </div>
                                       </div>
                                     );
                                   }
-                                )}
+                                ) }
                               </div>
-                            )}
+                            ) }
                         </div>
                       </div>
                     );
                   })
-                )}
-                {typingUsers.length > 0 && (
+                ) }
+                { typingUsers.length > 0 && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground px-2 py-1">
                     <div className="flex gap-1">
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
                       <div
                         className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
+                        style={ { animationDelay: "0.2s" } }
                       />
                       <div
                         className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: "0.4s" }}
+                        style={ { animationDelay: "0.4s" } }
                       />
                     </div>
                     <span>
-                      {typingUsers.length === 1
-                        ? `${typingUsers[0].userName} is typing...`
+                      { typingUsers.length === 1
+                        ? `${ typingUsers[0].userName } is typing...`
                         : typingUsers.length === 2
-                          ? `${typingUsers[0].userName} and ${typingUsers[1].userName} are typing...`
-                          : `${typingUsers[0].userName} and ${typingUsers.length - 1} others are typing...`}
+                          ? `${ typingUsers[0].userName } and ${ typingUsers[1].userName } are typing...`
+                          : `${ typingUsers[0].userName } and ${ typingUsers.length - 1 } others are typing...` }
                     </span>
                   </div>
-                )}
-                <div ref={messagesEndRef} />
+                ) }
+                <div ref={ messagesEndRef } />
               </div>
             </ScrollArea>
 
             <div className="p-4 border-t border-border bg-card relative">
-              {replyingToMessage && (
+              { replyingToMessage && (
                 <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted/50 rounded-lg">
                   <div className="flex-1 min-w-0">
                     <span className="text-xs text-muted-foreground">
-                      Replying to{" "}
+                      Replying to{ " " }
                     </span>
                     <span className="text-xs font-medium">
-                      {replyingToMessage.senderName}
+                      { replyingToMessage.senderName }
                     </span>
                     <p className="text-sm text-muted-foreground truncate">
-                      {replyingToMessage.text}
+                      { replyingToMessage.text }
                     </p>
                   </div>
                   <Button
                     size="icon"
                     variant="ghost"
                     className="h-6 w-6 flex-shrink-0"
-                    onClick={cancelReply}
+                    onClick={ cancelReply }
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-              )}
-              {editingMessageId &&
+              ) }
+              { editingMessageId &&
                 selectedChannel?.messages.find(
                   (m) => m.id === editingMessageId
                 ) && (
@@ -2101,82 +2278,101 @@ export const Channels = () => {
                       size="icon"
                       variant="ghost"
                       className="h-6 w-6 flex-shrink-0"
-                      onClick={cancelEditMessage}
+                      onClick={ cancelEditMessage }
                     >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                )}
-              {showFormatToolbar && (
+                ) }
+              { showFormatToolbar && (
                 <div className="absolute bottom-full left-4 right-4 mb-2">
-                  <MessageFormatToolbar onFormatClick={handleFormatClick} />
+                  <MessageFormatToolbar onFormatClick={ handleFormatClick } />
                 </div>
-              )}
+              ) }
               <div className="flex items-end gap-2">
                 <Textarea
-                  ref={messageInputRef}
+                  ref={ messageInputRef }
                   placeholder={
                     editingMessageId
                       ? "Edit your message..."
-                      : `Message #${selectedChannel.name.toLowerCase()}`
+                      : `Message #${ selectedChannel.name.toLowerCase() }`
                   }
-                  value={editingMessageId ? editingMessageText : messageInput}
-                  onChange={(e) => {
-                    if (editingMessageId) {
+                  value={ editingMessageId ? editingMessageText : messageInput }
+                  onChange={ (e) =>
+                  {
+                    if (editingMessageId)
+                    {
                       setEditingMessageText(e.target.value);
-                    } else {
+                    } else
+                    {
                       setMessageInput(e.target.value);
-                      if (e.target.value.trim()) {
+                      if (e.target.value.trim())
+                      {
                         handleTyping();
-                      } else {
-                        if (selectedChannelId && loggedInUser) {
+                      } else
+                      {
+                        if (selectedChannelId && loggedInUser)
+                        {
                           updateTypingStatus(false);
                         }
                       }
                     }
-                  }}
-                  onFocus={() => setShowFormatToolbar(true)}
-                  onBlur={(e) => {
-                    setTimeout(() => {
-                      if (!e.relatedTarget?.closest(".format-toolbar")) {
+                  } }
+                  onFocus={ () => setShowFormatToolbar(true) }
+                  onBlur={ (e) =>
+                  {
+                    setTimeout(() =>
+                    {
+                      if (!e.relatedTarget?.closest(".format-toolbar"))
+                      {
                         setShowFormatToolbar(false);
                       }
-                      if (!editingMessageId) {
+                      if (!editingMessageId)
+                      {
                         handleInputBlur();
                       }
                     }, 200);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
+                  } }
+                  onKeyDown={ (e) =>
+                  {
+                    if (e.key === "Enter" && !e.shiftKey)
+                    {
                       e.preventDefault();
-                      if (editingMessageId) {
+                      if (editingMessageId)
+                      {
                         handleEditMessage(editingMessageId, editingMessageText);
-                      } else {
+                      } else
+                      {
                         handleSendMessage();
                       }
-                    } else if (e.key === "Escape" && editingMessageId) {
+                    } else if (e.key === "Escape" && editingMessageId)
+                    {
                       cancelEditMessage();
                     }
-                  }}
-                  rows={1}
+                  } }
+                  rows={ 1 }
                   className="flex-1 resize-none min-h-[40px] max-h-[200px] overflow-y-auto"
-                  style={{
+                  style={ {
                     height: 'auto',
-                  }}
-                  onInput={(e) => {
+                  } }
+                  onInput={ (e) =>
+                  {
                     const target = e.target as HTMLTextAreaElement;
                     target.style.height = 'auto';
                     target.style.height = Math.min(target.scrollHeight, 200) + 'px';
-                  }}
+                  } }
                 />
                 <Button
-                  onClick={() => {
-                    if (editingMessageId) {
+                  onClick={ () =>
+                  {
+                    if (editingMessageId)
+                    {
                       handleEditMessage(editingMessageId, editingMessageText);
-                    } else {
+                    } else
+                    {
                       handleSendMessage();
                     }
-                  }}
+                  } }
                   disabled={
                     editingMessageId
                       ? !editingMessageText.trim() || isSendingMessage
@@ -2184,11 +2380,11 @@ export const Channels = () => {
                   }
                   size="icon"
                 >
-                  {isSendingMessage ? (
+                  { isSendingMessage ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <Send className="h-4 w-4" />
-                  )}
+                  ) }
                 </Button>
               </div>
             </div>
@@ -2205,23 +2401,28 @@ export const Channels = () => {
               </p>
             </div>
           </div>
-        )}
+        ) }
       </div>
 
       <Dialog
-        open={showAddMemberDialog !== null}
-        onOpenChange={(open) => {
-          if (open) {
-            if (showAddMemberDialog) {
+        open={ showAddMemberDialog !== null }
+        onOpenChange={ (open) =>
+        {
+          if (open)
+          {
+            if (showAddMemberDialog)
+            {
               addMemberDialogChannelIdRef.current = showAddMemberDialog;
             }
-          } else {
+          } else
+          {
             setShowAddMemberDialog(null);
-            setTimeout(() => {
+            setTimeout(() =>
+            {
               addMemberDialogChannelIdRef.current = null;
             }, 200);
           }
-        }}
+        } }
       >
         <DialogContent>
           <DialogHeader>
@@ -2232,12 +2433,13 @@ export const Channels = () => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
-              {isLoadingMembers ? (
+              { isLoadingMembers ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>
               ) : teamMembers.length > 0 ? (
-                teamMembers.map((member) => {
+                teamMembers.map((member) =>
+                {
                   const channelId =
                     showAddMemberDialog || addMemberDialogChannelIdRef.current;
                   const channel = channels.find((c) => c.id === channelId);
@@ -2249,43 +2451,44 @@ export const Channels = () => {
                   );
                   return (
                     <div
-                      key={member.id || member.userId || member.user_id}
+                      key={ member.id || member.userId || member.user_id }
                       className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={ (e) => e.stopPropagation() }
                     >
                       <div className="flex items-center gap-3">
                         <Avatar>
                           <AvatarImage
-                            src={member.profileImage || member.avatar}
+                            src={ member.profileImage || member.avatar }
                           />
                           <AvatarFallback>
-                            {getInitials(
+                            { getInitials(
                               member.name || member.firstName || "User"
-                            )}
+                            ) }
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">
-                            {member.name ||
-                              `${member.firstName || ""} ${member.lastName || ""}`.trim() ||
-                              "User"}
+                            { member.name ||
+                              `${ member.firstName || "" } ${ member.lastName || "" }`.trim() ||
+                              "User" }
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {member.email || member.profiles?.email || ""}
+                            { member.email || member.profiles?.email || "" }
                           </p>
                         </div>
                       </div>
-                      {isMember ? (
+                      { isMember ? (
                         <Badge variant="secondary">Already Added</Badge>
                       ) : (
                         <Button
                           size="sm"
                           disabled={
                             addingMemberId ===
-                              (member.id || member.userId || member.user_id) ||
+                            (member.id || member.userId || member.user_id) ||
                             !!addingMemberId
                           }
-                          onClick={(e) => {
+                          onClick={ (e) =>
+                          {
                             e.stopPropagation();
                             const channelId =
                               showAddMemberDialog ||
@@ -2293,19 +2496,20 @@ export const Channels = () => {
                             if (
                               channelId &&
                               (member.id || member.userId || member.user_id)
-                            ) {
+                            )
+                            {
                               handleAddMember(
                                 channelId,
                                 member.id ||
-                                  member.userId ||
-                                  member.user_id ||
-                                  ""
+                                member.userId ||
+                                member.user_id ||
+                                ""
                               );
                             }
-                          }}
+                          } }
                         >
-                          {addingMemberId ===
-                          (member.id || member.userId || member.user_id) ? (
+                          { addingMemberId ===
+                            (member.id || member.userId || member.user_id) ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               Adding...
@@ -2315,9 +2519,9 @@ export const Channels = () => {
                               <UserPlus className="mr-2 h-4 w-4" />
                               Add
                             </>
-                          )}
+                          ) }
                         </Button>
-                      )}
+                      ) }
                     </div>
                   );
                 })
@@ -2331,16 +2535,17 @@ export const Channels = () => {
                     channels
                   </p>
                 </div>
-              )}
+              ) }
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={(e) => {
+              onClick={ (e) =>
+              {
                 e.stopPropagation();
                 setShowAddMemberDialog(null);
-              }}
+              } }
             >
               Close
             </Button>
@@ -2349,8 +2554,8 @@ export const Channels = () => {
       </Dialog>
 
       <Dialog
-        open={showRemoveMemberDialog !== null}
-        onOpenChange={(open) => !open && setShowRemoveMemberDialog(null)}
+        open={ showRemoveMemberDialog !== null }
+        onOpenChange={ (open) => !open && setShowRemoveMemberDialog(null) }
       >
         <DialogContent>
           <DialogHeader>
@@ -2361,10 +2566,11 @@ export const Channels = () => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
-              {showRemoveMemberDialog &&
+              { showRemoveMemberDialog &&
                 channels
                   .find((c) => c.id === showRemoveMemberDialog)
-                  ?.members.map((member) => {
+                  ?.members.map((member) =>
+                  {
                     const channel = channels.find(
                       (c) => c.id === showRemoveMemberDialog
                     );
@@ -2398,62 +2604,64 @@ export const Channels = () => {
 
                     return (
                       <div
-                        key={member.id}
+                        key={ member.id }
                         className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50"
                       >
                         <div className="flex items-center gap-3 flex-1">
                           <Avatar>
                             <AvatarImage
-                              src={member.avatar ? member.avatar : undefined}
-                              alt={displayName}
+                              src={ member.avatar ? member.avatar : undefined }
+                              alt={ displayName }
                             />
                             <AvatarFallback>
-                              {getInitials(displayName)}
+                              { getInitials(displayName) }
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
-                            <p className="text-sm font-medium">{displayName}</p>
-                            {displayEmail && (
+                            <p className="text-sm font-medium">{ displayName }</p>
+                            { displayEmail && (
                               <p className="text-xs text-muted-foreground">
-                                {displayEmail}
+                                { displayEmail }
                               </p>
-                            )}
+                            ) }
                             <div className="flex gap-1 mt-1">
-                              {isCreator && (
+                              { isCreator && (
                                 <Badge variant="secondary" className="text-xs">
                                   Creator
                                 </Badge>
-                              )}
-                              {member.role === "ADMIN" && (
+                              ) }
+                              { member.role === "ADMIN" && (
                                 <Badge variant="secondary" className="text-xs">
                                   Admin
                                 </Badge>
-                              )}
-                              {!isCreator && member.role === "MEMBER" && (
+                              ) }
+                              { !isCreator && member.role === "MEMBER" && (
                                 <Badge variant="outline" className="text-xs">
                                   Member
                                 </Badge>
-                              )}
+                              ) }
                             </div>
                           </div>
                         </div>
-                        {canManage && (
+                        { canManage && (
                           <div className="flex items-center gap-2">
-                            {canChangeRoleOrRemove && (
+                            { canChangeRoleOrRemove && (
                               <Select
-                                value={member.role}
-                                onValueChange={(value: "ADMIN" | "MEMBER") => {
+                                value={ member.role }
+                                onValueChange={ (value: "ADMIN" | "MEMBER") =>
+                                {
                                   if (
                                     showRemoveMemberDialog &&
                                     value !== member.role
-                                  ) {
+                                  )
+                                  {
                                     handleChangeMemberRole(
                                       showRemoveMemberDialog,
                                       member.id,
                                       value
                                     );
                                   }
-                                }}
+                                } }
                                 disabled={
                                   !!isCurrentUser ||
                                   changingRoleMemberId === member.id
@@ -2467,13 +2675,13 @@ export const Channels = () => {
                                   <SelectItem value="ADMIN">Admin</SelectItem>
                                 </SelectContent>
                               </Select>
-                            )}
-                            {canChangeRoleOrRemove && !isLastAdmin && (
+                            ) }
+                            { canChangeRoleOrRemove && !isLastAdmin && (
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                disabled={removingMemberId === member.id}
-                                onClick={() =>
+                                disabled={ removingMemberId === member.id }
+                                onClick={ () =>
                                   showRemoveMemberDialog &&
                                   handleRemoveMember(
                                     showRemoveMemberDialog,
@@ -2481,7 +2689,7 @@ export const Channels = () => {
                                   )
                                 }
                               >
-                                {removingMemberId === member.id ? (
+                                { removingMemberId === member.id ? (
                                   <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Removing...
@@ -2491,27 +2699,27 @@ export const Channels = () => {
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Remove
                                   </>
-                                )}
+                                ) }
                               </Button>
-                            )}
+                            ) }
                           </div>
-                        )}
+                        ) }
                       </div>
                     );
-                  })}
-              {showRemoveMemberDialog &&
+                  }) }
+              { showRemoveMemberDialog &&
                 channels.find((c) => c.id === showRemoveMemberDialog)?.members
                   .length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
                     No members found
                   </div>
-                )}
+                ) }
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowRemoveMemberDialog(null)}
+              onClick={ () => setShowRemoveMemberDialog(null) }
             >
               Close
             </Button>
