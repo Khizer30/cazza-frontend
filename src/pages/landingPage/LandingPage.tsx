@@ -1359,7 +1359,7 @@ export const LandingPage = () => {
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="border-2 border-border rounded-lg px-6 hover:border-primary/50 transition-colors"
+                  className="border-2 border-border rounded-lg px-6 hover:border-primary/50 transition-colors last:border-b-2"
                 >
                   <AccordionTrigger className="text-left text-lg font-semibold text-foreground hover:no-underline">
                     {faq.q}
