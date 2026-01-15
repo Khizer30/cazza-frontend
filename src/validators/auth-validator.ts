@@ -137,9 +137,7 @@ export const marketplacesSchema = z.object({
 });
 
 export const toolsSchema = z.object({
-  tools: z
-    .array(z.string())
-    .min(1, { message: "Please select at least one tool" }),
+  tools: z.array(z.string()),
   techStack: z.object({
     useXero: z.boolean(),
     multipleCurrencies: z.boolean(),
