@@ -15,12 +15,15 @@ import {
   faAmazon,
   faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "@/hooks/useUser";
+import { useUserStore } from "@/store/userStore";
 
 const analyticsData = [
   {
     id: "shopify",
     name: "Shopify",
+    apiName: "SHOPIFY",
     type: "ecommerce",
     icon: faShopify,
     description: "Import orders, customers, and inventory",
@@ -29,6 +32,7 @@ const analyticsData = [
   {
     id: "amazon",
     name: "Amazon",
+    apiName: "AMAZON",
     type: "marketplace",
     icon: faAmazon,
     description: "Connect Amazon Seller Central",
@@ -37,6 +41,7 @@ const analyticsData = [
   {
     id: "tiktok",
     name: "TikTok Shop",
+    apiName: "TIKTOK",
     type: "marketplace",
     icon: faTiktok,
     description: "Sync TikTok Shop orders and products",
@@ -45,6 +50,7 @@ const analyticsData = [
   {
     id: "xero",
     name: "Xero",
+    apiName: "XERO",
     type: "accounting",
     imageUrl: "/xero-logo.svg",
     description: "Sync accounting data and financial reports",
@@ -53,6 +59,8 @@ const analyticsData = [
 ];
 
 export const ClientPlatforms = () => {
+  const { user } = useUserStore();
+  const { updateUserPlatforms, fetchUserProfile } = useUser();
   const [selectedPlatform, setSelectedPlatform] = useState<{
     id: string;
     name: string;
@@ -60,20 +68,60 @@ export const ClientPlatforms = () => {
   } | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const handleSync = true;
   const isSyncing = false;
 
-  const handleConnect = (platformId: string) => {
+  useEffect(() => {
+    if (!user) {
+      fetchUserProfile();
+    }
+  }, [user, fetchUserProfile]);
+
+  const isPlatformConnected = (apiName: string): boolean => {
+    return user?.platforms?.includes(apiName) || false;
+  };
+
+  const handleConnect = async (platformId: string) => {
     const platform = analyticsData.find((p) => p.id === platformId);
-    if (platform) {
-      setSelectedPlatform({
-        id: platform.id,
-        name: platform.name,
-        type: platform.type as "ecommerce" | "marketplace" | "accounting",
-      });
-      setIsModalOpen(true);
+    if (!platform) return;
+
+    if (isPlatformConnected(platform.apiName)) {
+      await handleDisconnect(platform.apiName, platform.name);
+      return;
+    }
+
+    try {
+      setIsUpdating(true);
+      const currentPlatforms = user?.platforms || [];
+      const updatedPlatforms = [...currentPlatforms, platform.apiName];
+      
+      await updateUserPlatforms({ platforms: updatedPlatforms }, `${platform.name} connected successfully`);
+    } catch (error) {
+      console.error("Error connecting platform:", error);
+    } finally {
+      setIsUpdating(false);
     }
   };
+
+  const handleDisconnect = async (apiName: string, platformName?: string) => {
+    try {
+      setIsUpdating(true);
+      const currentPlatforms = user?.platforms || [];
+      const updatedPlatforms = currentPlatforms.filter((p) => p !== apiName);
+      
+      const platform = analyticsData.find((p) => p.apiName === apiName);
+      const name = platformName || platform?.name || "Platform";
+      
+      await updateUserPlatforms({ platforms: updatedPlatforms }, `${name} disconnected successfully`);
+    } catch (error) {
+      console.error("Error disconnecting platform:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const connectedCount = user?.platforms?.length || 0;
   return (
     <Card className="m-4">
       <CardHeader>
@@ -112,19 +160,19 @@ export const ClientPlatforms = () => {
         <div className="grid grid-cols-2 gap-4 pt-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">
-              {/* {connectedPlatforms.length} */}0
+              {connectedCount}
             </div>
             <p className="text-sm text-muted-foreground">Connected</p>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold">
-              {/* {Math.round(connectionRate)}% */}0
+              {analyticsData.length > 0 ? Math.round((connectedCount / analyticsData.length) * 100) : 0}%
             </div>
             <p className="text-sm text-muted-foreground">Setup Complete</p>
           </div>
         </div>
 
-        <Progress value={25} className="mt-2" />
+        <Progress value={analyticsData.length > 0 ? (connectedCount / analyticsData.length) * 100 : 0} className="mt-2" />
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -171,10 +219,15 @@ export const ClientPlatforms = () => {
                     <div className="flex items-center gap-3">
                       <Button
                         size="sm"
-                        className="bg-primary text-primary-foreground hover:bg-primary/90"
+                        className={
+                          isPlatformConnected(platform.apiName)
+                            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            : "bg-primary text-primary-foreground hover:bg-primary/90"
+                        }
                         onClick={() => handleConnect(platform.id)}
+                        disabled={isUpdating}
                       >
-                        Connect
+                        {isPlatformConnected(platform.apiName) ? "Disconnect" : "Connect"}
                       </Button>
                     </div>
                   </div>
@@ -230,10 +283,15 @@ export const ClientPlatforms = () => {
                     <div className="flex items-center gap-3">
                       <Button
                         size="sm"
-                        className="bg-primary text-primary-foreground hover:bg-primary/90"
+                        className={
+                          isPlatformConnected(platform.apiName)
+                            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            : "bg-primary text-primary-foreground hover:bg-primary/90"
+                        }
                         onClick={() => handleConnect(platform.id)}
+                        disabled={isUpdating}
                       >
-                        Connect
+                        {isPlatformConnected(platform.apiName) ? "Disconnect" : "Connect"}
                       </Button>
                     </div>
                   </div>

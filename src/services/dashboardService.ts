@@ -8,12 +8,14 @@ import type {
 export const getDashboardSummaryService = (
   fromDate?: string,
   toDate?: string,
-  marketplace: string = "all"
+  marketplace?: string
 ) => {
   const params = new URLSearchParams();
   if (fromDate) params.append("fromDate", fromDate);
   if (toDate) params.append("toDate", toDate);
-  if (marketplace) params.append("marketplace", marketplace);
+  if (marketplace && marketplace.trim() !== "") {
+    params.append("marketplace", marketplace);
+  }
 
   const url = `${END_POINT.dashboard.summary}?${params.toString()}`;
 
@@ -23,12 +25,14 @@ export const getDashboardSummaryService = (
 export const getDashboardDetailService = (
   fromDate?: string,
   toDate?: string,
-  marketplace: string = "all"
+  marketplace?: string
 ) => {
   const params = new URLSearchParams();
   if (fromDate) params.append("fromDate", fromDate);
   if (toDate) params.append("toDate", toDate);
-  if (marketplace) params.append("marketplace", marketplace);
+  if (marketplace && marketplace.trim() !== "") {
+    params.append("marketplace", marketplace);
+  }
 
   const url = `${END_POINT.dashboard.detail}?${params.toString()}`;
 

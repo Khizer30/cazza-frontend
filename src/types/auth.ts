@@ -38,6 +38,7 @@ export interface User {
   providers: string[];
   verified: boolean;
   isActive: boolean;
+  platforms: string[];
   createdAt: string;
   updatedAt: string;
   planId: string | null;
@@ -138,6 +139,10 @@ export interface UPDATE_USER_PAYLOAD {
   lastName?: string;
   profileImage?: File | null;
   role?: string;
+}
+
+export interface UPDATE_USER_PLATFORMS_PAYLOAD {
+  platforms: string[];
 }
 
 export interface UPDATE_USER_RESPONSE {

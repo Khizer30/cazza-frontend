@@ -7,6 +7,7 @@ import type {
   USER_PROFILE_RESPONSE,
   UPDATE_USER_PAYLOAD,
   UPDATE_USER_RESPONSE,
+  UPDATE_USER_PLATFORMS_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_RESPONSE,
   DELETE_USER_RESPONSE,
@@ -81,4 +82,8 @@ export const startSubscriptionService = (
 
 export const unsubscribeService = () => {
   return apiInvoker<UNSUBSCRIBE_RESPONSE>(END_POINT.user.unsubscribe, "POST");
+};
+
+export const updateUserPlatformsService = (payload: UPDATE_USER_PLATFORMS_PAYLOAD) => {
+  return apiInvoker<UPDATE_USER_RESPONSE>(END_POINT.user.profile, "PUT", payload);
 };

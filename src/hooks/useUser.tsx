@@ -3,6 +3,7 @@ import {
   getUserProfileService,
   onboardingService,
   updateUserService,
+  updateUserPlatformsService,
   updateBusinessProfileService,
   deleteUserService,
   startSubscriptionService,
@@ -14,6 +15,7 @@ import { useTeamStore } from "@/store/teamStore";
 import type {
   ONBOARDING_PAYLOAD,
   UPDATE_USER_PAYLOAD,
+  UPDATE_USER_PLATFORMS_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
   TEAM_INVITE_PAYLOAD,
   START_SUBSCRIPTION_PAYLOAD,
@@ -304,12 +306,45 @@ export const useUser = () => {
     }
   };
 
+  const updateUserPlatforms = async (payload: UPDATE_USER_PLATFORMS_PAYLOAD, customMessage?: string) => {
+    try {
+      setLoading(true);
+      const res = await updateUserPlatformsService(payload);
+      if (res && res.success) {
+        // Fetch updated user profile after update
+        await fetchUserProfile();
+        showToast(customMessage || res.message || "Platforms updated successfully", "success");
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to update platforms", "error");
+        throw new Error(res.message || "Update platforms failed");
+      }
+    } catch (error: unknown) {
+      console.error("Update user platforms error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to update platforms";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     user,
     isLoading,
     fetchUserProfile,
     completeOnboarding,
     updateUser,
+    updateUserPlatforms,
     updateBusinessProfile,
     inviteTeamMember,
     deleteUser,

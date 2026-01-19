@@ -6,10 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Badge } from "../ui/badge";
 import { PLATFORM_COLORS } from "@/constants/PlatfromRevenueChart";
 import type { DashboardSummaryData } from "@/types/auth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faShopify,
+  faAmazon,
+  faTiktok,
+} from "@fortawesome/free-brands-svg-icons";
 
 interface PlatformRevenue {
   platform: string;
@@ -20,11 +25,13 @@ interface PlatformRevenue {
 interface PlatformRevenueChartProps {
   summary: DashboardSummaryData | null;
   isLoading: boolean;
+  selectedMarketplace?: string;
 }
 
 export const PlatformRevenueChart = ({
   summary,
   isLoading,
+  selectedMarketplace,
 }: PlatformRevenueChartProps) => {
   const error = false;
 
@@ -43,35 +50,41 @@ export const PlatformRevenueChart = ({
     );
   }
 
-  const platformRevenue: PlatformRevenue[] = summary
-    ? [
-      {
-        platform: "tiktok",
-        platform_name: "TikTok Shop",
-        total_revenue: Number(summary.revenueByPlatform.tiktok),
-      },
-      {
-        platform: "amazon",
-        platform_name: "Amazon",
-        total_revenue: Number(summary.revenueByPlatform.amazon),
-      },
-      {
+  const getSelectedPlatformRevenue = (): PlatformRevenue | null => {
+    if (!summary || !selectedMarketplace) return null;
+
+    const marketplaceMap: { [key: string]: { platform: string; platform_name: string; revenueKey: keyof typeof summary.revenueByPlatform } } = {
+      "shopify": {
         platform: "shopify",
         platform_name: "Shopify",
-        total_revenue: Number(summary.revenueByPlatform.shopify),
+        revenueKey: "shopify",
       },
-      {
-        platform: "ebay",
-        platform_name: "eBay",
-        total_revenue: Number(summary.revenueByPlatform.ebay),
+      "amazon": {
+        platform: "amazon",
+        platform_name: "Amazon",
+        revenueKey: "amazon",
       },
-    ]
-    : [];
+      "tiktok": {
+        platform: "tiktok",
+        platform_name: "TikTok Shop",
+        revenueKey: "tiktok",
+      },
+    };
 
-  const totalRevenue = platformRevenue.reduce(
-    (sum, platform) => sum + platform.total_revenue,
-    0
-  );
+    const platformKey = selectedMarketplace.toLowerCase();
+    const config = marketplaceMap[platformKey];
+    
+    if (!config) return null;
+
+    return {
+      platform: config.platform,
+      platform_name: config.platform_name,
+      total_revenue: Number(summary.revenueByPlatform[config.revenueKey]),
+    };
+  };
+
+  const selectedPlatform = getSelectedPlatformRevenue();
+  const totalRevenue = selectedPlatform?.total_revenue || 0;
 
   if (error) {
     return (
@@ -85,34 +98,22 @@ export const PlatformRevenueChart = ({
     );
   }
 
-  const pieData = platformRevenue
-    .filter((p) => p.total_revenue > 0)
-    .map((platform) => ({
-      name: platform.platform_name,
-      value: platform.total_revenue,
-      platform: platform.platform,
-    }));
+  if (!selectedMarketplace) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12">
+          <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Select a Marketplace</h3>
+          <p className="text-sm text-muted-foreground text-center">
+            Please select a marketplace from the dropdown above to view revenue data.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Date Range Header */}
-      {/* {dateRange && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Revenue Analysis
-            </CardTitle>
-            <CardDescription>
-              Platform revenue breakdown for the period:{" "}
-              {dateRange.from ? format(dateRange.from, "MMM dd, yyyy") : "N/A"}{" "}
-              to {dateRange.to ? format(dateRange.to, "MMM dd, yyyy") : "N/A"}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      )} */}
-
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="midday-card">
           <CardContent className="p-4">
@@ -137,10 +138,10 @@ export const PlatformRevenueChart = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Connected Platforms
+                  Platform
                 </p>
                 <p className="text-2xl font-bold">
-                  {summary?.connectedPlatforms.length || 0}
+                  {selectedPlatform?.platform_name || "N/A"}
                 </p>
               </div>
               <div className="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center">
@@ -151,84 +152,52 @@ export const PlatformRevenueChart = ({
         </Card>
       </div>
 
-      {/* Revenue by Platform Section */}
       <Card>
         <CardHeader>
           <CardTitle>Revenue by Platform</CardTitle>
-          <CardDescription>Current month breakdown</CardDescription>
         </CardHeader>
         <CardContent>
-          {pieData.length > 0 ? (
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
-              <div className="w-full lg:w-1/2 flex justify-center">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={70}
-                      outerRadius={100}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={
-                            PLATFORM_COLORS[
-                            entry.platform as keyof typeof PLATFORM_COLORS
-                            ] || PLATFORM_COLORS.other
-                          }
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value: number | undefined) =>
-                        value !== undefined
-                          ? `£${Math.round(value).toLocaleString("en-GB")}`
-                          : "£0"
-                      }
+          {selectedPlatform && selectedPlatform.total_revenue > 0 ? (
+            <div className="flex items-center justify-between p-6 rounded-lg border bg-card">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                  {selectedPlatform.platform === "shopify" && (
+                    <FontAwesomeIcon
+                      icon={faShopify}
+                      className="h-6 w-6"
+                      style={{ color: "#96bf48" }}
                     />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div className="w-full lg:w-1/2 space-y-3">
-                {platformRevenue.map((platform) => (
-                  <div
-                    key={platform.platform}
-                    className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{
-                          backgroundColor:
-                            PLATFORM_COLORS[
-                            platform.platform as keyof typeof PLATFORM_COLORS
-                            ] || PLATFORM_COLORS.other,
-                        }}
-                      />
-                      <span className="text-sm font-medium">
-                        {platform.platform_name}
-                      </span>
-                    </div>
-                    <Badge
-                      variant="secondary"
-                      className="text-sm font-semibold"
-                    >
-                      £{Math.round(platform.total_revenue).toLocaleString("en-GB")}
-                    </Badge>
-                  </div>
-                ))}
+                  )}
+                  {selectedPlatform.platform === "amazon" && (
+                    <FontAwesomeIcon
+                      icon={faAmazon}
+                      className="h-6 w-6"
+                      style={{ color: "#FF9900" }}
+                    />
+                  )}
+                  {selectedPlatform.platform === "tiktok" && (
+                    <FontAwesomeIcon
+                      icon={faTiktok}
+                      className="h-6 w-6"
+                      style={{ color: "#FFFFFF" }}
+                    />
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {selectedPlatform.platform_name}
+                  </p>
+                  <p className="text-3xl font-bold mt-1">
+                    £{Math.round(selectedPlatform.total_revenue).toLocaleString("en-GB")}
+                  </p>
+                </div>
               </div>
             </div>
           ) : (
             <div className="text-center text-muted-foreground py-12">
               <p>No revenue data available</p>
               <p className="text-sm mt-1">
-                Connect your sales platforms to see revenue breakdown
+                Revenue data will appear here once available
               </p>
             </div>
           )}

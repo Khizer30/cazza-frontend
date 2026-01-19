@@ -31,6 +31,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useUserStore } from "@/store/userStore";
 
 import {
   AreaChart,
@@ -44,9 +45,20 @@ import {
 import type { DateRange } from "react-day-picker";
 
 export const ClientDashboard = () => {
+  const { user } = useUserStore();
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-  const [marketplace, setMarketplace] = useState<string>("all");
+  const [marketplace, setMarketplace] = useState<string>("");
+
+  const getMarketplaceNameFromPlatform = (platformName: string): string => {
+    const mapping: { [key: string]: string } = {
+      "TIKTOK": "TikTok Shop",
+      "SHOPIFY": "Shopify",
+      "AMAZON": "Amazon",
+    };
+    return mapping[platformName] || platformName;
+  };
   const [summary, setSummary] = useState<DashboardSummaryData | null>(null);
+  const [revenueSummary, setRevenueSummary] = useState<DashboardSummaryData | null>(null);
   const [detailData, setDetailData] = useState<DashboardDetailItem[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,6 +72,14 @@ export const ClientDashboard = () => {
   };
 
   const fetchData = async () => {
+    if (!marketplace) {
+      setSummary(null);
+      setDetailData([]);
+      setChartData([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -154,17 +174,36 @@ export const ClientDashboard = () => {
               onDateRangeChange={setDateRange}
               placeholder="Select date range for insights"
             />
-            <Select value={marketplace} onValueChange={setMarketplace}>
+            <Select value={marketplace || undefined} onValueChange={setMarketplace}>
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select marketplace" />
+                <SelectValue placeholder="Select Marketplace" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Marketplaces</SelectItem>
-                {summary?.connectedPlatforms?.map((platform) => (
-                  <SelectItem key={platform} value={platform.toLowerCase()}>
-                    {platform}
-                  </SelectItem>
-                ))}
+                {(() => {
+                  const connectedPlatforms = user?.platforms || [];
+                  const marketplacePlatforms = ["SHOPIFY", "AMAZON", "TIKTOK"];
+                  const connectedMarketplaces = connectedPlatforms.filter((p) =>
+                    marketplacePlatforms.includes(p)
+                  );
+                  
+                  if (connectedMarketplaces.length === 0) {
+                    return (
+                      <SelectItem value="no-platforms" disabled>
+                        No platforms connected
+                      </SelectItem>
+                    );
+                  }
+                  
+                  return connectedMarketplaces.map((platform) => {
+                    const displayName = getMarketplaceNameFromPlatform(platform);
+                    const apiValue = platform.toLowerCase();
+                    return (
+                      <SelectItem key={platform} value={apiValue}>
+                        {displayName}
+                      </SelectItem>
+                    );
+                  });
+                })()}
               </SelectContent>
             </Select>
             <Button
@@ -184,7 +223,7 @@ export const ClientDashboard = () => {
                 {dateRange.to?.toLocaleDateString()}
                 {" • "}
                 <strong>Marketplace:</strong>{" "}
-                {marketplace === "all" ? "All Marketplaces" : marketplace.charAt(0).toUpperCase() + marketplace.slice(1)}
+                {marketplace ? marketplace.charAt(0).toUpperCase() + marketplace.slice(1) : "Select Marketplace"}
               </p>
             </div>
           )}
@@ -208,8 +247,20 @@ export const ClientDashboard = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-3">
-          {/* Financial KPI Summary - Midday Style */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 midday-fade-in">
+          {!marketplace ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <BarChart3 className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Select a Marketplace</h3>
+                <p className="text-sm text-muted-foreground text-center">
+                  Please select a marketplace from the dropdown above to view your financial insights and analytics.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Financial KPI Summary - Midday Style */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 midday-fade-in">
             <Card>
               <CardContent className="px-6 py-2">
                 <div className="space-y-1">
@@ -412,18 +463,48 @@ export const ClientDashboard = () => {
               )}
             </CardContent>
           </Card>
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="revenue" className="space-y-6">
-          <PlatformRevenueChart summary={summary} isLoading={loading} />
+          {!marketplace ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <TrendingUp className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Select a Marketplace</h3>
+                <p className="text-sm text-muted-foreground text-center">
+                  Please select a marketplace from the dropdown above to view revenue analytics.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <PlatformRevenueChart 
+              summary={summary} 
+              isLoading={loading} 
+              selectedMarketplace={marketplace} 
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="profit-loss" className="space-y-6">
-          <ProfitLossStatement
-            summary={summary}
-            detailData={detailData}
-            isLoadingProp={loading}
-          />
+          {!marketplace ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <PieChart className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Select a Marketplace</h3>
+                <p className="text-sm text-muted-foreground text-center">
+                  Please select a marketplace from the dropdown above to view profit & loss statements.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <ProfitLossStatement
+              summary={summary}
+              detailData={detailData}
+              isLoadingProp={loading}
+            />
+          )}
         </TabsContent>
       </Tabs>
     </div>
