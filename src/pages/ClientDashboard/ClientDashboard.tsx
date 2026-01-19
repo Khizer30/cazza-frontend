@@ -58,7 +58,6 @@ export const ClientDashboard = () => {
     return mapping[platformName] || platformName;
   };
   const [summary, setSummary] = useState<DashboardSummaryData | null>(null);
-  const [revenueSummary, setRevenueSummary] = useState<DashboardSummaryData | null>(null);
   const [detailData, setDetailData] = useState<DashboardDetailItem[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

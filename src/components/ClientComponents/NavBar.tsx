@@ -29,7 +29,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
       <ScrollArea className="flex-1 h-full">
         <div className="p-2 lg:p-3 space-y-2">
           <div
-            ref={(el) => (iconRefs.current['insights'] = el)}
+            ref={(el) => { iconRefs.current['insights'] = el; }}
             className="relative"
             onMouseEnter={() => setHoveredItem('insights')}
             onMouseLeave={() => setHoveredItem(null)}
@@ -50,7 +50,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           <div
-            ref={(el) => (iconRefs.current['ask-cazza'] = el)}
+            ref={(el) => { iconRefs.current['ask-cazza'] = el; }}
             className="relative"
             onMouseEnter={() => setHoveredItem('ask-cazza')}
             onMouseLeave={() => setHoveredItem(null)}
@@ -71,7 +71,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           <div
-            ref={(el) => (iconRefs.current['channels'] = el)}
+            ref={(el) => { iconRefs.current['channels'] = el; }}
             className="relative"
             onMouseEnter={() => setHoveredItem('channels')}
             onMouseLeave={() => setHoveredItem(null)}
@@ -92,7 +92,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           <div
-            ref={(el) => (iconRefs.current['integrations'] = el)}
+            ref={(el) => { iconRefs.current['integrations'] = el; }}
             className="relative"
             onMouseEnter={() => setHoveredItem('integrations')}
             onMouseLeave={() => setHoveredItem(null)}
@@ -113,7 +113,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           <div
-            ref={(el) => (iconRefs.current['blog'] = el)}
+            ref={(el) => { iconRefs.current['blog'] = el; }}
             className="relative"
             onMouseEnter={() => setHoveredItem('blog')}
             onMouseLeave={() => setHoveredItem(null)}

@@ -2,12 +2,9 @@ import { DollarSign, Zap } from "lucide-react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Badge } from "../ui/badge";
-import { PLATFORM_COLORS } from "@/constants/PlatfromRevenueChart";
 import type { DashboardSummaryData } from "@/types/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
