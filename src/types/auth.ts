@@ -368,29 +368,50 @@ export interface START_SUBSCRIPTION_PAYLOAD {
   interval: "monthly" | "yearly";
 }
 
+export interface PricingBreakdown {
+  owner: {
+    count: number;
+    unitPrice: number;
+    subtotal: number;
+  };
+  admins: {
+    count: number;
+    unitPrice: number;
+    subtotal: number;
+  };
+  members: {
+    count: number;
+    unitPrice: number;
+    subtotal: number;
+  };
+  monthlyTotal: number;
+}
+
+export interface SubscriptionDetails {
+  status: "ACTIVE" | "TRIAL" | "CANCELED" | "EXPIRED" | "PENDING";
+  hasStripeSubscription: boolean;
+  pricing: PricingBreakdown;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+}
+
+export interface GET_SUBSCRIPTION_RESPONSE {
+  success: boolean;
+  message: string;
+  data: SubscriptionDetails;
+}
+
 export interface START_SUBSCRIPTION_RESPONSE {
   success: boolean;
   message: string;
-  data?: {
+  data: {
     checkoutUrl: string;
-    subscription?: {
-      id: string;
-      planType: string;
-      trialEnd?: string;
-      subscribed: boolean;
-      subscriptionEnd?: string;
-      customAmount?: number;
-      [key: string]: any;
-    };
   };
 }
 
 export interface UNSUBSCRIBE_RESPONSE {
   success: boolean;
   message: string;
-  data?: {
-    subscription: Subscription;
-  };
 }
 
 export interface TEAM_MEMBER_SUBSCRIPTION_PAYLOAD {

@@ -13,7 +13,8 @@ export const END_POINT = {
     onboarding: "/user/onboarding",
     businessProfile: "/user/business-profile",
     support: "/user/support",
-    subscription: "/billing/checkout",
+    subscription: "/billing/subscription",
+    checkout: "/billing/checkout",
     unsubscribe: "/billing/unsubscribe",
   },
   team: {

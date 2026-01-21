@@ -6,6 +6,7 @@ import {
   updateProfileImageService,
   updateBusinessProfileService,
   deleteUserService,
+  getSubscriptionService,
   startSubscriptionService,
   unsubscribeService,
   createSupportTicketService,
@@ -246,18 +247,44 @@ export const useUser = () => {
     }
   };
 
+  const getSubscription = async () => {
+    try {
+      setLoading(true);
+      const res = await getSubscriptionService();
+      if (res && res.success) {
+        return res.data;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to fetch subscription", "error");
+        throw new Error(res.message || "Get subscription failed");
+      }
+    } catch (error: unknown) {
+      console.error("Get subscription error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch subscription";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const startSubscription = async (payload: START_SUBSCRIPTION_PAYLOAD) => {
     try {
       setLoading(true);
       const res = await startSubscriptionService(payload);
       if (res && res.success) {
-        // If checkout URL is provided, redirect to it
         if (res.data?.checkoutUrl) {
           window.location.href = res.data.checkoutUrl;
           return res;
         }
-        // Otherwise, fetch updated user profile after subscription
-        await fetchUserProfile();
         showToast(
           res.message || "Subscription started successfully",
           "success"
@@ -291,10 +318,8 @@ export const useUser = () => {
       setLoading(true);
       const res = await unsubscribeService();
       if (res && res.success) {
-        // Fetch updated user profile after unsubscribe
-        await fetchUserProfile();
         showToast(
-          res.message || "Subscription canceled successfully",
+          res.message || "Subscription will be cancelled at the end of the billing period",
           "success"
         );
         return res;
@@ -396,6 +421,7 @@ export const useUser = () => {
     updateBusinessProfile,
     inviteTeamMember,
     deleteUser,
+    getSubscription,
     startSubscription,
     unsubscribe,
     createSupportTicket,

@@ -14,6 +14,7 @@ import type {
   DELETE_USER_RESPONSE,
   START_SUBSCRIPTION_PAYLOAD,
   START_SUBSCRIPTION_RESPONSE,
+  GET_SUBSCRIPTION_RESPONSE,
   UNSUBSCRIBE_RESPONSE,
   SUPPORT_TICKET_PAYLOAD,
   SUPPORT_TICKET_RESPONSE,
@@ -71,11 +72,18 @@ export const deleteUserService = () => {
   return apiInvoker<DELETE_USER_RESPONSE>(END_POINT.user.profile, "DELETE");
 };
 
+export const getSubscriptionService = () => {
+  return apiInvoker<GET_SUBSCRIPTION_RESPONSE>(
+    END_POINT.user.subscription,
+    "GET"
+  );
+};
+
 export const startSubscriptionService = (
   payload: START_SUBSCRIPTION_PAYLOAD
 ) => {
   return apiInvoker<START_SUBSCRIPTION_RESPONSE>(
-    END_POINT.user.subscription,
+    END_POINT.user.checkout,
     "POST",
     payload
   );

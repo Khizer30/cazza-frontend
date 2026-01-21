@@ -866,26 +866,6 @@ export const AccountSettings = () => {
                   {currentUser?.team?.subscriptionStatus || "N/A"}
                 </Badge>
               </div>
-              {currentUser?.team?.stripeCustomerId && (
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <p className="font-medium">Stripe Customer ID</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {currentUser.team.stripeCustomerId}
-                    </p>
-                  </div>
-                </div>
-              )}
-              {currentUser?.team?.stripeSubscriptionId && (
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <p className="font-medium">Subscription ID</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {currentUser.team.stripeSubscriptionId}
-                    </p>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
