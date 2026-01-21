@@ -30,7 +30,10 @@ export default defineConfig(() => ({
         target: 'https://api.cazza.ai',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: '', 
+        cookieDomainRewrite: {
+          'api.cazza.ai': 'www.cazza.ai',
+          '.api.cazza.ai': '.cazza.ai'
+        },
       }
     }
   }

@@ -18,6 +18,7 @@ import {
 import { useState, useEffect } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/components/ToastProvider";
 
 const analyticsData = [
   {
@@ -60,7 +61,8 @@ const analyticsData = [
 
 export const ClientPlatforms = () => {
   const { user } = useUserStore();
-  const { updateUser, fetchUserProfile } = useUser();
+  const { fetchUserProfile } = useUser();
+  const { showToast } = useToast();
   const [selectedPlatform, setSelectedPlatform] = useState<{
     id: string;
     name: string;
@@ -96,23 +98,39 @@ export const ClientPlatforms = () => {
       const currentPlatforms = user?.platforms || [];
       const updatedPlatforms = [...currentPlatforms, platform.apiName];
 
-      await updateUser({ platforms: updatedPlatforms });
+      
+      const { updateUserService } = await import("@/services/userService");
+      const res = await updateUserService({ platforms: updatedPlatforms });
+
+      if (res && res.success) {
+        await fetchUserProfile();
+        showToast(`${platform.name} connected successfully`, "success");
+      }
     } catch (error) {
       console.error("Error connecting platform:", error);
+      showToast("Failed to connect platform", "error");
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const handleDisconnect = async (apiName: string, _platformName?: string) => {
+  const handleDisconnect = async (apiName: string, platformName?: string) => {
     try {
       setIsUpdating(true);
       const currentPlatforms = user?.platforms || [];
       const updatedPlatforms = currentPlatforms.filter((p) => p !== apiName);
 
-      await updateUser({ platforms: updatedPlatforms });
+     
+      const { updateUserService } = await import("@/services/userService");
+      const res = await updateUserService({ platforms: updatedPlatforms });
+
+      if (res && res.success) {
+        await fetchUserProfile();
+        showToast(`${platformName || 'Platform'} disconnected successfully`, "success");
+      }
     } catch (error) {
       console.error("Error disconnecting platform:", error);
+      showToast("Failed to disconnect platform", "error");
     } finally {
       setIsUpdating(false);
     }
