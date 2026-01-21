@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from "path"
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
   base: '/',
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -15,14 +15,23 @@ export default defineConfig(({ mode }) => ({
     outDir: "dist"
   },
   server: {
-    // Proxy only in development
-    proxy: mode === 'development' ? {
+    proxy: {
       '/api': {
         target: 'https://api.cazza.ai',
         changeOrigin: true,
         secure: false,
         cookieDomainRewrite: 'localhost',
       }
-    } : undefined
+    }
+  },
+  preview: {
+    proxy: {
+      '/api': {
+        target: 'https://api.cazza.ai',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: '', 
+      }
+    }
   }
 }))
