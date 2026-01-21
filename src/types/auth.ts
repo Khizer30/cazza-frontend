@@ -274,26 +274,11 @@ export interface TeamMemberSubscription {
 
 export interface TeamMember {
   id: string;
-  userId?: string;
-  user_id?: string;
-  firstName?: string;
-  lastName?: string;
-  name?: string;
-  email?: string;
-  profiles?: {
-    email?: string;
-    [key: string]: any;
-  };
+  firstName: string;
+  lastName: string;
+  email: string;
   role: "OWNER" | "ADMIN" | "MEMBER" | string;
-  profileType?: string;
   profileImage?: string | null;
-  verified?: boolean;
-  isActive?: boolean;
-  joined_at?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  ownerId?: string;
-  subscription?: TeamMemberSubscription | null;
   [key: string]: any;
 }
 

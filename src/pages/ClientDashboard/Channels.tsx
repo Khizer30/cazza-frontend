@@ -2444,14 +2444,11 @@ export const Channels = () =>
                     showAddMemberDialog || addMemberDialogChannelIdRef.current;
                   const channel = channels.find((c) => c.id === channelId);
                   const isMember = channel?.members.some(
-                    (m) =>
-                      m.id === member.id ||
-                      m.id === member.userId ||
-                      m.id === member.user_id
+                    (m) => m.id === member.id
                   );
                   return (
                     <div
-                      key={ member.id || member.userId || member.user_id }
+                      key={ member.id }
                       className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50"
                       onClick={ (e) => e.stopPropagation() }
                     >
@@ -2462,18 +2459,16 @@ export const Channels = () =>
                           />
                           <AvatarFallback>
                             { getInitials(
-                              member.name || member.firstName || "User"
+                              `${ member.firstName || "" } ${ member.lastName || "" }`.trim() || "User"
                             ) }
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">
-                            { member.name ||
-                              `${ member.firstName || "" } ${ member.lastName || "" }`.trim() ||
-                              "User" }
+                            { `${ member.firstName || "" } ${ member.lastName || "" }`.trim() || "User" }
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            { member.email || member.profiles?.email || "" }
+                            { member.email || "" }
                           </p>
                         </div>
                       </div>
@@ -2483,8 +2478,7 @@ export const Channels = () =>
                         <Button
                           size="sm"
                           disabled={
-                            addingMemberId ===
-                            (member.id || member.userId || member.user_id) ||
+                            addingMemberId === member.id ||
                             !!addingMemberId
                           }
                           onClick={ (e) =>
@@ -2493,23 +2487,16 @@ export const Channels = () =>
                             const channelId =
                               showAddMemberDialog ||
                               addMemberDialogChannelIdRef.current;
-                            if (
-                              channelId &&
-                              (member.id || member.userId || member.user_id)
-                            )
+                            if (channelId && member.id)
                             {
                               handleAddMember(
                                 channelId,
-                                member.id ||
-                                member.userId ||
-                                member.user_id ||
-                                ""
+                                member.id
                               );
                             }
                           } }
                         >
-                          { addingMemberId ===
-                            (member.id || member.userId || member.user_id) ? (
+                          { addingMemberId === member.id ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               Adding...

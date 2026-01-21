@@ -33,11 +33,10 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (
-      error.response &&
-      (error.response.status === 401 || error.response.status === 403)
-    ) {
+    if (error.response && error.response.status === 401) {
       const isAuthEndpoint = error.config?.url?.includes("/auth/");
+      // Only logout on 401 (Unauthorized) - means token is invalid/expired
+      // 403 (Forbidden) means user is authenticated but lacks permission - don't logout
       if (!isAuthEndpoint) {
         localStorage.clear();
         window.location.href = "/login";

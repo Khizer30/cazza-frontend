@@ -44,9 +44,15 @@ export const BillingSettings = () => {
         if (details) {
           setSubscriptionDetails(details);
         }
-      } catch (error) {
-        console.error("Failed to fetch subscription details:", error);
-        hasFetchedSubscription.current = false;
+      } catch (error: any) {
+        // Handle 403 Forbidden gracefully for team members
+        if (error?.response?.status === 403) {
+          // Team members don't have access to billing - this is expected
+          hasFetchedSubscription.current = true;
+        } else {
+          console.error("Failed to fetch subscription details:", error);
+          hasFetchedSubscription.current = false;
+        }
       } finally {
         setLoadingSubscription(false);
       }
@@ -109,6 +115,10 @@ export const BillingSettings = () => {
   const isActive = subscriptionDetails?.status === "ACTIVE";
   const isCanceled = subscriptionDetails?.cancelAtPeriodEnd === true;
   const hasNoSubscription = !subscriptionDetails || (subscriptionDetails.status !== "ACTIVE" && !subscriptionDetails.hasStripeSubscription);
+  // OWNER has ownerId = null OR role = "OWNER"
+  // Team member has ownerId set (not null)
+  const isOwner = user?.ownerId === null || user?.role?.toUpperCase() === "OWNER";
+  const isTeamMember = !isOwner;
 
   return (
     <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
@@ -120,6 +130,22 @@ export const BillingSettings = () => {
               <CardContent className="p-12">
                 <div className="flex items-center justify-center">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              </CardContent>
+            </Card>
+          ) : isTeamMember ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Billing Information</CardTitle>
+                <CardDescription>
+                  Subscription and billing details
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">
+                    Billing is managed by the team owner. Please contact your team owner for subscription details.
+                  </p>
                 </div>
               </CardContent>
             </Card>

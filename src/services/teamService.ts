@@ -17,12 +17,21 @@ import type {
   ACCEPT_INVITATION_RESPONSE,
 } from "@/types/auth";
 
-export const inviteTeamMemberService = (payload: TEAM_INVITE_PAYLOAD) => {
-  return apiInvoker<TEAM_INVITE_RESPONSE>(
-    END_POINT.team.invite,
-    "POST",
-    payload
-  );
+export const inviteTeamMemberService = async (payload: TEAM_INVITE_PAYLOAD) => {
+  const formData = new URLSearchParams();
+  formData.append("email", payload.email);
+  formData.append("role", payload.role);
+
+  const response = await axiosInstance({
+    url: END_POINT.team.invite,
+    method: "POST",
+    data: formData.toString(),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+
+  return response.data as TEAM_INVITE_RESPONSE;
 };
 
 export const getTeamInvitationsService = () => {

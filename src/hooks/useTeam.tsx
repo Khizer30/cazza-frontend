@@ -45,11 +45,17 @@ export const useTeam = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        if (error.response?.status === 400 || error.response?.status === 404) {
+        const status = error.response?.status;
+        if (status === 400 || status === 404) {
           setInvitations([]);
           return [];
         }
-        if (error.response?.status === 500) {
+        if (status === 401 || status === 403) {
+          // Handle auth errors gracefully - don't show error, just return empty
+          setInvitations([]);
+          return [];
+        }
+        if (status === 500) {
           console.error("Fetch invitations error:", error);
           showToast("Unable to load invitations. Please try again later.", "error");
           setInvitations([]);
@@ -86,13 +92,19 @@ export const useTeam = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
+        const status = error.response?.status;
         // Handle specific status codes
-        if (error.response?.status === 400 || error.response?.status === 404) {
+        if (status === 400 || status === 404) {
           // User might not have a team yet
           setMembers([]);
           return [];
         }
-        if (error.response?.status === 500) {
+        if (status === 401 || status === 403) {
+          // Handle auth errors gracefully - don't show error, just return empty
+          setMembers([]);
+          return [];
+        }
+        if (status === 500) {
           // Backend server error - don't show user the technical details
           console.error("Fetch team members error:", error);
           showToast("Unable to load team members. Please try again later.", "error");
@@ -130,11 +142,17 @@ export const useTeam = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        if (error.response?.status === 400 || error.response?.status === 404) {
+        const status = error.response?.status;
+        if (status === 400 || status === 404) {
           setAnalytics(null);
           return null;
         }
-        if (error.response?.status === 500) {
+        if (status === 401 || status === 403) {
+          // Handle auth errors gracefully - don't show error, just return null
+          setAnalytics(null);
+          return null;
+        }
+        if (status === 500) {
           console.error("Fetch team analytics error:", error);
           showToast("Unable to load team analytics. Please try again later.", "error");
           setAnalytics(null);
@@ -159,11 +177,153 @@ export const useTeam = () => {
   };
 
   const fetchAllTeamData = async () => {
-    await Promise.all([
-      fetchTeamInvitations(),
-      fetchTeamMembers(),
-      fetchTeamAnalytics(),
-    ]);
+    try {
+      setLoading(true);
+      // Fetch members first (all users can see this)
+      await fetchTeamMembersWithoutLoading();
+      // Then fetch invitations and analytics in parallel (only for OWNER/ADMIN)
+      // Use Promise.allSettled so if one fails, others still complete
+      await Promise.allSettled([
+        fetchTeamInvitationsWithoutLoading(),
+        fetchTeamAnalyticsWithoutLoading(),
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTeamMembersWithoutLoading = async () => {
+    try {
+      const res = await getTeamMembersService();
+      if (res && res.success) {
+        setMembers(res.data || []);
+        return res.data || [];
+      } else {
+        showToast(res.message || "Failed to fetch team members", "error");
+        return [];
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        const status = error.response?.status;
+        if (status === 400 || status === 404) {
+          setMembers([]);
+          return [];
+        }
+        if (status === 401 || status === 403) {
+          setMembers([]);
+          return [];
+        }
+        if (status === 500) {
+          console.error("Fetch team members error:", error);
+          showToast("Unable to load team members. Please try again later.", "error");
+          setMembers([]);
+          return [];
+        }
+        console.error("Fetch team members error:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch team members";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      setMembers([]);
+      return [];
+    }
+  };
+
+  const fetchTeamInvitationsWithoutLoading = async () => {
+    try {
+      const res = await getTeamInvitationsService();
+      if (res && res.success) {
+        const allInvitations = res.data || [];
+        const pendingInvitations = allInvitations.filter(
+          (invitation: any) =>
+            !invitation.status || invitation.status.toUpperCase() !== "ACCEPTED"
+        );
+        setInvitations(pendingInvitations);
+        return pendingInvitations;
+      } else {
+        showToast(res.message || "Failed to fetch invitations", "error");
+        return [];
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        const status = error.response?.status;
+        if (status === 400 || status === 404) {
+          setInvitations([]);
+          return [];
+        }
+        if (status === 401 || status === 403) {
+          setInvitations([]);
+          return [];
+        }
+        if (status === 500) {
+          console.error("Fetch invitations error:", error);
+          showToast("Unable to load invitations. Please try again later.", "error");
+          setInvitations([]);
+          return [];
+        }
+        console.error("Fetch invitations error:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch invitations";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      setInvitations([]);
+      return [];
+    }
+  };
+
+  const fetchTeamAnalyticsWithoutLoading = async () => {
+    try {
+      const res = await getTeamAnalyticsService();
+      if (res && res.success) {
+        setAnalytics(res.data);
+        return res.data;
+      } else {
+        showToast(res.message || "Failed to fetch team analytics", "error");
+        return null;
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        const status = error.response?.status;
+        if (status === 400 || status === 404) {
+          setAnalytics(null);
+          return null;
+        }
+        if (status === 401 || status === 403) {
+          setAnalytics(null);
+          return null;
+        }
+        if (status === 500) {
+          console.error("Fetch team analytics error:", error);
+          showToast("Unable to load team analytics. Please try again later.", "error");
+          setAnalytics(null);
+          return null;
+        }
+        console.error("Fetch team analytics error:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to fetch team analytics";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      setAnalytics(null);
+      return null;
+    }
   };
 
   const cancelInvitation = async (invitationId: string) => {

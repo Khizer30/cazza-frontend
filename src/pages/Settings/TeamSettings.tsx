@@ -11,15 +11,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Mail, Shield, Users, Loader2, X, CreditCard } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { TeamInviteDialog } from "@/components/TeamInviteDialog";
 import { useTeam } from "@/hooks/useTeam";
+import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/components/ToastProvider";
 import { SettingsSidebar } from "@/components/SettingsSidebar";
@@ -78,6 +72,7 @@ export const TeamSettings = () => {
   const { user: currentUser } = useUserStore();
   const { showToast } = useToast();
   const [searchParams] = useSearchParams();
+  const { startSubscription, isLoading: isSubscriptionLoading } = useUser();
   const {
     members,
     invitations,
@@ -87,15 +82,11 @@ export const TeamSettings = () => {
     cancelInvitation,
     removeTeamMember,
     updateTeamMemberRole,
-    payForTeamMember,
   } = useTeam();
 
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [cancelInviteId, setCancelInviteId] = useState<string | null>(null);
   const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
-  const [memberIntervals, setMemberIntervals] = useState<
-    Record<string, "monthly" | "yearly">
-  >({});
   const [payingForMemberId, setPayingForMemberId] = useState<string | null>(
     null
   );
@@ -122,7 +113,9 @@ export const TeamSettings = () => {
     }
   }, [searchParams, fetchAllTeamData, showToast]);
 
-  const canManageTeam = !currentUser?.ownerId;
+  // Only OWNER and ADMIN can manage team (invite, remove, change roles)
+  // OWNER has ownerId = null, team members have ownerId set
+  const canManageTeam = !currentUser?.ownerId && (currentUser?.role?.toUpperCase() === "OWNER" || currentUser?.role?.toUpperCase() === "ADMIN");
 
   // Handle invite button click
   const handleInvite = useCallback(() => {
@@ -155,26 +148,19 @@ export const TeamSettings = () => {
 
   const handlePayForMember = useCallback(
     async (member: any) => {
-      const userId = member.id;
-
-      if (!userId) {
-        showToast("Member ID not found. Please contact support.", "error");
-        return;
-      }
-
-      const interval = memberIntervals[member.id] || "monthly";
       setPayingForMemberId(member.id);
       try {
-        await payForTeamMember(userId, interval);
+        await startSubscription({ interval: "monthly" });
       } catch (error) {
         console.error("Error paying for team member:", error);
-        // Error is already handled in payForTeamMember hook
+        // Error is already handled in startSubscription hook
       } finally {
         setPayingForMemberId(null);
       }
     },
-    [memberIntervals, payForTeamMember, showToast]
+    [startSubscription]
   );
+
 
   const confirmRemoveMember = useCallback(async () => {
     if (removeMemberId) {
@@ -194,15 +180,7 @@ export const TeamSettings = () => {
     if (m.firstName) {
       return m.firstName[0].toUpperCase();
     }
-    if (m.name) {
-      return m.name
-        .split(" ")
-        .map((s: string) => s[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase();
-    }
-    const email = m.email || m.profiles?.email || "";
+    const email = m.email || "";
     return email[0]?.toUpperCase() || "?";
   };
 
@@ -213,48 +191,13 @@ export const TeamSettings = () => {
     if (m.firstName) {
       return m.firstName;
     }
-    if (m.name) {
-      return m.name;
-    }
     return "Unknown";
   };
 
   const getMemberEmail = (m: any) => {
-    return m.email || m.profiles?.email || "No email";
+    return m.email || "No email";
   };
 
-  // Helper function to get member's current subscription interval (normalized)
-  const getMemberSubscriptionInterval = (
-    member: any
-  ): "monthly" | "yearly" | null => {
-    if (!member.subscription || member.subscription.status !== "ACTIVE") {
-      return null;
-    }
-    const interval = member.subscription.interval?.toLowerCase();
-    if (interval === "month" || interval === "monthly") {
-      return "monthly";
-    }
-    if (interval === "year" || interval === "yearly") {
-      return "yearly";
-    }
-    return null;
-  };
-
-  // Helper function to check if button should be disabled
-  const isPayButtonDisabled = (member: any): boolean => {
-    const selectedInterval = memberIntervals[member.id] || "monthly";
-    const currentSubscriptionInterval = getMemberSubscriptionInterval(member);
-
-    // If member has an active subscription with the same interval, disable the button
-    if (
-      currentSubscriptionInterval &&
-      currentSubscriptionInterval === selectedInterval
-    ) {
-      return true;
-    }
-
-    return false;
-  };
 
   // Helper function to get subscription display text
   const getSubscriptionDisplay = (member: any): string | null => {
@@ -296,11 +239,8 @@ export const TeamSettings = () => {
     return null;
   };
 
-  // Filter out current user from members list
-  const filteredMembers = members.filter(
-    (member) =>
-      member.userId !== currentUser?.id && member.user_id !== currentUser?.id
-  );
+  // Show all team members including current user
+  const filteredMembers = members;
 
   // Filter out accepted invitations - only show pending ones
   const pendingInvitations = invitations.filter(
@@ -392,8 +332,8 @@ export const TeamSettings = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {/* Pending Members Section */}
-                {pendingInvitations.length > 0 && (
+                {/* Pending Members Section - Only show for OWNER/ADMIN */}
+                {canManageTeam && pendingInvitations.length > 0 && (
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-lg font-semibold mb-2">
@@ -478,7 +418,11 @@ export const TeamSettings = () => {
                       Active team members in your organization
                     </p>
                   </div>
-                  {filteredMembers.length > 0 ? (
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : filteredMembers.length > 0 ? (
                     filteredMembers.map((member) => (
                       <div
                         key={member.id}
@@ -522,58 +466,37 @@ export const TeamSettings = () => {
                           </Badge>
                           {canManageTeam && (
                             <>
-                              {/* Subscription checkout for team members */}
+                              {/* Pay for team member */}
                               {member.role?.toUpperCase() !== "OWNER" && (
-                                <div className="flex items-center gap-2">
-                                  <Select
-                                    value={
-                                      memberIntervals[member.id] || "monthly"
-                                    }
-                                    onValueChange={(
-                                      value: "monthly" | "yearly"
-                                    ) => {
-                                      setMemberIntervals((prev) => ({
-                                        ...prev,
-                                        [member.id]: value,
-                                      }));
-                                    }}
-                                  >
-                                    <SelectTrigger className="w-[120px]">
-                                      <SelectValue placeholder="Interval" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="monthly">
-                                        Monthly
-                                      </SelectItem>
-                                      <SelectItem value="yearly">
-                                        Yearly
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePayForMember(member)}
-                                    disabled={
-                                      isLoading ||
-                                      payingForMemberId === member.id ||
-                                      isPayButtonDisabled(member)
-                                    }
-                                    className="gap-2"
-                                  >
-                                    {payingForMemberId === member.id ? (
-                                      <>
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        Processing...
-                                      </>
-                                    ) : (
-                                      <>
-                                        <CreditCard className="h-4 w-4" />
-                                        Pay for him
-                                      </>
-                                    )}
-                                  </Button>
-                                </div>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handlePayForMember(member)}
+                                  disabled={
+                                    isLoading ||
+                                    isSubscriptionLoading ||
+                                    payingForMemberId === member.id ||
+                                    currentUser?.team?.subscriptionStatus === "ACTIVE"
+                                  }
+                                  className="gap-2"
+                                >
+                                  {payingForMemberId === member.id ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      Processing...
+                                    </>
+                                  ) : currentUser?.team?.subscriptionStatus === "ACTIVE" ? (
+                                    <>
+                                      <CreditCard className="h-4 w-4" />
+                                      Already Paid
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CreditCard className="h-4 w-4" />
+                                      Pay for him
+                                    </>
+                                  )}
+                                </Button>
                               )}
                               {/* Only show role toggle for members (not OWNER) */}
                               {member.role?.toUpperCase() !== "OWNER" && (

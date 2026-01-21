@@ -260,6 +260,12 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Get subscription error:", error);
       if (error instanceof AxiosError) {
+        const status = error.response?.status;
+        // Handle 403 Forbidden gracefully - team members don't have access to billing
+        if (status === 403) {
+          // Don't show error toast for 403 - it's expected for team members
+          return null;
+        }
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||
