@@ -27,13 +27,30 @@ export interface Subscription {
   customAmount?: number;
 }
 
+export interface Team {
+  id: string;
+  ownerId: string;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+  subscriptionStatus: "ACTIVE" | "TRIALING" | "CANCELED" | "EXPIRED" | "PENDING";
+  createdAt: string;
+  updatedAt: string;
+  owner?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    profileImage: string | null;
+  };
+}
+
 export interface User {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   role: string;
-  profileType: string;
+  profileType?: string;
   profileImage: string | null;
   providers: string[];
   verified: boolean;
@@ -44,8 +61,10 @@ export interface User {
   planId: string | null;
   planExpiry: string | null;
   ownerId: string | null;
+  teamId?: string | null;
   subscription: Subscription | null;
   businessProfile: BusinessProfile | null;
+  team?: Team | null;
 }
 
 export interface LOGIN_RESPONSE {

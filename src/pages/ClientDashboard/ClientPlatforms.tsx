@@ -104,7 +104,7 @@ export const ClientPlatforms = () => {
     }
   };
 
-  const handleDisconnect = async (apiName: string, platformName?: string) => {
+  const handleDisconnect = async (apiName: string, _platformName?: string) => {
     try {
       setIsUpdating(true);
       const currentPlatforms = user?.platforms || [];
