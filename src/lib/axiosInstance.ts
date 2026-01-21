@@ -1,8 +1,17 @@
 import axios, { type AxiosInstance } from "axios";
 
-// Always use proxy - works in both development and production
+// Determine base URL based on environment
 const getBaseURL = () => {
-  return '/api';
+  // Check if we're on production domain
+  const isProduction = window.location.hostname === 'www.cazza.ai' || window.location.hostname === 'cazza.ai';
+
+  if (isProduction) {
+    // Production: use direct backend URL
+    return 'https://api.cazza.ai/api';
+  } else {
+    // Development: use proxy
+    return '/api';
+  }
 };
 
 const axiosInstance: AxiosInstance = axios.create({
