@@ -49,3 +49,10 @@ export const googleCallbackService = (payload: GOOGLE_CALLBACK_PAYLOAD) => {
     payload
   );
 };
+
+export const logoutService = () => {
+  return apiInvoker<{ success: boolean; message: string }>(
+    END_POINT.auth.logout,
+    "GET"
+  );
+};

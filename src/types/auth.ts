@@ -137,12 +137,18 @@ export interface USER_PROFILE_RESPONSE {
 export interface UPDATE_USER_PAYLOAD {
   firstName?: string;
   lastName?: string;
-  profileImage?: File | null;
   role?: string;
+  platforms?: string[];
 }
 
-export interface UPDATE_USER_PLATFORMS_PAYLOAD {
-  platforms: string[];
+export interface UPDATE_PROFILE_IMAGE_PAYLOAD {
+  profileImage: File;
+}
+
+export interface UPDATE_PROFILE_IMAGE_RESPONSE {
+  success: boolean;
+  message: string;
+  data?: User;
 }
 
 export interface UPDATE_USER_RESPONSE {

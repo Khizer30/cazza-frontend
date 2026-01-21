@@ -7,13 +7,16 @@ import type {
   USER_PROFILE_RESPONSE,
   UPDATE_USER_PAYLOAD,
   UPDATE_USER_RESPONSE,
-  UPDATE_USER_PLATFORMS_PAYLOAD,
+  UPDATE_PROFILE_IMAGE_PAYLOAD,
+  UPDATE_PROFILE_IMAGE_RESPONSE,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_RESPONSE,
   DELETE_USER_RESPONSE,
   START_SUBSCRIPTION_PAYLOAD,
   START_SUBSCRIPTION_RESPONSE,
   UNSUBSCRIBE_RESPONSE,
+  SUPPORT_TICKET_PAYLOAD,
+  SUPPORT_TICKET_RESPONSE,
 } from "@/types/auth";
 
 export const getUserProfileService = () => {
@@ -28,21 +31,19 @@ export const onboardingService = (payload: ONBOARDING_PAYLOAD) => {
   );
 };
 
-export const updateUserService = async (payload: UPDATE_USER_PAYLOAD) => {
-  const formData = new FormData();
+export const updateUserService = (payload: UPDATE_USER_PAYLOAD) => {
+  return apiInvoker<UPDATE_USER_RESPONSE>(
+    END_POINT.user.profile,
+    "PUT",
+    payload
+  );
+};
 
-  if (payload.firstName !== undefined) {
-    formData.append("firstName", payload.firstName);
-  }
-  if (payload.lastName !== undefined) {
-    formData.append("lastName", payload.lastName);
-  }
-  if (payload.role !== undefined) {
-    formData.append("role", payload.role);
-  }
-  if (payload.profileImage instanceof File) {
-    formData.append("profileImage", payload.profileImage);
-  }
+export const updateProfileImageService = async (
+  payload: UPDATE_PROFILE_IMAGE_PAYLOAD
+) => {
+  const formData = new FormData();
+  formData.append("profileImage", payload.profileImage);
 
   const response = await axiosInstance({
     url: END_POINT.user.profile,
@@ -53,7 +54,7 @@ export const updateUserService = async (payload: UPDATE_USER_PAYLOAD) => {
     },
   });
 
-  return response.data as UPDATE_USER_RESPONSE;
+  return response.data as UPDATE_PROFILE_IMAGE_RESPONSE;
 };
 
 export const updateBusinessProfileService = (
@@ -84,6 +85,10 @@ export const unsubscribeService = () => {
   return apiInvoker<UNSUBSCRIBE_RESPONSE>(END_POINT.user.unsubscribe, "POST");
 };
 
-export const updateUserPlatformsService = (payload: UPDATE_USER_PLATFORMS_PAYLOAD) => {
-  return apiInvoker<UPDATE_USER_RESPONSE>(END_POINT.user.profile, "PUT", payload);
+export const createSupportTicketService = (payload: SUPPORT_TICKET_PAYLOAD) => {
+  return apiInvoker<SUPPORT_TICKET_RESPONSE>(
+    END_POINT.user.support,
+    "POST",
+    payload
+  );
 };

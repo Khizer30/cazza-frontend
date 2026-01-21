@@ -53,16 +53,22 @@ export const SignIn = () => {
     setLoading(true);
     const paylaod = { ...data, email: data.email.toLowerCase() };
     try {
-      await signIn(paylaod);
-      const currentUser = useUserStore.getState().user;
-      if (
-        currentUser &&
-        !currentUser.businessProfile &&
-        currentUser.role === "OWNER"
-      ) {
-        navigate("/dashboard");
-      } else {
-        navigate("/dashboard");
+      const response = await signIn(paylaod);
+
+      if (response && response.success) {
+        // Get the user from the store after signIn completes
+        const currentUser = useUserStore.getState().user;
+
+        // Check if user needs onboarding
+        if (
+          currentUser &&
+          !currentUser.businessProfile &&
+          currentUser.role === "OWNER"
+        ) {
+          navigate("/onboarding");
+        } else {
+          navigate("/dashboard");
+        }
       }
     } catch (err) {
       console.error("Sign in error:", err);

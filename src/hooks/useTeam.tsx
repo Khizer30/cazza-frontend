@@ -45,7 +45,13 @@ export const useTeam = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        if (error.response?.status === 400) {
+        if (error.response?.status === 400 || error.response?.status === 404) {
+          setInvitations([]);
+          return [];
+        }
+        if (error.response?.status === 500) {
+          console.error("Fetch invitations error:", error);
+          showToast("Unable to load invitations. Please try again later.", "error");
           setInvitations([]);
           return [];
         }
@@ -60,6 +66,7 @@ export const useTeam = () => {
       } else {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
+      setInvitations([]);
       return [];
     } finally {
       setLoading(false);
@@ -79,7 +86,16 @@ export const useTeam = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        if (error.response?.status === 400) {
+        // Handle specific status codes
+        if (error.response?.status === 400 || error.response?.status === 404) {
+          // User might not have a team yet
+          setMembers([]);
+          return [];
+        }
+        if (error.response?.status === 500) {
+          // Backend server error - don't show user the technical details
+          console.error("Fetch team members error:", error);
+          showToast("Unable to load team members. Please try again later.", "error");
           setMembers([]);
           return [];
         }
@@ -94,6 +110,7 @@ export const useTeam = () => {
       } else {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
+      setMembers([]);
       return [];
     } finally {
       setLoading(false);
@@ -113,7 +130,13 @@ export const useTeam = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        if (error.response?.status === 400) {
+        if (error.response?.status === 400 || error.response?.status === 404) {
+          setAnalytics(null);
+          return null;
+        }
+        if (error.response?.status === 500) {
+          console.error("Fetch team analytics error:", error);
+          showToast("Unable to load team analytics. Please try again later.", "error");
           setAnalytics(null);
           return null;
         }
@@ -128,6 +151,7 @@ export const useTeam = () => {
       } else {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
+      setAnalytics(null);
       return null;
     } finally {
       setLoading(false);

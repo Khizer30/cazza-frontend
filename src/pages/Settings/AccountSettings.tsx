@@ -76,6 +76,7 @@ export const AccountSettings = () => {
     user,
     fetchUserProfile,
     updateUser,
+    updateProfileImage,
     updateBusinessProfile,
     deleteUser,
     isLoading,
@@ -85,7 +86,8 @@ export const AccountSettings = () => {
 
   // Use store user if available, otherwise use hook user
   const currentUser = storeUser || user;
-  const isClient = currentUser?.profileType === "BUSINESS" || false;
+  // User is a business client if they have a businessProfile
+  const isClient = !!currentUser?.businessProfile;
 
   // Avatar upload state
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -95,6 +97,8 @@ export const AccountSettings = () => {
   // Form and saving state
   const [savingPersonal, setSavingPersonal] = useState(false);
   const [savingBusiness, setSavingBusiness] = useState(false);
+  const [savingMarketplaces, setSavingMarketplaces] = useState(false);
+  const [savingTechStack, setSavingTechStack] = useState(false);
 
   const {
     register: registerPersonalInfo,
@@ -263,32 +267,30 @@ export const AccountSettings = () => {
 
     setSavingPersonal(true);
     try {
-      // Update user profile (firstName, lastName, profileImage, role)
-      // Role is managed in state but not displayed in UI
+      // Upload profile image first if a new one is selected
+      if (avatarFile) {
+        await updateProfileImage({ profileImage: avatarFile });
+        setAvatarFile(null);
+      }
+
+      // Update user profile (firstName, lastName, role)
       const userUpdatePayload: any = {
         firstName: firstName,
         lastName: lastName,
         role: currentUser.role, // Include role from current user state
       };
 
-      if (avatarFile) {
-        userUpdatePayload.profileImage = avatarFile;
-      }
-
       await updateUser(userUpdatePayload);
 
       // Update local form data
       setFormData(prev => ({ ...prev, firstName, lastName }));
-
-      // Clear avatar file after successful upload
-      setAvatarFile(null);
     } catch (error) {
       console.error("Save personal info error:", error);
       // Error is already handled in the hooks
     } finally {
       setSavingPersonal(false);
     }
-  }, [formData, avatarFile, currentUser, updateUser, watchPersonalInfo]);
+  }, [formData, avatarFile, currentUser, updateUser, updateProfileImage, watchPersonalInfo]);
 
   const handleSaveBusinessInfo = useCallback(async (data?: BusinessInfoData) => {
     if (!currentUser || !currentUser.businessProfile) return;
@@ -299,13 +301,11 @@ export const AccountSettings = () => {
     try {
       // Update business profile only
       const businessUpdatePayload = {
-        firstName: formData.firstName || currentUser.firstName, // Required by API - use formData or fallback to currentUser
-        lastName: formData.lastName || currentUser.lastName, // Required by API - use formData or fallback to currentUser
         businessName: businessName,
-        businessEntityType: formData.entityType,
-        annualRevenueBand: formData.revenueBand,
-        marketplaces: formData.marketplaces,
-        tools: formData.accountingStack.integrations,
+        businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
+        annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
+        marketplaces: formData.marketplaces?.length > 0 ? formData.marketplaces : currentUser.businessProfile.marketplaces || [],
+        tools: formData.accountingStack.integrations?.length > 0 ? formData.accountingStack.integrations : currentUser.businessProfile.tools || [],
         useXero: formData.accountingStack.hasXero,
         useMultipleCurrencies: formData.accountingStack.multiCurrency,
       };
@@ -321,6 +321,52 @@ export const AccountSettings = () => {
       setSavingBusiness(false);
     }
   }, [formData, currentUser, updateBusinessProfile, watchBusinessInfo]);
+
+  const handleSaveMarketplaces = useCallback(async () => {
+    if (!currentUser || !currentUser.businessProfile) return;
+
+    setSavingMarketplaces(true);
+    try {
+      const businessUpdatePayload = {
+        businessName: formData.businessName || currentUser.businessProfile.businessName,
+        businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
+        annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
+        marketplaces: formData.marketplaces,
+        tools: formData.accountingStack.integrations?.length > 0 ? formData.accountingStack.integrations : currentUser.businessProfile.tools || [],
+        useXero: formData.accountingStack.hasXero,
+        useMultipleCurrencies: formData.accountingStack.multiCurrency,
+      };
+
+      await updateBusinessProfile(businessUpdatePayload);
+    } catch (error) {
+      console.error("Save marketplaces error:", error);
+    } finally {
+      setSavingMarketplaces(false);
+    }
+  }, [formData, currentUser, updateBusinessProfile]);
+
+  const handleSaveTechStack = useCallback(async () => {
+    if (!currentUser || !currentUser.businessProfile) return;
+
+    setSavingTechStack(true);
+    try {
+      const businessUpdatePayload = {
+        businessName: formData.businessName || currentUser.businessProfile.businessName,
+        businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
+        annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
+        marketplaces: formData.marketplaces?.length > 0 ? formData.marketplaces : currentUser.businessProfile.marketplaces || [],
+        tools: formData.accountingStack.integrations,
+        useXero: formData.accountingStack.hasXero,
+        useMultipleCurrencies: formData.accountingStack.multiCurrency,
+      };
+
+      await updateBusinessProfile(businessUpdatePayload);
+    } catch (error) {
+      console.error("Save tech stack error:", error);
+    } finally {
+      setSavingTechStack(false);
+    }
+  }, [formData, currentUser, updateBusinessProfile]);
 
   const [deleting, setDeleting] = useState(false);
 
@@ -695,11 +741,11 @@ export const AccountSettings = () => {
                 {/* Save Marketplaces Button */}
                 <div className="flex justify-end pt-4">
                   <Button
-                    onClick={handleSubmitBusinessInfo(handleSaveBusinessInfo)}
-                    disabled={savingBusiness}
+                    onClick={handleSaveMarketplaces}
+                    disabled={savingMarketplaces}
                     className="px-8"
                   >
-                    {savingBusiness ? (
+                    {savingMarketplaces ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Saving...
@@ -780,11 +826,11 @@ export const AccountSettings = () => {
                 {/* Save Tech Stack Button */}
                 <div className="flex justify-end pt-4">
                   <Button
-                    onClick={handleSubmitBusinessInfo(handleSaveBusinessInfo)}
-                    disabled={savingBusiness}
+                    onClick={handleSaveTechStack}
+                    disabled={savingTechStack}
                     className="px-8"
                   >
-                    {savingBusiness ? (
+                    {savingTechStack ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Saving...
@@ -797,6 +843,51 @@ export const AccountSettings = () => {
               </CardContent>
             </Card>
           )}
+
+          <Separator />
+
+          {/* Subscription & Plan */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Subscription & Plan</CardTitle>
+              <CardDescription>
+                View your current subscription status and plan details
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <p className="font-medium">Current Status</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {currentUser?.team?.subscriptionStatus || "Not Available"}
+                  </p>
+                </div>
+                <Badge variant={currentUser?.team?.subscriptionStatus === "TRIALING" ? "secondary" : "default"}>
+                  {currentUser?.team?.subscriptionStatus || "N/A"}
+                </Badge>
+              </div>
+              {currentUser?.team?.stripeCustomerId && (
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <p className="font-medium">Stripe Customer ID</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {currentUser.team.stripeCustomerId}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {currentUser?.team?.stripeSubscriptionId && (
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <p className="font-medium">Subscription ID</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {currentUser.team.stripeSubscriptionId}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <Separator />
 

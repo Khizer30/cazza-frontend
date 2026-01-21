@@ -3,11 +3,12 @@ import {
   getUserProfileService,
   onboardingService,
   updateUserService,
-  updateUserPlatformsService,
+  updateProfileImageService,
   updateBusinessProfileService,
   deleteUserService,
   startSubscriptionService,
   unsubscribeService,
+  createSupportTicketService,
 } from "@/services/userService";
 import { inviteTeamMemberService } from "@/services/teamService";
 import { useUserStore } from "@/store/userStore";
@@ -15,10 +16,11 @@ import { useTeamStore } from "@/store/teamStore";
 import type {
   ONBOARDING_PAYLOAD,
   UPDATE_USER_PAYLOAD,
-  UPDATE_USER_PLATFORMS_PAYLOAD,
+  UPDATE_PROFILE_IMAGE_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
   TEAM_INVITE_PAYLOAD,
   START_SUBSCRIPTION_PAYLOAD,
+  SUPPORT_TICKET_PAYLOAD,
 } from "@/types/auth";
 import { AxiosError } from "axios";
 
@@ -66,7 +68,13 @@ export const useUser = () => {
       const res = await onboardingService(payload);
       if (res && res.success) {
         // Fetch updated user profile after onboarding
-        await fetchUserProfile();
+        // Don't fail if user profile fetch fails - onboarding was successful
+        try {
+          await fetchUserProfile();
+        } catch (profileError) {
+          console.warn("Failed to fetch user profile after onboarding, but onboarding was successful:", profileError);
+          // Continue anyway - user can be fetched later
+        }
         showToast(
           res.message || "Onboarding completed successfully",
           "success"
@@ -146,13 +154,20 @@ export const useUser = () => {
         throw new Error(res.message || "Update failed");
       }
     } catch (error: unknown) {
-      console.error("Update business profile error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          "Failed to update business profile";
-        showToast(errorMessage, "error");
+        // Show specific validation errors if available
+        if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+          const validationMessages = error.response.data.errors
+            .map((err: any) => err.message || err.msg || JSON.stringify(err))
+            .join(", ");
+          showToast(`Validation error: ${validationMessages}`, "error");
+        } else {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            "Failed to update business profile";
+          showToast(errorMessage, "error");
+        }
       } else if (error instanceof Error) {
         showToast(error.message, "error");
       } else {
@@ -306,26 +321,59 @@ export const useUser = () => {
     }
   };
 
-  const updateUserPlatforms = async (payload: UPDATE_USER_PLATFORMS_PAYLOAD, customMessage?: string) => {
+  const updateProfileImage = async (payload: UPDATE_PROFILE_IMAGE_PAYLOAD) => {
     try {
       setLoading(true);
-      const res = await updateUserPlatformsService(payload);
+      const res = await updateProfileImageService(payload);
       if (res && res.success) {
         // Fetch updated user profile after update
         await fetchUserProfile();
-        showToast(customMessage || res.message || "Platforms updated successfully", "success");
+        showToast(res.message || "Profile image updated successfully", "success");
         return res;
       } else if (res && !res.success) {
-        showToast(res.message || "Failed to update platforms", "error");
-        throw new Error(res.message || "Update platforms failed");
+        showToast(res.message || "Failed to update profile image", "error");
+        throw new Error(res.message || "Update profile image failed");
       }
     } catch (error: unknown) {
-      console.error("Update user platforms error:", error);
+      console.error("Update profile image error:", error);
       if (error instanceof AxiosError) {
         const errorMessage =
           error.response?.data?.message ||
           error.response?.data?.error ||
-          "Failed to update platforms";
+          "Failed to update profile image";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createSupportTicket = async (payload: SUPPORT_TICKET_PAYLOAD) => {
+    try {
+      setLoading(true);
+      const res = await createSupportTicketService(payload);
+      if (res && res.success) {
+        showToast(
+          res.message || "Support ticket created successfully",
+          "success"
+        );
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to create support ticket", "error");
+        throw new Error(res.message || "Create support ticket failed");
+      }
+    } catch (error: unknown) {
+      console.error("Create support ticket error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to create support ticket";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -344,11 +392,12 @@ export const useUser = () => {
     fetchUserProfile,
     completeOnboarding,
     updateUser,
-    updateUserPlatforms,
+    updateProfileImage,
     updateBusinessProfile,
     inviteTeamMember,
     deleteUser,
     startSubscription,
     unsubscribe,
+    createSupportTicket,
   };
 };

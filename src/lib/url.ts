@@ -6,6 +6,7 @@ export const END_POINT = {
     setNewPassowrd: "/auth/reset-password",
     google: "/auth/google",
     googleCallback: "/auth/google/callback",
+    logout: "/auth/logout",
   },
   user: {
     profile: "/user",

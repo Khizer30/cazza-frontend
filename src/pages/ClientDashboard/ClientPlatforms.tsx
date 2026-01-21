@@ -60,7 +60,7 @@ const analyticsData = [
 
 export const ClientPlatforms = () => {
   const { user } = useUserStore();
-  const { updateUserPlatforms, fetchUserProfile } = useUser();
+  const { updateUser, fetchUserProfile } = useUser();
   const [selectedPlatform, setSelectedPlatform] = useState<{
     id: string;
     name: string;
@@ -95,8 +95,8 @@ export const ClientPlatforms = () => {
       setIsUpdating(true);
       const currentPlatforms = user?.platforms || [];
       const updatedPlatforms = [...currentPlatforms, platform.apiName];
-      
-      await updateUserPlatforms({ platforms: updatedPlatforms }, `${platform.name} connected successfully`);
+
+      await updateUser({ platforms: updatedPlatforms });
     } catch (error) {
       console.error("Error connecting platform:", error);
     } finally {
@@ -109,11 +109,8 @@ export const ClientPlatforms = () => {
       setIsUpdating(true);
       const currentPlatforms = user?.platforms || [];
       const updatedPlatforms = currentPlatforms.filter((p) => p !== apiName);
-      
-      const platform = analyticsData.find((p) => p.apiName === apiName);
-      const name = platformName || platform?.name || "Platform";
-      
-      await updateUserPlatforms({ platforms: updatedPlatforms }, `${name} disconnected successfully`);
+
+      await updateUser({ platforms: updatedPlatforms });
     } catch (error) {
       console.error("Error disconnecting platform:", error);
     } finally {

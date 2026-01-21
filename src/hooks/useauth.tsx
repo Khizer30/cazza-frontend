@@ -3,6 +3,7 @@ import {
   forgotPasswordService,
   getGoogleAuthUrlService,
   googleCallbackService,
+  logoutService,
   setNewPasswordService,
   signInService,
   signUpService,
@@ -16,7 +17,7 @@ import type {
   SETNEWPASSWORD_PAYLOAD,
   SIGNUP_PAYLOAD,
 } from "@/types/auth";
-import { setToken, setRefreshToken, removeToken } from "@/utils/localStorage";
+// Removed localStorage imports - using cookies only
 import { AxiosError } from "axios";
 
 export const useauth = () => {
@@ -40,35 +41,18 @@ export const useauth = () => {
   const signIn = async (paylaod: LOGIN_PAYLOAD) => {
     try {
       const res = await signInService(paylaod);
+
       if (res && res.success) {
-        // Handle new response structure with data object
-        if (res.data) {
-          const { accessToken, refreshToken, user } = res.data;
+        // Tokens are now managed via HTTP-only cookies from backend
+        // No need to manually store tokens in localStorage
 
-          // Store tokens
-          if (accessToken) {
-            setToken(accessToken);
-          }
-          if (refreshToken) {
-            setRefreshToken(refreshToken);
-          }
+        // Fetch user profile after successful login
+        const userData = await fetchUserProfile();
+        console.log("User Data:", userData);
 
-          // Always fetch fresh user profile to ensure we have the latest data
-          // This ensures we check businessProfile status correctly
-          const userData = await fetchUserProfile();
-
-          // If fetchUserProfile returns null, try to use user from response as fallback
-          if (!userData && user) {
-            setUser(user);
-          }
-        } else {
-          // Legacy support for old response format
-          const token = res.token || res.accessToken || res.access_token;
-          if (token) {
-            setToken(token);
-            // Fetch user profile after storing token
-            await fetchUserProfile();
-          }
+        // If fetchUserProfile returns null, try to use user from response as fallback
+        if (!userData && res.data?.user) {
+          setUser(res.data.user);
         }
 
         showToast(res.message || "Successfully signed in", "success");
@@ -221,24 +205,15 @@ export const useauth = () => {
       const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
       const res = await googleCallbackService(payload);
       if (res && res.success) {
-        // Handle response similar to regular login
-        if (res.data) {
-          const { accessToken, refreshToken, user } = res.data;
+        // Tokens are now stored in HTTP-only cookies by the backend
+        // No need to manually store tokens in localStorage
 
-          // Store tokens
-          if (accessToken) {
-            setToken(accessToken);
-          }
-          if (refreshToken) {
-            setRefreshToken(refreshToken);
-          }
+        // Fetch user profile after successful Google auth
+        const userData = await fetchUserProfile();
 
-          const userData = await fetchUserProfile();
-
-          // If fetchUserProfile returns null, try to use user from response as fallback
-          if (!userData && user) {
-            setUser(user);
-          }
+        // If fetchUserProfile returns null, try to use user from response as fallback
+        if (!userData && res.data?.user) {
+          setUser(res.data.user);
         }
 
         showToast(
@@ -270,16 +245,30 @@ export const useauth = () => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     try {
-      removeToken();
+      // Call backend logout API to clear cookies
+      await logoutService();
+
+      // Clear local user state
       setUser(null);
+
+      // Clear any localStorage items
+      localStorage.clear();
+
       showToast("Successfully signed out", "success");
+
       // Navigate to login page
       window.location.href = "/login";
     } catch (error) {
       console.error("Logout error:", error);
-      showToast("An error occurred during sign out", "error");
+
+      // Even if backend call fails, clear local state and redirect
+      setUser(null);
+      localStorage.clear();
+
+      showToast("Signed out", "success");
+      window.location.href = "/login";
     }
   };
 
