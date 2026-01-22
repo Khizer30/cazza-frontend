@@ -4,13 +4,7 @@ import { TikTokConnectionForm } from "@/components/ConectionForms/TikTokConnecti
 import { XeroConnectionForm } from "@/components/ConectionForms/XeroConnectionForm";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 interface PlatformConnectionModalProps {
   isOpen: boolean;
@@ -28,7 +22,7 @@ export const PlatformConnectionModal = ({
   onClose,
   platform,
   // onConnect,
-  onConnectionSuccess,
+  onConnectionSuccess
 }: PlatformConnectionModalProps) => {
   const [isLoading] = useState(false);
 
@@ -48,23 +42,15 @@ export const PlatformConnectionModal = ({
           />
         );
       case "amazon":
-        return (
-          <AmazonConnectionForm onSubmit={handleSubmit} isLoading={isLoading} />
-        );
+        return <AmazonConnectionForm onSubmit={handleSubmit} isLoading={isLoading} />;
       case "tiktok":
-        return (
-          <TikTokConnectionForm onSubmit={handleSubmit} isLoading={isLoading} />
-        );
+        return <TikTokConnectionForm onSubmit={handleSubmit} isLoading={isLoading} />;
       case "xero":
-        return (
-          <XeroConnectionForm onSubmit={handleSubmit} isLoading={isLoading} />
-        );
+        return <XeroConnectionForm onSubmit={handleSubmit} isLoading={isLoading} />;
       default:
         return (
           <div className="text-center py-4">
-            <p className="text-muted-foreground">
-              Platform connection form not available yet.
-            </p>
+            <p className="text-muted-foreground">Platform connection form not available yet.</p>
             <Button onClick={onClose} variant="outline" className="mt-4">
               Close
             </Button>

@@ -1,20 +1,10 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PlatformConnectionModal } from "@/modals/PlatformConnectionModal";
 import { Plug2, RefreshCw } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faShopify,
-  faAmazon,
-  faTiktok,
-} from "@fortawesome/free-brands-svg-icons";
+import { faShopify, faAmazon, faTiktok } from "@fortawesome/free-brands-svg-icons";
 import { useState, useEffect } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
@@ -28,7 +18,7 @@ const analyticsData = [
     type: "ecommerce",
     icon: faShopify,
     description: "Import orders, customers, and inventory",
-    color: "#96bf48",
+    color: "#96bf48"
   },
   {
     id: "amazon",
@@ -37,7 +27,7 @@ const analyticsData = [
     type: "marketplace",
     icon: faAmazon,
     description: "Connect Amazon Seller Central",
-    color: "#FF9900",
+    color: "#FF9900"
   },
   {
     id: "tiktok",
@@ -46,7 +36,7 @@ const analyticsData = [
     type: "marketplace",
     icon: faTiktok,
     description: "Sync TikTok Shop orders and products",
-    color: "#FFFFFF",
+    color: "#FFFFFF"
   },
   {
     id: "xero",
@@ -55,8 +45,8 @@ const analyticsData = [
     type: "accounting",
     imageUrl: "/xero-logo.svg",
     description: "Sync accounting data and financial reports",
-    color: "#13B5EA",
-  },
+    color: "#13B5EA"
+  }
 ];
 
 export const ClientPlatforms = () => {
@@ -98,7 +88,6 @@ export const ClientPlatforms = () => {
       const currentPlatforms = user?.platforms || [];
       const updatedPlatforms = [...currentPlatforms, platform.apiName];
 
-      
       const { updateUserService } = await import("@/services/userService");
       const res = await updateUserService({ platforms: updatedPlatforms });
 
@@ -120,13 +109,12 @@ export const ClientPlatforms = () => {
       const currentPlatforms = user?.platforms || [];
       const updatedPlatforms = currentPlatforms.filter((p) => p !== apiName);
 
-     
       const { updateUserService } = await import("@/services/userService");
       const res = await updateUserService({ platforms: updatedPlatforms });
 
       if (res && res.success) {
         await fetchUserProfile();
-        showToast(`${platformName || 'Platform'} disconnected successfully`, "success");
+        showToast(`${platformName || "Platform"} disconnected successfully`, "success");
       }
     } catch (error) {
       console.error("Error disconnecting platform:", error);
@@ -152,31 +140,20 @@ export const ClientPlatforms = () => {
               // onClick={handleSync}
               // disabled={isSyncing}
               className={`flex items-center gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 focus:bg-primary/10 focus:text-primary focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all duration-200 midday-button ${
-                isSyncing
-                  ? "bg-success/10 border-success/20 text-success animate-pulse"
-                  : ""
+                isSyncing ? "bg-success/10 border-success/20 text-success animate-pulse" : ""
               } ${isSyncing ? "cursor-not-allowed" : "cursor-pointer"}`}
             >
-              <RefreshCw
-                className={`h-4 w-4 ${
-                  isSyncing ? "animate-spin text-success" : ""
-                }`}
-              />
+              <RefreshCw className={`h-4 w-4 ${isSyncing ? "animate-spin text-success" : ""}`} />
               {isSyncing ? "Syncing..." : "Sync"}
             </Button>
           )}
         </div>
-        <CardDescription>
-          Connect your sales platforms and accounting software for real-time
-          insights
-        </CardDescription>
+        <CardDescription>Connect your sales platforms and accounting software for real-time insights</CardDescription>
 
         {/* Overview Stats */}
         <div className="grid grid-cols-2 gap-4 pt-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary">
-              {connectedCount}
-            </div>
+            <div className="text-2xl font-bold text-primary">{connectedCount}</div>
             <p className="text-sm text-muted-foreground">Connected</p>
           </div>
           <div className="text-center">
@@ -187,15 +164,16 @@ export const ClientPlatforms = () => {
           </div>
         </div>
 
-        <Progress value={analyticsData.length > 0 ? (connectedCount / analyticsData.length) * 100 : 0} className="mt-2" />
+        <Progress
+          value={analyticsData.length > 0 ? (connectedCount / analyticsData.length) * 100 : 0}
+          className="mt-2"
+        />
       </CardHeader>
 
       <CardContent className="space-y-6">
         {/* Accounting */}
         <div>
-          <h4 className="font-semibold mb-3 text-foreground">
-            Accounting Software
-          </h4>
+          <h4 className="font-semibold mb-3 text-foreground">Accounting Software</h4>
           <div className="space-y-3">
             {analyticsData
               .filter((platform) => platform.type === "accounting")
@@ -214,20 +192,14 @@ export const ClientPlatforms = () => {
                             className="h-8 w-8 object-contain"
                           />
                         ) : (
-                          <FontAwesomeIcon
-                            icon={platform.icon}
-                            className="h-5 w-5"
-                            style={{ color: platform.color }}
-                          />
+                          <FontAwesomeIcon icon={platform.icon} className="h-5 w-5" style={{ color: platform.color }} />
                         )}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <h5 className="font-medium">{platform.name}</h5>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {platform.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{platform.description}</p>
                       </div>
                     </div>
 
@@ -253,16 +225,10 @@ export const ClientPlatforms = () => {
 
         {/* Sales Platforms */}
         <div>
-          <h4 className="font-semibold mb-3 text-foreground">
-            Sales Platforms
-          </h4>
+          <h4 className="font-semibold mb-3 text-foreground">Sales Platforms</h4>
           <div className="space-y-3">
             {analyticsData
-              .filter(
-                (platform) =>
-                  platform.type === "ecommerce" ||
-                  platform.type === "marketplace"
-              )
+              .filter((platform) => platform.type === "ecommerce" || platform.type === "marketplace")
               .map((platform) => {
                 return (
                   <div
@@ -278,20 +244,14 @@ export const ClientPlatforms = () => {
                             className="h-8 w-8 object-contain"
                           />
                         ) : (
-                          <FontAwesomeIcon
-                            icon={platform.icon}
-                            className="h-5 w-5"
-                            style={{ color: platform.color }}
-                          />
+                          <FontAwesomeIcon icon={platform.icon} className="h-5 w-5" style={{ color: platform.color }} />
                         )}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <h5 className="font-medium">{platform.name}</h5>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {platform.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{platform.description}</p>
                       </div>
                     </div>
 

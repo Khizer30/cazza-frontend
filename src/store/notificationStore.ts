@@ -24,7 +24,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
   setNotifications: (notifications) =>
     set({
       notifications,
-      unreadCount: notifications.filter((n) => !n.isRead).length,
+      unreadCount: notifications.filter((n) => !n.isRead).length
     }),
 
   setUnreadCount: (count) => set({ unreadCount: count }),
@@ -33,19 +33,17 @@ export const useNotificationStore = create<NotificationState>((set) => ({
 
   triggerRefresh: () =>
     set((state) => ({
-      refreshTrigger: state.refreshTrigger + 1,
+      refreshTrigger: state.refreshTrigger + 1
     })),
 
   markAsRead: (notificationId) =>
     set((state) => {
       const updatedNotifications = state.notifications.map((notification) =>
-        notification.id === notificationId
-          ? { ...notification, isRead: true }
-          : notification
+        notification.id === notificationId ? { ...notification, isRead: true } : notification
       );
       return {
         notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.isRead).length,
+        unreadCount: updatedNotifications.filter((n) => !n.isRead).length
       };
     }),
 
@@ -53,11 +51,11 @@ export const useNotificationStore = create<NotificationState>((set) => ({
     set((state) => {
       const updatedNotifications = state.notifications.map((notification) => ({
         ...notification,
-        isRead: true,
+        isRead: true
       }));
       return {
         notifications: updatedNotifications,
-        unreadCount: 0,
+        unreadCount: 0
       };
     }),
 
@@ -65,6 +63,6 @@ export const useNotificationStore = create<NotificationState>((set) => ({
     set({
       notifications: [],
       unreadCount: 0,
-      refreshTrigger: 0,
-    }),
+      refreshTrigger: 0
+    })
 }));

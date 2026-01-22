@@ -9,7 +9,7 @@ import {
   addMemberToGroupService,
   removeMemberFromGroupService,
   updateMemberRoleService,
-  type CreateChatGroupPayload,
+  type CreateChatGroupPayload
 } from "@/services/chatService";
 import { AxiosError } from "axios";
 
@@ -29,8 +29,7 @@ export const useChat = () => {
       throw new Error("Invalid response from server");
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to create chat group";
+        const errorMessage = error.response?.data?.message || "Failed to create chat group";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -49,8 +48,7 @@ export const useChat = () => {
       return [];
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to fetch chat groups";
+        const errorMessage = error.response?.data?.message || "Failed to fetch chat groups";
         showToast(errorMessage, "error");
       }
       return [];
@@ -66,18 +64,14 @@ export const useChat = () => {
       return null;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to fetch chat group";
+        const errorMessage = error.response?.data?.message || "Failed to fetch chat group";
         showToast(errorMessage, "error");
       }
       return null;
     }
   };
 
-  const updateChatGroup = async (
-    groupId: string,
-    data: { name: string; description?: string; icon?: string }
-  ) => {
+  const updateChatGroup = async (groupId: string, data: { name: string; description?: string; icon?: string }) => {
     try {
       const res = await updateChatGroupService(groupId, data);
       if (res && res.success) {
@@ -90,8 +84,7 @@ export const useChat = () => {
       return false;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to update chat group";
+        const errorMessage = error.response?.data?.message || "Failed to update chat group";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -114,8 +107,7 @@ export const useChat = () => {
       return false;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to delete chat group";
+        const errorMessage = error.response?.data?.message || "Failed to delete chat group";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -139,8 +131,7 @@ export const useChat = () => {
       throw new Error("Invalid response from server");
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to get Firebase token";
+        const errorMessage = error.response?.data?.message || "Failed to get Firebase token";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -150,11 +141,7 @@ export const useChat = () => {
     }
   };
 
-  const addMemberToGroup = async (
-    groupId: string,
-    userId: string,
-    role: "ADMIN" | "MEMBER" = "MEMBER"
-  ) => {
+  const addMemberToGroup = async (groupId: string, userId: string, role: "ADMIN" | "MEMBER" = "MEMBER") => {
     try {
       const res = await addMemberToGroupService(groupId, { userId, role });
       if (res && res.success) {
@@ -167,8 +154,7 @@ export const useChat = () => {
       return false;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to add member";
+        const errorMessage = error.response?.data?.message || "Failed to add member";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -191,8 +177,7 @@ export const useChat = () => {
       return false;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to remove member";
+        const errorMessage = error.response?.data?.message || "Failed to remove member";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -202,11 +187,7 @@ export const useChat = () => {
     }
   };
 
-  const updateMemberRole = async (
-    groupId: string,
-    userId: string,
-    role: "ADMIN" | "MEMBER"
-  ) => {
+  const updateMemberRole = async (groupId: string, userId: string, role: "ADMIN" | "MEMBER") => {
     try {
       const res = await updateMemberRoleService(groupId, userId, { role });
       if (res && res.success) {
@@ -219,8 +200,7 @@ export const useChat = () => {
       return false;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to update member role";
+        const errorMessage = error.response?.data?.message || "Failed to update member role";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -239,6 +219,6 @@ export const useChat = () => {
     getFirebaseToken,
     addMemberToGroup,
     removeMemberFromGroup,
-    updateMemberRole,
+    updateMemberRole
   };
 };

@@ -1,30 +1,14 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  AlertCircle,
-  ArrowLeft,
-  Eye,
-  EyeOff,
-  Lock,
-  Loader2,
-} from "lucide-react";
+import { AlertCircle, ArrowLeft, Eye, EyeOff, Lock, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  setNewPasswordSchema,
-  type SetNewPasswordData,
-} from "@/validators/auth-validator";
+import { setNewPasswordSchema, type SetNewPasswordData } from "@/validators/auth-validator";
 import { useauth } from "@/hooks/useauth";
 import type { SETNEWPASSWORD_PAYLOAD } from "@/types/auth";
 
@@ -43,14 +27,14 @@ export const SetNewPassword = () => {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
+    setValue
   } = useForm<SetNewPasswordData>({
     resolver: zodResolver(setNewPasswordSchema),
     defaultValues: {
       token: token,
       newPassword: "",
-      confirmPassword: "",
-    },
+      confirmPassword: ""
+    }
   });
 
   // Update token in form when it's available from URL
@@ -65,7 +49,7 @@ export const SetNewPassword = () => {
     try {
       const payload: SETNEWPASSWORD_PAYLOAD = {
         token: data.token,
-        newPassword: data.newPassword,
+        newPassword: data.newPassword
       };
       await setNewPasswordAPI(payload);
       // Navigate to login after successful password reset
@@ -83,9 +67,7 @@ export const SetNewPassword = () => {
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-semibold">
-            Set New Password
-          </CardTitle>
+          <CardTitle className="text-2xl font-semibold">Set New Password</CardTitle>
           <CardDescription>Enter your new password below</CardDescription>
         </CardHeader>
 
@@ -93,9 +75,7 @@ export const SetNewPassword = () => {
           {!token && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Invalid or missing reset token. Please check your email link.
-              </AlertDescription>
+              <AlertDescription>Invalid or missing reset token. Please check your email link.</AlertDescription>
             </Alert>
           )}
 
@@ -118,11 +98,7 @@ export const SetNewPassword = () => {
                   className="absolute right-3 top-3 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
                   disabled={loading || !token}
                 >
-                  {showNewPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
+                  {showNewPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </button>
               </div>
               {errors.newPassword && (
@@ -151,11 +127,7 @@ export const SetNewPassword = () => {
                   className="absolute right-3 top-3 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
                   disabled={loading || !token}
                 >
-                  {showConfirmPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
+                  {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </button>
               </div>
               {errors.confirmPassword && (
@@ -166,11 +138,7 @@ export const SetNewPassword = () => {
               )}
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading || !token}
-            >
+            <Button type="submit" className="w-full" disabled={loading || !token}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -1,19 +1,13 @@
 import { useState } from "react";
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { ExternalLink, Loader2 } from "lucide-react";
 
 export const AmazonConnectionForm = ({
   onSubmit,
-  isLoading,
+  isLoading
 }: {
   onSubmit: (data: any) => void;
   isLoading: boolean;
@@ -55,9 +49,7 @@ export const AmazonConnectionForm = ({
           onChange={(e) => setSellerId(e.target.value)}
           required
         />
-        <p className="text-sm text-muted-foreground">
-          Find your Seller ID in Seller Central → Settings → Account Info
-        </p>
+        <p className="text-sm text-muted-foreground">Find your Seller ID in Seller Central → Settings → Account Info</p>
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

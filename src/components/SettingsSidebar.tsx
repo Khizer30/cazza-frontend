@@ -1,12 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import {
-  Settings,
-  CreditCard,
-  HelpCircle,
-  Users,
-  Menu,
-  X,
-} from "lucide-react";
+import { Settings, CreditCard, HelpCircle, Users, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -23,50 +16,38 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
     {
       title: "Account Settings",
       path: "/settings",
-      icon: Settings,
+      icon: Settings
     },
     {
       title: "Billing",
       path: "/billing",
-      icon: CreditCard,
+      icon: CreditCard
     },
     {
       title: "Support",
       path: "/support",
-      icon: HelpCircle,
+      icon: HelpCircle
     },
     {
       title: "Teams",
       path: "/teams",
-      icon: Users,
-    },
+      icon: Users
+    }
   ];
 
   return (
     <>
       {/* Mobile Menu Button */}
       <div className="md:hidden p-4 border-b border-border bg-card">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="gap-2"
-        >
-          {isMobileOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
+        <Button variant="ghost" size="sm" onClick={() => setIsMobileOpen(!isMobileOpen)} className="gap-2">
+          {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           <span>Settings Menu</span>
         </Button>
       </div>
 
       {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setIsMobileOpen(false)}
-        />
+        <div className="md:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setIsMobileOpen(false)} />
       )}
 
       {/* Sidebar */}
@@ -83,12 +64,7 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Settings</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden h-8 w-8"
-              onClick={() => setIsMobileOpen(false)}
-            >
+            <Button variant="ghost" size="icon" className="md:hidden h-8 w-8" onClick={() => setIsMobileOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
           </div>

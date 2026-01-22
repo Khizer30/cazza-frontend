@@ -1,12 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Italic,
-  Underline,
-  Strikethrough,
-  Link as LinkIcon,
-  List,
-  Bold,
-} from "lucide-react";
+import { Italic, Underline, Strikethrough, Link as LinkIcon, List, Bold } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MessageFormatToolbarProps {
@@ -14,17 +7,14 @@ interface MessageFormatToolbarProps {
   className?: string;
 }
 
-export const MessageFormatToolbar = ({
-  onFormatClick,
-  className,
-}: MessageFormatToolbarProps) => {
+export const MessageFormatToolbar = ({ onFormatClick, className }: MessageFormatToolbarProps) => {
   const formatButtons = [
     { icon: Bold, format: "bold", label: "Bold" },
     { icon: Italic, format: "italic", label: "Italic" },
     { icon: Underline, format: "underline", label: "Underline" },
     { icon: Strikethrough, format: "strikethrough", label: "Strikethrough" },
     { icon: LinkIcon, format: "link", label: "Link" },
-    { icon: List, format: "bulletList", label: "Bullet List" },
+    { icon: List, format: "bulletList", label: "Bullet List" }
   ];
 
   return (

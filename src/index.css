@@ -150,7 +150,9 @@
     line-height: 1.4;
   }
 
-  .prose h4, .prose h5, .prose h6 {
+  .prose h4,
+  .prose h5,
+  .prose h6 {
     font-weight: 600;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
@@ -169,7 +171,8 @@
     font-style: italic;
   }
 
-  .prose ul, .prose ol {
+  .prose ul,
+  .prose ol {
     margin-bottom: 1rem;
     padding-left: 1.5rem;
   }
@@ -237,7 +240,8 @@
     margin-bottom: 1rem;
   }
 
-  .prose th, .prose td {
+  .prose th,
+  .prose td {
     border: 1px solid var(--border);
     padding: 0.5rem;
     text-align: left;

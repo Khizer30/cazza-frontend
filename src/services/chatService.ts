@@ -56,11 +56,7 @@ export interface ChatGroupDetailResponse {
 }
 
 export const createChatGroupService = (payload: CreateChatGroupPayload) => {
-  return apiInvoker<ChatGroupResponse>(
-    END_POINT.chat.createGroup,
-    "POST",
-    payload
-  );
+  return apiInvoker<ChatGroupResponse>(END_POINT.chat.createGroup, "POST", payload);
 };
 
 export const getUserChatGroupsService = () => {
@@ -68,41 +64,25 @@ export const getUserChatGroupsService = () => {
 };
 
 export const getChatGroupByIdService = (groupId: string) => {
-  return apiInvoker<ChatGroupDetailResponse>(
-    `${END_POINT.chat.getGroupById}/${groupId}`,
-    "GET"
-  );
+  return apiInvoker<ChatGroupDetailResponse>(`${END_POINT.chat.getGroupById}/${groupId}`, "GET");
 };
 
 export const updateChatGroupService = (
   groupId: string,
   payload: { name: string; description?: string; icon?: string }
 ) => {
-  return apiInvoker<ChatGroupResponse>(
-    `${END_POINT.chat.updateGroup}/${groupId}`,
-    "PUT",
-    payload
-  );
+  return apiInvoker<ChatGroupResponse>(`${END_POINT.chat.updateGroup}/${groupId}`, "PUT", payload);
 };
 
 export const deleteChatGroupService = (groupId: string) => {
-  return apiInvoker<{ success: boolean; message?: string }>(
-    `${END_POINT.chat.deleteGroup}/${groupId}`,
-    "DELETE"
-  );
+  return apiInvoker<{ success: boolean; message?: string }>(`${END_POINT.chat.deleteGroup}/${groupId}`, "DELETE");
 };
 
 export const getFirebaseTokenService = (groupId: string) => {
-  return apiInvoker<FirebaseTokenResponse>(
-    `${END_POINT.chat.getFirebaseToken}?groupId=${groupId}`,
-    "GET"
-  );
+  return apiInvoker<FirebaseTokenResponse>(`${END_POINT.chat.getFirebaseToken}?groupId=${groupId}`, "GET");
 };
 
-export const addMemberToGroupService = (
-  groupId: string,
-  payload: { userId: string; role: "ADMIN" | "MEMBER" }
-) => {
+export const addMemberToGroupService = (groupId: string, payload: { userId: string; role: "ADMIN" | "MEMBER" }) => {
   return apiInvoker<{ success: boolean; message?: string }>(
     `${END_POINT.chat.addMember}/${groupId}/member`,
     "POST",
@@ -110,21 +90,14 @@ export const addMemberToGroupService = (
   );
 };
 
-export const removeMemberFromGroupService = (
-  groupId: string,
-  userId: string
-) => {
+export const removeMemberFromGroupService = (groupId: string, userId: string) => {
   return apiInvoker<{ success: boolean; message?: string }>(
     `${END_POINT.chat.removeMember}/${groupId}/member/${userId}`,
     "DELETE"
   );
 };
 
-export const updateMemberRoleService = (
-  groupId: string,
-  userId: string,
-  payload: { role: "ADMIN" | "MEMBER" }
-) => {
+export const updateMemberRoleService = (groupId: string, userId: string, payload: { role: "ADMIN" | "MEMBER" }) => {
   return apiInvoker<{ success: boolean; message?: string }>(
     `${END_POINT.chat.updateMemberRole}/${groupId}/member/${userId}/role`,
     "PUT",

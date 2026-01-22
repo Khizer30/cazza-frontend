@@ -3,26 +3,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Save, Loader2, CalendarIcon, Eye, Edit3, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useRef, useEffect } from "react";
-import { createBlogService, getBlogDetailService, updateBlogService, deleteBlogImageService } from "@/services/blogService";
+import {
+  createBlogService,
+  getBlogDetailService,
+  updateBlogService,
+  deleteBlogImageService
+} from "@/services/blogService";
 import { useToast } from "@/components/ToastProvider";
 import { BlogFormatToolbar } from "@/components/ClientComponents/BlogFormatToolbar";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,7 +26,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -60,7 +55,7 @@ export const BlogForm = () => {
     date: undefined,
     body: "",
     status: "DRAFT",
-    authorName: "",
+    authorName: ""
   });
   const [blogImage, setBlogImage] = useState<File | null>(null);
   const [blogImagePreview, setBlogImagePreview] = useState<string | null>(null);
@@ -92,7 +87,7 @@ export const BlogForm = () => {
               date: new Date(blog.date),
               body: blog.body,
               status: blog.status,
-              authorName: blog.authorName,
+              authorName: blog.authorName
             });
             if (blog.blogImage) {
               setExistingBlogImage(blog.blogImage);
@@ -300,10 +295,7 @@ export const BlogForm = () => {
         return;
     }
 
-    const newText =
-      currentText.substring(0, start) +
-      formattedText +
-      currentText.substring(end);
+    const newText = currentText.substring(0, start) + formattedText + currentText.substring(end);
 
     setFormData((prev) => ({ ...prev, body: newText }));
 
@@ -370,43 +362,34 @@ export const BlogForm = () => {
         status: formData.status,
         authorName: formData.authorName,
         blogImage: blogImage || undefined,
-        images: images.length > 0 ? images : undefined,
+        images: images.length > 0 ? images : undefined
       };
 
-      const response = isEditing
-        ? await updateBlogService(id!, payload)
-        : await createBlogService(payload);
+      const response = isEditing ? await updateBlogService(id!, payload) : await createBlogService(payload);
 
       if (response.success) {
         showToast(
           isEditing
             ? "Blog updated successfully"
             : formData.status === "PUBLISHED"
-            ? "Blog published successfully"
-            : "Blog saved successfully",
+              ? "Blog published successfully"
+              : "Blog saved successfully",
           "success"
         );
         navigate("/manage-blogs");
       } else {
-        showToast(
-          response.message ||
-            (isEditing ? "Failed to update blog" : "Failed to create blog"),
-          "error"
-        );
+        showToast(response.message || (isEditing ? "Failed to update blog" : "Failed to create blog"), "error");
       }
     } catch (error) {
       console.error(isEditing ? "Error updating blog:" : "Error creating blog:", error);
       showToast(
-        isEditing
-          ? "Failed to update blog. Please try again."
-          : "Failed to create blog. Please try again.",
+        isEditing ? "Failed to update blog. Please try again." : "Failed to create blog. Please try again.",
         "error"
       );
     } finally {
       setLoading(false);
     }
   };
-
 
   if (fetchingBlog) {
     return (
@@ -433,9 +416,7 @@ export const BlogForm = () => {
             {isEditing ? "Edit Blog Post" : "Create New Blog Post"}
           </h1>
           <p className="text-muted-foreground">
-            {isEditing
-              ? "Update your blog post details"
-              : "Fill in the details to create a new blog post"}
+            {isEditing ? "Update your blog post details" : "Fill in the details to create a new blog post"}
           </p>
         </div>
 
@@ -475,9 +456,7 @@ export const BlogForm = () => {
                     id="authorName"
                     placeholder="Enter author name"
                     value={formData.authorName}
-                    onChange={(e) =>
-                      handleInputChange("authorName", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("authorName", e.target.value)}
                     required
                   />
                 </div>
@@ -495,11 +474,7 @@ export const BlogForm = () => {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.date ? (
-                          format(formData.date, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
+                        {formData.date ? format(formData.date, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -521,9 +496,7 @@ export const BlogForm = () => {
                 <Label htmlFor="status">Status</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value: "PUBLISHED" | "DRAFT") =>
-                    handleInputChange("status", value)
-                  }
+                  onValueChange={(value: "PUBLISHED" | "DRAFT") => handleInputChange("status", value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -566,12 +539,7 @@ export const BlogForm = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="body">Blog Body *</Label>
-                {!isPreviewMode && (
-                  <BlogFormatToolbar
-                    onFormatClick={handleFormatClick}
-                    className="mb-2"
-                  />
-                )}
+                {!isPreviewMode && <BlogFormatToolbar onFormatClick={handleFormatClick} className="mb-2" />}
                 {!isPreviewMode ? (
                   <Textarea
                     ref={bodyTextareaRef}
@@ -587,9 +555,7 @@ export const BlogForm = () => {
                   <div className="border border-border rounded-md p-4 min-h-[300px] bg-background">
                     {formData.body ? (
                       <div className="prose prose-invert max-w-none text-foreground/90">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {formData.body}
-                        </ReactMarkdown>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{formData.body}</ReactMarkdown>
                       </div>
                     ) : (
                       <p className="text-muted-foreground text-center py-8">
@@ -639,7 +605,7 @@ export const BlogForm = () => {
                     </Button>
                   </div>
                 )}
-                {(!existingBlogImage && !blogImage) && (
+                {!existingBlogImage && !blogImage && (
                   <Input
                     id="blogImage"
                     type="file"
@@ -748,7 +714,10 @@ export const BlogForm = () => {
                     </span>
                   </div>
                 </div>
-                <AlertDialog open={deleteContentImageDialog !== null} onOpenChange={(open) => !open && setDeleteContentImageDialog(null)}>
+                <AlertDialog
+                  open={deleteContentImageDialog !== null}
+                  onOpenChange={(open) => !open && setDeleteContentImageDialog(null)}
+                >
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Content Image</AlertDialogTitle>
@@ -780,11 +749,7 @@ export const BlogForm = () => {
           </Card>
 
           <div className="flex justify-start pt-4">
-            <Button
-              type="submit"
-              className="bg-primary hover:bg-primary/90"
-              disabled={loading}
-            >
+            <Button type="submit" className="bg-primary hover:bg-primary/90" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />

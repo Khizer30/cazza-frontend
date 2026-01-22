@@ -16,45 +16,34 @@ export const AmazonSellers = () => {
         {/* Decorative inner border */}
         <div className="absolute inset-3 border-[3px] border-gray-500 rounded-lg pointer-events-none"></div>
 
-        <h1 className="text-5xl font-serif text-gray-900 mb-4 tracking-wide uppercase">
-          Cazza for Amazon Sellers
-        </h1>
+        <h1 className="text-5xl font-serif text-gray-900 mb-4 tracking-wide uppercase">Cazza for Amazon Sellers</h1>
         <p className="text-gray-700 italic mb-8 text-lg">
-          Cazza connects directly to Amazon’s official Selling Partner API
-          (SP-API) to turn your data into clear, real-time financial insights.
-          You’ll always know what’s really happening behind your payouts —
-          without spreadsheets or guesswork.
+          Cazza connects directly to Amazon’s official Selling Partner API (SP-API) to turn your data into clear,
+          real-time financial insights. You’ll always know what’s really happening behind your payouts — without
+          spreadsheets or guesswork.
         </p>
 
         <div className="text-left space-y-6 max-w-2xl mx-auto font-light text-gray-800 leading-relaxed">
           <section>
-            <h2 className="text-2xl font-semibold font-serif text-gray-900 mb-2">
-              What Cazza Does
-            </h2>
+            <h2 className="text-2xl font-semibold font-serif text-gray-900 mb-2">What Cazza Does</h2>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>Orders &amp; Refunds</strong> — track sales, returns,
-                and reimbursements.
+                <strong>Orders &amp; Refunds</strong> — track sales, returns, and reimbursements.
               </li>
               <li>
-                <strong>Settlements &amp; Payouts</strong> — understand every
-                payment cycle.
+                <strong>Settlements &amp; Payouts</strong> — understand every payment cycle.
               </li>
               <li>
-                <strong>Fees &amp; FBA Costs</strong> — see fulfilment, storage,
-                and ad spend clearly.
+                <strong>Fees &amp; FBA Costs</strong> — see fulfilment, storage, and ad spend clearly.
               </li>
               <li>
-                <strong>Performance &amp; Profit Metrics</strong> — uncover your
-                true margins.
+                <strong>Performance &amp; Profit Metrics</strong> — uncover your true margins.
               </li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold font-serif text-gray-900 mb-2">
-              Ask Anything
-            </h2>
+            <h2 className="text-2xl font-semibold font-serif text-gray-900 mb-2">Ask Anything</h2>
             <ul className="list-disc pl-6 space-y-2">
               <li>“Why doesn’t my Amazon payout match my sales?”</li>
               <li>“What’s my FBA fee percentage this month?”</li>
@@ -64,27 +53,20 @@ export const AmazonSellers = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold font-serif text-gray-900 mb-2">
-              Data Protection
-            </h2>
+            <h2 className="text-2xl font-semibold font-serif text-gray-900 mb-2">Data Protection</h2>
             <p>
-              We follow Amazon’s Acceptable Use Policy and Data Protection
-              Policy in full. Cazza does not share, resell, or combine your
-              Amazon data with any non-Amazon source. Information is stored
-              using bank-grade encryption, and deleted immediately if you
-              disconnect your account.
+              We follow Amazon’s Acceptable Use Policy and Data Protection Policy in full. Cazza does not share, resell,
+              or combine your Amazon data with any non-Amazon source. Information is stored using bank-grade encryption,
+              and deleted immediately if you disconnect your account.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold font-serif text-gray-900 mb-2">
-              Built by Experts
-            </h2>
+            <h2 className="text-2xl font-semibold font-serif text-gray-900 mb-2">Built by Experts</h2>
             <p>
-              Cazza was built by chartered accountants who specialise in
-              e-commerce. It’s the missing layer between your Seller Central
-              data and your business decisions — designed to give founders
-              instant clarity without replacing their accountants.
+              Cazza was built by chartered accountants who specialise in e-commerce. It’s the missing layer between your
+              Seller Central data and your business decisions — designed to give founders instant clarity without
+              replacing their accountants.
             </p>
           </section>
         </div>

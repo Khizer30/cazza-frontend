@@ -3,21 +3,21 @@ import axios, { type AxiosInstance } from "axios";
 // Determine base URL based on environment
 const getBaseURL = () => {
   // Check if we're on production domain
-  const isProduction = window.location.hostname === 'www.cazza.ai' || window.location.hostname === 'cazza.ai';
+  const isProduction = window.location.hostname === "www.cazza.ai" || window.location.hostname === "cazza.ai";
 
   if (isProduction) {
     // Production: use direct backend URL
-    return 'https://api.cazza.ai/api';
+    return "https://api.cazza.ai/api";
   } else {
     // Development: use proxy
-    return '/api';
+    return "/api";
   }
 };
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: getBaseURL(),
-  timeout: 60000, 
-  withCredentials: true,
+  timeout: 60000,
+  withCredentials: true
 });
 
 axiosInstance.interceptors.request.use(

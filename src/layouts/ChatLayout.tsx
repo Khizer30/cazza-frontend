@@ -13,7 +13,7 @@ import {
   Pencil,
   Check,
   X,
-  Loader2,
+  Loader2
 } from "lucide-react";
 
 interface ChatHistoryItem {
@@ -46,7 +46,7 @@ export function ChatLayout({
   currentChatId,
   isSidebarOpen = false,
   onToggleSidebar,
-  isLoading = false,
+  isLoading = false
 }: ChatLayoutProps) {
   const [internalSidebarOpen, setInternalSidebarOpen] = useState(() => {
     if (typeof window !== "undefined") return window.innerWidth >= 1024;
@@ -66,8 +66,7 @@ export function ChatLayout({
   }, []);
 
   const sidebarOpen = onToggleSidebar ? isSidebarOpen : internalSidebarOpen;
-  const handleToggleSidebar =
-    onToggleSidebar || (() => setInternalSidebarOpen(!internalSidebarOpen));
+  const handleToggleSidebar = onToggleSidebar || (() => setInternalSidebarOpen(!internalSidebarOpen));
 
   const handleStartEdit = (chatId: string, currentTitle: string) => {
     setEditingChatId(chatId);
@@ -107,12 +106,7 @@ export function ChatLayout({
             <span className="font-semibold text-foreground">Chat History</span>
           </div>
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onNewChat}
-              className="h-8 w-8 p-0 hover:bg-primary/10"
-            >
+            <Button variant="ghost" size="sm" onClick={onNewChat} className="h-8 w-8 p-0 hover:bg-primary/10">
               <Plus className="w-4 h-4" />
             </Button>
             <Button
@@ -131,9 +125,7 @@ export function ChatLayout({
             {isLoading ? (
               <div className="p-8 flex flex-col items-center justify-center space-y-3">
                 <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground animate-pulse">
-                  Loading history...
-                </p>
+                <p className="text-sm text-muted-foreground animate-pulse">Loading history...</p>
               </div>
             ) : chatHistory.length === 0 ? (
               <div className="p-4 text-center text-muted-foreground">
@@ -146,9 +138,7 @@ export function ChatLayout({
                 <div
                   key={chat.id}
                   className={`group relative rounded-lg p-3 transition-all duration-200 ${
-                    currentChatId === chat.id
-                      ? "bg-primary/10 border border-primary/20"
-                      : "hover:bg-muted/50"
+                    currentChatId === chat.id ? "bg-primary/10 border border-primary/20" : "hover:bg-muted/50"
                   } ${editingChatId === chat.id ? "" : "cursor-pointer"}`}
                   onClick={() => {
                     if (editingChatId !== chat.id) {
@@ -163,10 +153,8 @@ export function ChatLayout({
                         value={editingTitle || ""}
                         onChange={(e) => setEditingTitle(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" && !isRenaming)
-                            handleSaveEdit(chat.id);
-                          if (e.key === "Escape" && !isRenaming)
-                            handleCancelEdit();
+                          if (e.key === "Enter" && !isRenaming) handleSaveEdit(chat.id);
+                          if (e.key === "Escape" && !isRenaming) handleCancelEdit();
                         }}
                         className="h-8 text-sm"
                         autoFocus
@@ -183,11 +171,7 @@ export function ChatLayout({
                         type="button"
                         disabled={isRenaming}
                       >
-                        {isRenaming ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Check className="w-4 h-4" />
-                        )}
+                        {isRenaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                       </button>
                       <button
                         onClick={(e) => {
@@ -205,15 +189,10 @@ export function ChatLayout({
                   ) : (
                     <div className="flex items-start gap-2 w-full">
                       <div className="min-w-0 flex-1">
-                        <p
-                          className="text-sm font-medium text-foreground truncate max-w-[140px]"
-                          title={chat.title}
-                        >
+                        <p className="text-sm font-medium text-foreground truncate max-w-[140px]" title={chat.title}>
                           {chat.title}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {chat.timestamp}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">{chat.timestamp}</p>
                       </div>
                       <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         {onRenameChat && (
@@ -268,12 +247,7 @@ export function ChatLayout({
           </div>
         )}
 
-        {sidebarOpen && (
-          <div
-            className="lg:hidden fixed inset-0 bg-black/50 z-40"
-            onClick={handleToggleSidebar}
-          />
-        )}
+        {sidebarOpen && <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={handleToggleSidebar} />}
 
         {/* Chat Content */}
         <div className="flex-1 flex flex-col min-h-0">{children}</div>

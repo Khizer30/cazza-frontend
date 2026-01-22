@@ -1,20 +1,8 @@
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   TrendingUp,
   TrendingDown,
@@ -24,7 +12,7 @@ import {
   ChevronDown,
   Download,
   FileText,
-  FileSpreadsheet,
+  FileSpreadsheet
 } from "lucide-react";
 import { type PLTableRow } from "@/constants/ProfitLssStatement";
 import type { DashboardDetailItem, DashboardSummaryData } from "@/types/auth";
@@ -37,7 +25,7 @@ const formatValue = (value: number | string): string => {
   const prefix = value < 0 ? "-£ " : "£ ";
   return `${prefix}${Math.abs(value).toLocaleString("en-GB", {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 2
   })}`;
 };
 
@@ -48,20 +36,13 @@ const getValueColor = (value: number | string, parameter: string): string => {
     return "";
   }
   if (value < 0) return "text-red-500";
-  if (
-    value > 0 &&
-    (parameter === "Gross profit" ||
-      parameter === "Net profit" ||
-      parameter === "Net Profit (£)")
-  )
+  if (value > 0 && (parameter === "Gross profit" || parameter === "Net profit" || parameter === "Net Profit (£)"))
     return "text-green-500";
   return "";
 };
 
 // Transform Dashboard Detail API data to table structure
-const transformDetailData = (
-  data: DashboardDetailItem[]
-): { columns: string[]; rows: PLTableRow[] } => {
+const transformDetailData = (data: DashboardDetailItem[]): { columns: string[]; rows: PLTableRow[] } => {
   if (!data || data.length === 0) {
     return { columns: [], rows: [] };
   }
@@ -87,7 +68,7 @@ const transformDetailData = (
     "Tax",
     "Payout",
     "Net Sales",
-    "Net Profit",
+    "Net Profit"
   ];
 
   // Create rows for each metric
@@ -96,8 +77,7 @@ const transformDetailData = (
     columns.forEach((monthYear) => {
       const item = data.find((d) => d.monthYear === monthYear);
       if (item) {
-        values[monthYear] =
-          parseFloat(item[metric as keyof DashboardDetailItem] as string) || 0;
+        values[monthYear] = parseFloat(item[metric as keyof DashboardDetailItem] as string) || 0;
       }
     });
 
@@ -105,7 +85,7 @@ const transformDetailData = (
       parameter: `${metric} (£)`,
       values,
       isBold: metric === "Net Profit",
-      isHighlighted: metric === "Net Profit",
+      isHighlighted: metric === "Net Profit"
     };
   });
 
@@ -115,7 +95,7 @@ const transformDetailData = (
 export const ProfitLossStatement = ({
   summary: externalSummary,
   detailData,
-  isLoadingProp,
+  isLoadingProp
 }: {
   summary?: DashboardSummaryData | null;
   detailData?: DashboardDetailItem[];
@@ -176,8 +156,6 @@ export const ProfitLossStatement = ({
     // TODO: Implement PDF export API call
   };
 
-
-
   if (isLoadingProp) {
     return (
       <Card>
@@ -217,9 +195,7 @@ export const ProfitLossStatement = ({
                 <CalendarIcon className="h-5 w-5" />
                 Profit & Loss Statement
               </CardTitle>
-              <CardDescription>
-                Granular, accounting-grade reports with full traceability
-              </CardDescription>
+              <CardDescription>Granular, accounting-grade reports with full traceability</CardDescription>
             </div>
             {/* Export & Sync Buttons */}
             <div className="flex items-center gap-2">
@@ -305,12 +281,11 @@ export const ProfitLossStatement = ({
           <CardContent className="p-4 py-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Total Revenue
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
                 <p className="text-2xl font-bold text-success">
-                  £{Math.round(totalRevenue).toLocaleString("en-GB", {
-                    maximumFractionDigits: 0,
+                  £
+                  {Math.round(totalRevenue).toLocaleString("en-GB", {
+                    maximumFractionDigits: 0
                   })}
                 </p>
               </div>
@@ -325,12 +300,11 @@ export const ProfitLossStatement = ({
           <CardContent className="p-4 py-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Total Expenses
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Total Expenses</p>
                 <p className="text-2xl font-bold text-red-600">
-                  £{Math.round(totalExpenses).toLocaleString("en-GB", {
-                    maximumFractionDigits: 0,
+                  £
+                  {Math.round(totalExpenses).toLocaleString("en-GB", {
+                    maximumFractionDigits: 0
                   })}
                 </p>
               </div>
@@ -345,15 +319,11 @@ export const ProfitLossStatement = ({
           <CardContent className="p-4 py-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Net Profit
-                </p>
-                <p
-                  className={`text-2xl font-bold ${grossProfit >= 0 ? "text-success" : "text-destructive"
-                    }`}
-                >
-                  £{Math.round(grossProfit).toLocaleString("en-GB", {
-                    maximumFractionDigits: 0,
+                <p className="text-sm font-medium text-muted-foreground">Net Profit</p>
+                <p className={`text-2xl font-bold ${grossProfit >= 0 ? "text-success" : "text-destructive"}`}>
+                  £
+                  {Math.round(grossProfit).toLocaleString("en-GB", {
+                    maximumFractionDigits: 0
                   })}
                 </p>
               </div>
@@ -368,34 +338,19 @@ export const ProfitLossStatement = ({
           <CardContent className="p-4 py-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Profit Margin
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Profit Margin</p>
                 <p
-                  className={`text-2xl font-bold ${profitMargin >= 20
-                    ? "text-success"
-                    : profitMargin >= 10
-                      ? "text-warning"
-                      : "text-destructive"
-                    }`}
+                  className={`text-2xl font-bold ${
+                    profitMargin >= 20 ? "text-success" : profitMargin >= 10 ? "text-warning" : "text-destructive"
+                  }`}
                 >
                   {Math.round(profitMargin)}%
                 </p>
                 <Badge
-                  variant={
-                    profitMargin >= 20
-                      ? "default"
-                      : profitMargin >= 10
-                        ? "secondary"
-                        : "destructive"
-                  }
+                  variant={profitMargin >= 20 ? "default" : profitMargin >= 10 ? "secondary" : "destructive"}
                   className="text-xs"
                 >
-                  {profitMargin >= 20
-                    ? "Excellent"
-                    : profitMargin >= 10
-                      ? "Good"
-                      : "Needs Attention"}
+                  {profitMargin >= 20 ? "Excellent" : profitMargin >= 10 ? "Good" : "Needs Attention"}
                 </Badge>
               </div>
             </div>
@@ -407,9 +362,7 @@ export const ProfitLossStatement = ({
       <Card>
         <CardHeader>
           <CardTitle>P&L Statement Details</CardTitle>
-          <CardDescription>
-            Revenue, COGS, Fees (commission, shipping, ads) breakdown by period
-          </CardDescription>
+          <CardDescription>Revenue, COGS, Fees (commission, shipping, ads) breakdown by period</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -420,10 +373,7 @@ export const ProfitLossStatement = ({
                     Parameter/Date
                   </th>
                   {tableColumns.map((column) => (
-                    <th
-                      key={column}
-                      className="text-right p-3 font-medium text-muted-foreground min-w-[120px]"
-                    >
+                    <th key={column} className="text-right p-3 font-medium text-muted-foreground min-w-[120px]">
                       {column}
                     </th>
                   ))}
@@ -433,19 +383,18 @@ export const ProfitLossStatement = ({
                 {tableRows.map((row) => (
                   <tr
                     key={row.parameter}
-                    className={`border-b hover:bg-muted/30 transition-colors ${row.isHighlighted ? "bg-muted/20" : ""
-                      } ${row.isSubRow ? "bg-muted/10" : ""}`}
+                    className={`border-b hover:bg-muted/30 transition-colors ${
+                      row.isHighlighted ? "bg-muted/20" : ""
+                    } ${row.isSubRow ? "bg-muted/10" : ""}`}
                   >
                     <td
-                      className={`p-3 sticky left-0 bg-background ${row.isBold ? "font-semibold" : ""
-                        } ${row.isSubRow ? "pl-8" : ""}`}
+                      className={`p-3 sticky left-0 bg-background ${
+                        row.isBold ? "font-semibold" : ""
+                      } ${row.isSubRow ? "pl-8" : ""}`}
                     >
                       <div className="flex items-center gap-2">
                         {row.isExpandable && (
-                          <button
-                            onClick={() => toggleRow(row.parameter)}
-                            className="p-0.5 hover:bg-muted rounded"
-                          >
+                          <button onClick={() => toggleRow(row.parameter)} className="p-0.5 hover:bg-muted rounded">
                             {expandedRows.has(row.parameter) ? (
                               <ChevronDown className="w-4 h-4 text-muted-foreground" />
                             ) : (
@@ -461,12 +410,11 @@ export const ProfitLossStatement = ({
                       return (
                         <td
                           key={column}
-                          className={`p-3 text-right ${row.isBold ? "font-semibold" : ""
-                            } ${getValueColor(value, row.parameter)}`}
+                          className={`p-3 text-right ${
+                            row.isBold ? "font-semibold" : ""
+                          } ${getValueColor(value, row.parameter)}`}
                         >
-                          {typeof value === "number"
-                            ? formatValue(value)
-                            : value}
+                          {typeof value === "number" ? formatValue(value) : value}
                         </td>
                       );
                     })}

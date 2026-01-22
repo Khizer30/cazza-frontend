@@ -6,7 +6,7 @@ import { ExternalLink, Loader2 } from "lucide-react";
 
 export const TikTokConnectionForm = ({
   onSubmit,
-  isLoading,
+  isLoading
 }: {
   onSubmit: (data: any) => void;
   isLoading: boolean;
@@ -31,9 +31,7 @@ export const TikTokConnectionForm = ({
           onChange={(e) => setShopName(e.target.value)}
           required
         />
-        <p className="text-sm text-muted-foreground">
-          Enter your TikTok Shop business name
-        </p>
+        <p className="text-sm text-muted-foreground">Enter your TikTok Shop business name</p>
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

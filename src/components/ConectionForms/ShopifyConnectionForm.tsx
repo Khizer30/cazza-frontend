@@ -7,7 +7,7 @@ import { ExternalLink, Loader2 } from "lucide-react";
 export const ShopifyConnectionForm = ({
   // onSubmit,
   isLoading,
-  onClose,
+  onClose
   // onConnectionSuccess,
 }: {
   onSubmit: (data: any) => void;
@@ -36,18 +36,10 @@ export const ShopifyConnectionForm = ({
           onChange={(e) => setShopUrl(e.target.value)}
           required
         />
-        <p className="text-sm text-muted-foreground">
-          Enter your Shopify shop URL or just the shop name
-        </p>
+        <p className="text-sm text-muted-foreground">Enter your Shopify shop URL or just the shop name</p>
       </div>
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isConnecting || isLoading}
-      >
-        {(isLoading || isConnecting) && (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        )}
+      <Button type="submit" className="w-full" disabled={isConnecting || isLoading}>
+        {(isLoading || isConnecting) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Connect to Shopify
         <ExternalLink className="ml-2 h-4 w-4" />
       </Button>

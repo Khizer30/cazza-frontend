@@ -7,13 +7,10 @@ import {
   deleteChatService,
   askQuestionService,
   getChatHistoryService,
-  deleteMessageService,
+  deleteMessageService
 } from "@/services/chatbotService";
 import { AxiosError } from "axios";
-import type {
-  CREATE_CHAT_PAYLOAD,
-  UPDATE_CHAT_TITLE_PAYLOAD,
-} from "@/types/auth";
+import type { CREATE_CHAT_PAYLOAD, UPDATE_CHAT_TITLE_PAYLOAD } from "@/types/auth";
 
 export const useChatbot = () => {
   const { showToast } = useToast();
@@ -24,8 +21,7 @@ export const useChatbot = () => {
       if (res && res.success && res.data) {
         return res.data;
       } else if (res && !res.success) {
-        const errorMessage =
-          res.errors || res.message || "Failed to process question";
+        const errorMessage = res.errors || res.message || "Failed to process question";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       }
@@ -34,9 +30,7 @@ export const useChatbot = () => {
       console.error("Ask question error:", error);
       if (error instanceof AxiosError) {
         const errorMessage =
-          error.response?.data?.errors ||
-          error.response?.data?.message ||
-          "Failed to process question";
+          error.response?.data?.errors || error.response?.data?.message || "Failed to process question";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -60,8 +54,7 @@ export const useChatbot = () => {
     } catch (error: unknown) {
       console.error("Get chat history error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to retrieve chat history";
+        const errorMessage = error.response?.data?.message || "Failed to retrieve chat history";
         if (error.response?.status !== 404) {
           showToast(errorMessage, "error");
         }
@@ -88,8 +81,7 @@ export const useChatbot = () => {
     } catch (error: unknown) {
       console.error("Delete message error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to delete message";
+        const errorMessage = error.response?.data?.message || "Failed to delete message";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -113,8 +105,7 @@ export const useChatbot = () => {
     } catch (error: unknown) {
       console.error("Create chat error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to create chat";
+        const errorMessage = error.response?.data?.message || "Failed to create chat";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -138,8 +129,7 @@ export const useChatbot = () => {
     } catch (error: unknown) {
       console.error("Get all chats error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to retrieve chats";
+        const errorMessage = error.response?.data?.message || "Failed to retrieve chats";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -163,8 +153,7 @@ export const useChatbot = () => {
     } catch (error: unknown) {
       console.error("Get chat error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to retrieve chat";
+        const errorMessage = error.response?.data?.message || "Failed to retrieve chat";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -174,19 +163,12 @@ export const useChatbot = () => {
     }
   };
 
-  const updateChatTitle = async (
-    chatId: string,
-    payload: UPDATE_CHAT_TITLE_PAYLOAD,
-    muteToast: boolean = false
-  ) => {
+  const updateChatTitle = async (chatId: string, payload: UPDATE_CHAT_TITLE_PAYLOAD, muteToast: boolean = false) => {
     try {
       const res = await updateChatTitleService(chatId, payload);
       if (res && res.success && res.data) {
         if (!muteToast) {
-          showToast(
-            res.message || "Chat title updated successfully",
-            "success"
-          );
+          showToast(res.message || "Chat title updated successfully", "success");
         }
         return res.data;
       } else if (res && !res.success) {
@@ -198,8 +180,7 @@ export const useChatbot = () => {
     } catch (error: unknown) {
       console.error("Update chat title error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to update chat title";
+        const errorMessage = error.response?.data?.message || "Failed to update chat title";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -224,8 +205,7 @@ export const useChatbot = () => {
     } catch (error: unknown) {
       console.error("Delete chat error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message || "Failed to delete chat";
+        const errorMessage = error.response?.data?.message || "Failed to delete chat";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -243,6 +223,6 @@ export const useChatbot = () => {
     deleteChat,
     askQuestion,
     getChatHistory,
-    deleteMessage,
+    deleteMessage
   };
 };

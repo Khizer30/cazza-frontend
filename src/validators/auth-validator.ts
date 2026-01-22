@@ -12,7 +12,7 @@ export const logInSchema = z.object({
     .trim()
     .min(1, { message: "Password is required" })
     .min(8, { message: "Password must be at least 8 characters" })
-    .max(32, { message: "Password must not exceed 32 characters" }),
+    .max(32, { message: "Password must not exceed 32 characters" })
 });
 
 export const resetPasswordSchema = z.object({
@@ -20,7 +20,7 @@ export const resetPasswordSchema = z.object({
     .string()
     .trim()
     .min(1, { message: "Email is required" })
-    .email({ message: "Please enter a valid email address" }),
+    .email({ message: "Please enter a valid email address" })
 });
 
 export const signUpSchema = z
@@ -48,34 +48,21 @@ export const signUpSchema = z
       .min(1, { message: "Password is required" })
       .min(8, { message: "Password must be at least 8 characters" })
       .max(32, { message: "Password must not exceed 32 characters" })
-      .refine(
-        (password) => /[A-Z]/.test(password),
-        { message: "Password must contain at least one uppercase letter" }
-      )
-      .refine(
-        (password) => /[a-z]/.test(password),
-        { message: "Password must contain at least one lowercase letter" }
-      )
-      .refine(
-        (password) => /[0-9]/.test(password),
-        { message: "Password must contain at least one number" }
-      )
-      .refine(
-        (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
-        { message: "Password must contain at least one special character" }
-      ),
-    confirmPassword: z
-      .string()
-      .trim()
-      .min(1, { message: "Please confirm your password" }),
+      .refine((password) => /[A-Z]/.test(password), { message: "Password must contain at least one uppercase letter" })
+      .refine((password) => /[a-z]/.test(password), { message: "Password must contain at least one lowercase letter" })
+      .refine((password) => /[0-9]/.test(password), { message: "Password must contain at least one number" })
+      .refine((password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password), {
+        message: "Password must contain at least one special character"
+      }),
+    confirmPassword: z.string().trim().min(1, { message: "Please confirm your password" }),
     invitationId: z.string().optional(),
     acceptedTerms: z.boolean().refine((val) => val === true, {
-      message: "You must accept the terms and conditions",
-    }),
+      message: "You must accept the terms and conditions"
+    })
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirmPassword"],
+    path: ["confirmPassword"]
   });
 
 export const setNewPasswordSchema = z
@@ -87,30 +74,17 @@ export const setNewPasswordSchema = z
       .min(1, { message: "Password is required" })
       .min(8, { message: "Password must be at least 8 characters" })
       .max(32, { message: "Password must not exceed 32 characters" })
-      .refine(
-        (password) => /[A-Z]/.test(password),
-        { message: "Password must contain at least one uppercase letter" }
-      )
-      .refine(
-        (password) => /[a-z]/.test(password),
-        { message: "Password must contain at least one lowercase letter" }
-      )
-      .refine(
-        (password) => /[0-9]/.test(password),
-        { message: "Password must contain at least one number" }
-      )
-      .refine(
-        (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
-        { message: "Password must contain at least one special character" }
-      ),
-    confirmPassword: z
-      .string()
-      .trim()
-      .min(1, { message: "Please confirm your password" }),
+      .refine((password) => /[A-Z]/.test(password), { message: "Password must contain at least one uppercase letter" })
+      .refine((password) => /[a-z]/.test(password), { message: "Password must contain at least one lowercase letter" })
+      .refine((password) => /[0-9]/.test(password), { message: "Password must contain at least one number" })
+      .refine((password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password), {
+        message: "Password must contain at least one special character"
+      }),
+    confirmPassword: z.string().trim().min(1, { message: "Please confirm your password" })
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirmPassword"],
+    path: ["confirmPassword"]
   });
 
 // Onboarding validation schemas - split by step for granular validation
@@ -122,26 +96,20 @@ export const businessInfoSchema = z.object({
     .min(2, { message: "Business name must be at least 2 characters" })
     .max(100, { message: "Business name must not exceed 100 characters" })
     .regex(/^[a-zA-Z\s]+$/, { message: "Business name can only contain letters and spaces" }),
-  businessEntityType: z
-    .string()
-    .min(1, { message: "Please select a business entity type" }),
-  annualRevenueBand: z
-    .string()
-    .min(1, { message: "Please select an annual revenue band" }),
+  businessEntityType: z.string().min(1, { message: "Please select a business entity type" }),
+  annualRevenueBand: z.string().min(1, { message: "Please select an annual revenue band" })
 });
 
 export const marketplacesSchema = z.object({
-  marketplaces: z
-    .array(z.string())
-    .min(1, { message: "Please select at least one marketplace" }),
+  marketplaces: z.array(z.string()).min(1, { message: "Please select at least one marketplace" })
 });
 
 export const toolsSchema = z.object({
   tools: z.array(z.string()),
   techStack: z.object({
     useXero: z.boolean(),
-    multipleCurrencies: z.boolean(),
-  }),
+    multipleCurrencies: z.boolean()
+  })
 });
 
 // Full onboarding schema for final validation
@@ -153,20 +121,14 @@ export const onboardingSchema = z.object({
     .min(2, { message: "Business name must be at least 2 characters" })
     .max(100, { message: "Business name must not exceed 100 characters" })
     .regex(/^[a-zA-Z\s]+$/, { message: "Business name can only contain letters and spaces" }),
-  businessEntityType: z
-    .string()
-    .min(1, { message: "Please select a business entity type" }),
-  annualRevenueBand: z
-    .string()
-    .min(1, { message: "Please select an annual revenue band" }),
-  marketplaces: z
-    .array(z.string())
-    .min(1, { message: "Please select at least one marketplace" }),
+  businessEntityType: z.string().min(1, { message: "Please select a business entity type" }),
+  annualRevenueBand: z.string().min(1, { message: "Please select an annual revenue band" }),
+  marketplaces: z.array(z.string()).min(1, { message: "Please select at least one marketplace" }),
   tools: z.array(z.string()),
   techStack: z.object({
     useXero: z.boolean(),
-    multipleCurrencies: z.boolean(),
-  }),
+    multipleCurrencies: z.boolean()
+  })
 });
 
 export type LoginData = z.infer<typeof logInSchema>;

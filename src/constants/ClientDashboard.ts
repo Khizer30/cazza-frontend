@@ -4,6 +4,6 @@ export const tempRevenueData = [
   { month: "Nov", revenue: 5920, expenses: 3680 },
   { month: "Dec", revenue: 6240, expenses: 3950 },
   { month: "Jan", revenue: 6875, expenses: 4200 },
-  { month: "Feb", revenue: 7691, expenses: 4180 },
+  { month: "Feb", revenue: 7691, expenses: 4180 }
 ];
 export const totalRevenue = 2016;

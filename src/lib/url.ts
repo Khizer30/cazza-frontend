@@ -6,7 +6,7 @@ export const END_POINT = {
     setNewPassowrd: "/auth/reset-password",
     google: "/auth/google",
     googleCallback: "/auth/google/callback",
-    logout: "/auth/logout",
+    logout: "/auth/logout"
   },
   user: {
     profile: "/user",
@@ -15,7 +15,7 @@ export const END_POINT = {
     support: "/user/support",
     subscription: "/billing/subscription",
     checkout: "/billing/checkout",
-    unsubscribe: "/billing/unsubscribe",
+    unsubscribe: "/billing/unsubscribe"
   },
   team: {
     invite: "/team/invite",
@@ -26,7 +26,7 @@ export const END_POINT = {
     member: "/team/member",
     updateMemberRole: "/team/member",
     analytics: "/team/analytics",
-    memberSubscription: "/billing/checkout-team-member",
+    memberSubscription: "/billing/checkout-team-member"
   },
   chatbot: {
     ask: "/chatbot/ask",
@@ -36,7 +36,7 @@ export const END_POINT = {
     updateChatTitle: (chatId: string) => `/chatbot/chat/${chatId}/title`,
     deleteChat: (chatId: string) => `/chatbot/chat/${chatId}`,
     history: (chatId: string) => `/chatbot/chat/${chatId}/history`,
-    deleteMessage: (messageId: string) => `/chatbot/message/${messageId}`,
+    deleteMessage: (messageId: string) => `/chatbot/message/${messageId}`
   },
   chat: {
     createGroup: "/chat/group",
@@ -47,11 +47,11 @@ export const END_POINT = {
     getFirebaseToken: "/chat/token",
     addMember: "/chat/group",
     removeMember: "/chat/group",
-    updateMemberRole: "/chat/group",
+    updateMemberRole: "/chat/group"
   },
   dashboard: {
     summary: "/dashboard/summary",
-    detail: "/dashboard/detail",
+    detail: "/dashboard/detail"
   },
   blog: {
     list: "/blogs",
@@ -59,10 +59,10 @@ export const END_POINT = {
     create: "/blogs",
     update: (blogId: string) => `/blogs/${blogId}`,
     delete: (blogId: string) => `/blogs/${blogId}`,
-    deleteImage: (blogId: string) => `/blogs/${blogId}/image`,
+    deleteImage: (blogId: string) => `/blogs/${blogId}/image`
   },
   notifications: {
     list: "/notifications",
-    markRead: "/notifications/mark-read",
-  },
+    markRead: "/notifications/mark-read"
+  }
 } as const;

@@ -1,20 +1,8 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { submitSupportTicketService } from "@/services/supportService";
@@ -29,7 +17,7 @@ const categoryMap: Record<string, string> = {
   billing: "Billing Question",
   feature: "Feature Request",
   integration: "Integration Issue",
-  other: "Other",
+  other: "Other"
 };
 
 // Map form priority values to API priority values
@@ -37,7 +25,7 @@ const priorityMap: Record<string, "LOW" | "MEDIUM" | "HIGH" | "URGENT"> = {
   low: "LOW",
   medium: "MEDIUM",
   high: "HIGH",
-  urgent: "URGENT",
+  urgent: "URGENT"
 };
 
 export const SupportSettings = () => {
@@ -46,7 +34,7 @@ export const SupportSettings = () => {
     subject: "",
     priority: "",
     category: "",
-    description: "",
+    description: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -75,36 +63,28 @@ export const SupportSettings = () => {
         subject: ticketForm.subject.trim(),
         priority: priorityMap[ticketForm.priority] || "MEDIUM",
         category: categoryMap[ticketForm.category] || ticketForm.category,
-        description: ticketForm.description.trim(),
+        description: ticketForm.description.trim()
       };
 
       const response = await submitSupportTicketService(payload);
 
       if (response && response.success) {
-        showToast(
-          response.message || "Support ticket submitted successfully",
-          "success"
-        );
+        showToast(response.message || "Support ticket submitted successfully", "success");
         // Reset form after successful submission
         setTicketForm({
           subject: "",
           priority: "",
           category: "",
-          description: "",
+          description: ""
         });
       } else {
-        showToast(
-          response.message || "Failed to submit support ticket",
-          "error"
-        );
+        showToast(response.message || "Failed to submit support ticket", "error");
       }
     } catch (error: unknown) {
       console.error("Submit support ticket error:", error);
       if (error instanceof AxiosError) {
         const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          "Failed to submit support ticket";
+          error.response?.data?.message || error.response?.data?.error || "Failed to submit support ticket";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -124,10 +104,7 @@ export const SupportSettings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Create Support Ticket</CardTitle>
-              <CardDescription>
-                Submit a detailed support request for technical issues or
-                questions
-              </CardDescription>
+              <CardDescription>Submit a detailed support request for technical issues or questions</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -137,9 +114,7 @@ export const SupportSettings = () => {
                     id="subject"
                     placeholder="Brief description of your issue"
                     value={ticketForm.subject}
-                    onChange={(e) =>
-                      setTicketForm({ ...ticketForm, subject: e.target.value })
-                    }
+                    onChange={(e) => setTicketForm({ ...ticketForm, subject: e.target.value })}
                   />
                 </div>
 
@@ -147,9 +122,7 @@ export const SupportSettings = () => {
                   <Label htmlFor="priority">Priority *</Label>
                   <Select
                     value={ticketForm.priority}
-                    onValueChange={(value) =>
-                      setTicketForm({ ...ticketForm, priority: value })
-                    }
+                    onValueChange={(value) => setTicketForm({ ...ticketForm, priority: value })}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select priority" />
@@ -168,9 +141,7 @@ export const SupportSettings = () => {
                 <Label htmlFor="category">Category *</Label>
                 <Select
                   value={ticketForm.category}
-                  onValueChange={(value) =>
-                    setTicketForm({ ...ticketForm, category: value })
-                  }
+                  onValueChange={(value) => setTicketForm({ ...ticketForm, category: value })}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select category" />
@@ -179,9 +150,7 @@ export const SupportSettings = () => {
                     <SelectItem value="technical">Technical Issue</SelectItem>
                     <SelectItem value="billing">Billing Question</SelectItem>
                     <SelectItem value="feature">Feature Request</SelectItem>
-                    <SelectItem value="integration">
-                      Integration Issue
-                    </SelectItem>
+                    <SelectItem value="integration">Integration Issue</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
@@ -197,17 +166,13 @@ export const SupportSettings = () => {
                   onChange={(e) =>
                     setTicketForm({
                       ...ticketForm,
-                      description: e.target.value,
+                      description: e.target.value
                     })
                   }
                 />
               </div>
 
-              <Button
-                onClick={handleSubmitTicket}
-                disabled={isSubmitting}
-                className="w-full md:w-auto"
-              >
+              <Button onClick={handleSubmitTicket} disabled={isSubmitting} className="w-full md:w-auto">
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

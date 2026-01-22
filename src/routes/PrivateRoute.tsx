@@ -40,12 +40,7 @@ const PrivateRoute = () => {
 
   // Check if user needs onboarding (except if already on onboarding page)
   // Only OWNER role users need onboarding, skip for other roles
-  if (
-    location.pathname !== "/onboarding" &&
-    user &&
-    !user.businessProfile &&
-    user.role === "OWNER"
-  ) {
+  if (location.pathname !== "/onboarding" && user && !user.businessProfile && user.role === "OWNER") {
     return <Navigate to="/onboarding" replace />;
   }
 

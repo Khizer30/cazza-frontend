@@ -14,7 +14,7 @@ import type {
   UPDATE_TEAM_MEMBER_ROLE_RESPONSE,
   TEAM_MEMBER_SUBSCRIPTION_PAYLOAD,
   TEAM_MEMBER_SUBSCRIPTION_RESPONSE,
-  ACCEPT_INVITATION_RESPONSE,
+  ACCEPT_INVITATION_RESPONSE
 } from "@/types/auth";
 
 export const inviteTeamMemberService = async (payload: TEAM_INVITE_PAYLOAD) => {
@@ -27,32 +27,23 @@ export const inviteTeamMemberService = async (payload: TEAM_INVITE_PAYLOAD) => {
     method: "POST",
     data: formData.toString(),
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
   });
 
   return response.data as TEAM_INVITE_RESPONSE;
 };
 
 export const getTeamInvitationsService = () => {
-  return apiInvoker<TEAM_INVITATIONS_RESPONSE>(
-    END_POINT.team.invitations,
-    "GET"
-  );
+  return apiInvoker<TEAM_INVITATIONS_RESPONSE>(END_POINT.team.invitations, "GET");
 };
 
 export const getMyInvitationsService = () => {
-  return apiInvoker<TEAM_INVITATIONS_RESPONSE>(
-    END_POINT.team.myInvitations,
-    "GET"
-  );
+  return apiInvoker<TEAM_INVITATIONS_RESPONSE>(END_POINT.team.myInvitations, "GET");
 };
 
 export const cancelInvitationService = (invitationId: string) => {
-  return apiInvoker<DELETE_INVITATION_RESPONSE>(
-    `${END_POINT.team.invitation}/${invitationId}`,
-    "DELETE"
-  );
+  return apiInvoker<DELETE_INVITATION_RESPONSE>(`${END_POINT.team.invitation}/${invitationId}`, "DELETE");
 };
 
 export const getTeamMembersService = () => {
@@ -64,30 +55,18 @@ export const getTeamAnalyticsService = () => {
 };
 
 export const removeTeamMemberService = (memberId: string) => {
-  return apiInvoker<DELETE_MEMBER_RESPONSE>(
-    `${END_POINT.team.member}/${memberId}`,
-    "DELETE"
-  );
+  return apiInvoker<DELETE_MEMBER_RESPONSE>(`${END_POINT.team.member}/${memberId}`, "DELETE");
 };
 
 export const getInvitationService = (invitationId: string) => {
-  return apiInvoker<GET_INVITATION_RESPONSE>(
-    `${END_POINT.team.invitation}/${invitationId}`,
-    "GET"
-  );
+  return apiInvoker<GET_INVITATION_RESPONSE>(`${END_POINT.team.invitation}/${invitationId}`, "GET");
 };
 
 export const acceptInvitationService = (invitationId: string) => {
-  return apiInvoker<ACCEPT_INVITATION_RESPONSE>(
-    `${END_POINT.team.invitation}/${invitationId}/accept`,
-    "PATCH"
-  );
+  return apiInvoker<ACCEPT_INVITATION_RESPONSE>(`${END_POINT.team.invitation}/${invitationId}/accept`, "PATCH");
 };
 
-export const updateTeamMemberRoleService = async (
-  teamMemberId: string,
-  payload: UPDATE_TEAM_MEMBER_ROLE_PAYLOAD
-) => {
+export const updateTeamMemberRoleService = async (teamMemberId: string, payload: UPDATE_TEAM_MEMBER_ROLE_PAYLOAD) => {
   // Convert payload to URLSearchParams for x-www-form-urlencoded format
   const formData = new URLSearchParams();
   formData.append("role", payload.role);
@@ -97,22 +76,16 @@ export const updateTeamMemberRoleService = async (
     method: "PATCH",
     data: formData.toString(),
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
   });
 
   return response.data as UPDATE_TEAM_MEMBER_ROLE_RESPONSE;
 };
 
-export const teamMemberSubscriptionService = (
-  payload: TEAM_MEMBER_SUBSCRIPTION_PAYLOAD
-) => {
+export const teamMemberSubscriptionService = (payload: TEAM_MEMBER_SUBSCRIPTION_PAYLOAD) => {
   // Use the team member checkout endpoint
   const endpoint = "/billing/checkout-team-member";
 
-  return apiInvoker<TEAM_MEMBER_SUBSCRIPTION_RESPONSE>(
-    endpoint,
-    "POST",
-    payload
-  );
+  return apiInvoker<TEAM_MEMBER_SUBSCRIPTION_RESPONSE>(endpoint, "POST", payload);
 };

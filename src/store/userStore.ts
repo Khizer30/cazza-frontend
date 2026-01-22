@@ -19,8 +19,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   setUser: (user) => {
     set({
       user,
-      isOnboardingComplete:
-        user?.businessProfile !== null && user?.businessProfile !== undefined,
+      isOnboardingComplete: user?.businessProfile !== null && user?.businessProfile !== undefined
     });
   },
 
@@ -28,10 +27,8 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   checkOnboardingStatus: () => {
     const { user } = get();
-    return (
-      user?.businessProfile !== null && user?.businessProfile !== undefined
-    );
+    return user?.businessProfile !== null && user?.businessProfile !== undefined;
   },
 
-  clearUser: () => set({ user: null, isOnboardingComplete: false }),
+  clearUser: () => set({ user: null, isOnboardingComplete: false })
 }));

@@ -11,7 +11,7 @@ import {
   Heading3,
   Code,
   FileCode,
-  Quote,
+  Quote
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,10 +20,7 @@ interface BlogFormatToolbarProps {
   className?: string;
 }
 
-export const BlogFormatToolbar = ({
-  onFormatClick,
-  className,
-}: BlogFormatToolbarProps) => {
+export const BlogFormatToolbar = ({ onFormatClick, className }: BlogFormatToolbarProps) => {
   const formatButtons = [
     { icon: Bold, format: "bold", label: "Bold (Ctrl+B)" },
     { icon: Italic, format: "italic", label: "Italic (Ctrl+I)" },
@@ -36,15 +33,12 @@ export const BlogFormatToolbar = ({
     { icon: List, format: "bulletList", label: "Bullet List" },
     { icon: Code, format: "code", label: "Inline Code" },
     { icon: FileCode, format: "codeBlock", label: "Code Block" },
-    { icon: Quote, format: "quote", label: "Quote" },
+    { icon: Quote, format: "quote", label: "Quote" }
   ];
 
   return (
     <div
-      className={cn(
-        "flex items-center gap-1 p-2 bg-muted/50 border border-border rounded-md",
-        className
-      )}
+      className={cn("flex items-center gap-1 p-2 bg-muted/50 border border-border rounded-md", className)}
       onMouseDown={(e) => {
         // Prevent input from losing focus when clicking toolbar
         e.preventDefault();
@@ -56,9 +50,7 @@ export const BlogFormatToolbar = ({
 
         return (
           <div key={button.format} className="flex items-center">
-            {showDivider && (
-              <div className="w-px h-6 bg-border mx-1" />
-            )}
+            {showDivider && <div className="w-px h-6 bg-border mx-1" />}
             <Button
               variant="ghost"
               size="icon"

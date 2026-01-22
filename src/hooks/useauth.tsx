@@ -6,7 +6,7 @@ import {
   logoutService,
   setNewPasswordService,
   signInService,
-  signUpService,
+  signUpService
 } from "@/services/authService";
 import { getUserProfileService } from "@/services/userService";
 import { useUserStore } from "@/store/userStore";
@@ -15,7 +15,7 @@ import type {
   GOOGLE_CALLBACK_PAYLOAD,
   LOGIN_PAYLOAD,
   SETNEWPASSWORD_PAYLOAD,
-  SIGNUP_PAYLOAD,
+  SIGNUP_PAYLOAD
 } from "@/types/auth";
 // Removed localStorage imports - using cookies only
 import { AxiosError } from "axios";
@@ -65,9 +65,7 @@ export const useauth = () => {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          "An error occurred during sign in";
+          error.response?.data?.message || error.response?.data?.error || "An error occurred during sign in";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -82,11 +80,7 @@ export const useauth = () => {
     try {
       const res = await signUpService(paylaod);
       if (res && res.success) {
-        showToast(
-          res.message ||
-            "Verification email has been sent to your email address.",
-          "success"
-        );
+        showToast(res.message || "Verification email has been sent to your email address.", "success");
         return res;
       }
     } catch (error: unknown) {
@@ -95,15 +89,9 @@ export const useauth = () => {
         let errorMessage = "An error occurred during signup";
 
         // Check if backend returned detailed validation errors
-        if (
-          responseData?.errors &&
-          Array.isArray(responseData.errors) &&
-          responseData.errors.length > 0
-        ) {
+        if (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
           // Extract all error messages from the errors array
-          const errorMessages = responseData.errors
-            .map((err: { message?: string }) => err.message)
-            .filter(Boolean);
+          const errorMessages = responseData.errors.map((err: { message?: string }) => err.message).filter(Boolean);
 
           if (errorMessages.length > 0) {
             errorMessage = errorMessages.join(". ");
@@ -125,10 +113,7 @@ export const useauth = () => {
     try {
       const res = await forgotPasswordService(paylaod);
       if (res && res.success) {
-        showToast(
-          res.message || "Password reset email has been sent.",
-          "success"
-        );
+        showToast(res.message || "Password reset email has been sent.", "success");
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to send reset email", "error");
@@ -136,10 +121,7 @@ export const useauth = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          "An error occurred";
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -153,10 +135,7 @@ export const useauth = () => {
     try {
       const res = await setNewPasswordService(paylaod);
       if (res && res.success) {
-        showToast(
-          res.message || "Password has been reset successfully",
-          "success"
-        );
+        showToast(res.message || "Password has been reset successfully", "success");
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to reset password", "error");
@@ -164,10 +143,7 @@ export const useauth = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          "An error occurred";
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -188,10 +164,7 @@ export const useauth = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          "An error occurred";
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
       } else {
         showToast("An unexpected error occurred. Please try again.", "error");
@@ -216,10 +189,7 @@ export const useauth = () => {
           setUser(res.data.user);
         }
 
-        showToast(
-          res.message || "Successfully signed in with Google",
-          "success"
-        );
+        showToast(res.message || "Successfully signed in with Google", "success");
         return res;
       } else if (res && !res.success) {
         // Display the actual API error message
@@ -232,9 +202,7 @@ export const useauth = () => {
         const responseData = error.response?.data;
         // Display the actual API error message
         const errorMessage =
-          responseData?.message ||
-          responseData?.error ||
-          "An error occurred during Google authentication";
+          responseData?.message || responseData?.error || "An error occurred during Google authentication";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -280,6 +248,6 @@ export const useauth = () => {
     getGoogleAuthUrl,
     handleGoogleCallback,
     logout,
-    fetchUserProfile,
+    fetchUserProfile
   };
 };

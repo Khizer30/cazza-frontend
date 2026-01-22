@@ -10,7 +10,7 @@ async function apiInvoker<T>(
     const response = await axiosInstance({
       url,
       method,
-      data,
+      data
     });
     return response.data;
   } catch (error) {

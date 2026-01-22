@@ -14,13 +14,13 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
 
   const getTooltipStyle = (key: string) => {
     const ref = iconRefs.current[key];
-    if (!ref || hoveredItem !== key) return { display: 'none' };
+    if (!ref || hoveredItem !== key) return { display: "none" };
     const rect = ref.getBoundingClientRect();
     return {
-      position: 'fixed' as const,
+      position: "fixed" as const,
       left: `${rect.right + 8}px`,
       top: `${rect.top + rect.height / 2}px`,
-      transform: 'translateY(-50%)',
+      transform: "translateY(-50%)"
     };
   };
 
@@ -29,9 +29,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
       <ScrollArea className="flex-1 h-full">
         <div className="p-2 lg:p-3 space-y-2">
           <div
-            ref={(el) => { iconRefs.current['insights'] = el; }}
+            ref={(el) => {
+              iconRefs.current["insights"] = el;
+            }}
             className="relative"
-            onMouseEnter={() => setHoveredItem('insights')}
+            onMouseEnter={() => setHoveredItem("insights")}
             onMouseLeave={() => setHoveredItem(null)}
           >
             <Link to="/dashboard" onClick={onNavigate} className="block">
@@ -50,9 +52,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           <div
-            ref={(el) => { iconRefs.current['ask-cazza'] = el; }}
+            ref={(el) => {
+              iconRefs.current["ask-cazza"] = el;
+            }}
             className="relative"
-            onMouseEnter={() => setHoveredItem('ask-cazza')}
+            onMouseEnter={() => setHoveredItem("ask-cazza")}
             onMouseLeave={() => setHoveredItem(null)}
           >
             <Link to="/ask-cazza" onClick={onNavigate} className="block">
@@ -71,9 +75,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           <div
-            ref={(el) => { iconRefs.current['channels'] = el; }}
+            ref={(el) => {
+              iconRefs.current["channels"] = el;
+            }}
             className="relative"
-            onMouseEnter={() => setHoveredItem('channels')}
+            onMouseEnter={() => setHoveredItem("channels")}
             onMouseLeave={() => setHoveredItem(null)}
           >
             <Link to="/channels" onClick={onNavigate} className="block">
@@ -92,9 +98,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           <div
-            ref={(el) => { iconRefs.current['integrations'] = el; }}
+            ref={(el) => {
+              iconRefs.current["integrations"] = el;
+            }}
             className="relative"
-            onMouseEnter={() => setHoveredItem('integrations')}
+            onMouseEnter={() => setHoveredItem("integrations")}
             onMouseLeave={() => setHoveredItem(null)}
           >
             <Link to="/platforms" onClick={onNavigate} className="block">
@@ -113,9 +121,11 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
 
           <div
-            ref={(el) => { iconRefs.current['blog'] = el; }}
+            ref={(el) => {
+              iconRefs.current["blog"] = el;
+            }}
             className="relative"
-            onMouseEnter={() => setHoveredItem('blog')}
+            onMouseEnter={() => setHoveredItem("blog")}
             onMouseLeave={() => setHoveredItem(null)}
           >
             <Link to="/blog" onClick={onNavigate} className="block">
@@ -123,8 +133,7 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
                 variant="ghost"
                 size="icon"
                 className={`w-10 h-10 rounded-lg transition-all duration-300 hover:scale-110 ${
-                  location.pathname === "/blog" ||
-                  location.pathname.startsWith("/blog/")
+                  location.pathname === "/blog" || location.pathname.startsWith("/blog/")
                     ? "bg-primary text-primary-foreground shadow-lg"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
@@ -135,47 +144,47 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
           </div>
         </div>
       </ScrollArea>
-      
-      {hoveredItem === 'insights' && (
+
+      {hoveredItem === "insights" && (
         <div
           className="fixed bg-popover text-popover-foreground text-xs px-2.5 py-1.5 rounded shadow-md pointer-events-none whitespace-nowrap z-[9999] border border-border/50 backdrop-blur-sm"
-          style={getTooltipStyle('insights')}
+          style={getTooltipStyle("insights")}
         >
           Insights
         </div>
       )}
-      
-      {hoveredItem === 'ask-cazza' && (
+
+      {hoveredItem === "ask-cazza" && (
         <div
           className="fixed bg-popover text-popover-foreground text-xs px-2.5 py-1.5 rounded shadow-md pointer-events-none whitespace-nowrap z-[9999] border border-border/50 backdrop-blur-sm"
-          style={getTooltipStyle('ask-cazza')}
+          style={getTooltipStyle("ask-cazza")}
         >
           Ask Cazza
         </div>
       )}
-      
-      {hoveredItem === 'channels' && (
+
+      {hoveredItem === "channels" && (
         <div
           className="fixed bg-popover text-popover-foreground text-xs px-2.5 py-1.5 rounded shadow-md pointer-events-none whitespace-nowrap z-[9999] border border-border/50 backdrop-blur-sm"
-          style={getTooltipStyle('channels')}
+          style={getTooltipStyle("channels")}
         >
           Channels
         </div>
       )}
-      
-      {hoveredItem === 'integrations' && (
+
+      {hoveredItem === "integrations" && (
         <div
           className="fixed bg-popover text-popover-foreground text-xs px-2.5 py-1.5 rounded shadow-md pointer-events-none whitespace-nowrap z-[9999] border border-border/50 backdrop-blur-sm"
-          style={getTooltipStyle('integrations')}
+          style={getTooltipStyle("integrations")}
         >
           Integrations
         </div>
       )}
-      
-      {hoveredItem === 'blog' && (
+
+      {hoveredItem === "blog" && (
         <div
           className="fixed bg-popover text-popover-foreground text-xs px-2.5 py-1.5 rounded shadow-md pointer-events-none whitespace-nowrap z-[9999] border border-border/50 backdrop-blur-sm"
-          style={getTooltipStyle('blog')}
+          style={getTooltipStyle("blog")}
         >
           Blog
         </div>

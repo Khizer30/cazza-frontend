@@ -7,28 +7,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Camera, Loader2, Trash2, Upload, AlertCircle } from "lucide-react";
@@ -54,7 +42,7 @@ const personalInfoSchema = z.object({
     .trim()
     .min(1, { message: "Last name is required" })
     .min(2, { message: "Last name must be at least 2 characters" })
-    .regex(/^[a-zA-Z\s]+$/, { message: "Only alphabets are allowed" }),
+    .regex(/^[a-zA-Z\s]+$/, { message: "Only alphabets are allowed" })
 });
 
 const businessInfoSchema = z.object({
@@ -64,7 +52,7 @@ const businessInfoSchema = z.object({
     .min(1, { message: "Business name is required" })
     .min(2, { message: "Business name must be at least 2 characters" })
     .max(100, { message: "Business name must not exceed 100 characters" })
-    .regex(/^[a-zA-Z\s]+$/, { message: "Business name can only contain letters and spaces" }),
+    .regex(/^[a-zA-Z\s]+$/, { message: "Business name can only contain letters and spaces" })
 });
 
 type PersonalInfoData = z.infer<typeof personalInfoSchema>;
@@ -72,15 +60,8 @@ type BusinessInfoData = z.infer<typeof businessInfoSchema>;
 
 export const AccountSettings = () => {
   const navigate = useNavigate();
-  const {
-    user,
-    fetchUserProfile,
-    updateUser,
-    updateProfileImage,
-    updateBusinessProfile,
-    deleteUser,
-    isLoading,
-  } = useUser();
+  const { user, fetchUserProfile, updateUser, updateProfileImage, updateBusinessProfile, deleteUser, isLoading } =
+    useUser();
   const { user: storeUser } = useUserStore();
   const { logout } = useauth();
 
@@ -105,14 +86,14 @@ export const AccountSettings = () => {
     handleSubmit: handleSubmitPersonalInfo,
     formState: { errors: personalInfoErrors },
     setValue: setPersonalInfoValue,
-    watch: watchPersonalInfo,
+    watch: watchPersonalInfo
   } = useForm<PersonalInfoData>({
     resolver: zodResolver(personalInfoSchema),
     mode: "onBlur",
     defaultValues: {
       firstName: "",
-      lastName: "",
-    },
+      lastName: ""
+    }
   });
 
   const {
@@ -120,13 +101,13 @@ export const AccountSettings = () => {
     handleSubmit: handleSubmitBusinessInfo,
     formState: { errors: businessInfoErrors },
     setValue: setBusinessInfoValue,
-    watch: watchBusinessInfo,
+    watch: watchBusinessInfo
   } = useForm<BusinessInfoData>({
     resolver: zodResolver(businessInfoSchema),
     mode: "onBlur",
     defaultValues: {
-      businessName: "",
-    },
+      businessName: ""
+    }
   });
 
   type AccountFormData = {
@@ -152,7 +133,7 @@ export const AccountSettings = () => {
     accountingStack: { hasXero: false, multiCurrency: false, integrations: [] },
     businessName: "",
     entityType: "",
-    revenueBand: "",
+    revenueBand: ""
   });
 
   // Load user data when component mounts
@@ -171,7 +152,7 @@ export const AccountSettings = () => {
     if (currentUser) {
       const firstName = currentUser.firstName || "";
       const lastName = currentUser.lastName || "";
-      
+
       // Populate form with user data
       setFormData({
         firstName: firstName,
@@ -180,9 +161,8 @@ export const AccountSettings = () => {
         marketplaces: currentUser.businessProfile?.marketplaces || [],
         accountingStack: {
           hasXero: currentUser.businessProfile?.useXero || false,
-          multiCurrency:
-            currentUser.businessProfile?.useMultipleCurrencies || false,
-          integrations: currentUser.businessProfile?.tools || [],
+          multiCurrency: currentUser.businessProfile?.useMultipleCurrencies || false,
+          integrations: currentUser.businessProfile?.tools || []
         },
         businessName: currentUser.businessProfile?.businessName || "",
         entityType: currentUser.businessProfile?.businessEntityType || "",
@@ -191,7 +171,7 @@ export const AccountSettings = () => {
             ? "0-90k"
             : currentUser.businessProfile?.annualRevenueBand === "85k-750k"
               ? "90k-750k"
-              : currentUser.businessProfile?.annualRevenueBand || "",
+              : currentUser.businessProfile?.annualRevenueBand || ""
       });
 
       // Set avatar preview if profile image exists
@@ -201,7 +181,7 @@ export const AccountSettings = () => {
 
       setPersonalInfoValue("firstName", firstName);
       setPersonalInfoValue("lastName", lastName);
-      
+
       const businessName = currentUser.businessProfile?.businessName || "";
       setBusinessInfoValue("businessName", businessName);
     }
@@ -218,9 +198,7 @@ export const AccountSettings = () => {
       const exists = list.includes(marketplace);
       return {
         ...prev,
-        marketplaces: exists
-          ? list.filter((m) => m !== marketplace)
-          : [...list, marketplace],
+        marketplaces: exists ? list.filter((m) => m !== marketplace) : [...list, marketplace]
       };
     });
   }, []);
@@ -229,98 +207,103 @@ export const AccountSettings = () => {
     setFormData((prev: any) => {
       const list: string[] = prev.accountingStack?.integrations || [];
       const exists = list.includes(integration);
-      const newIntegrations = exists
-        ? list.filter((i) => i !== integration)
-        : [...list, integration];
+      const newIntegrations = exists ? list.filter((i) => i !== integration) : [...list, integration];
       return {
         ...prev,
         accountingStack: {
           ...(prev.accountingStack || {}),
-          integrations: newIntegrations,
-        },
+          integrations: newIntegrations
+        }
       };
     });
   }, []);
 
-  const handleAvatarUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      setAvatarFile(file);
-      // Create preview URL
-      const url = URL.createObjectURL(file);
-      setAvatarPreview(url);
-    },
-    []
-  );
+  const handleAvatarUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    // Create preview URL
+    const url = URL.createObjectURL(file);
+    setAvatarPreview(url);
+  }, []);
 
   const handleRemoveAvatar = useCallback(() => {
     setAvatarFile(null);
     setAvatarPreview(null);
   }, []);
 
-  const handleSavePersonalInfo = useCallback(async (data?: PersonalInfoData) => {
-    if (!currentUser) return;
+  const handleSavePersonalInfo = useCallback(
+    async (data?: PersonalInfoData) => {
+      if (!currentUser) return;
 
-    const firstName = data?.firstName || watchPersonalInfo("firstName") || formData.firstName;
-    const lastName = data?.lastName || watchPersonalInfo("lastName") || formData.lastName;
+      const firstName = data?.firstName || watchPersonalInfo("firstName") || formData.firstName;
+      const lastName = data?.lastName || watchPersonalInfo("lastName") || formData.lastName;
 
-    setSavingPersonal(true);
-    try {
-      // Upload profile image first if a new one is selected
-      if (avatarFile) {
-        await updateProfileImage({ profileImage: avatarFile });
-        setAvatarFile(null);
+      setSavingPersonal(true);
+      try {
+        // Upload profile image first if a new one is selected
+        if (avatarFile) {
+          await updateProfileImage({ profileImage: avatarFile });
+          setAvatarFile(null);
+        }
+
+        // Update user profile (firstName, lastName, role)
+        const userUpdatePayload: any = {
+          firstName: firstName,
+          lastName: lastName,
+          role: currentUser.role // Include role from current user state
+        };
+
+        await updateUser(userUpdatePayload);
+
+        // Update local form data
+        setFormData((prev) => ({ ...prev, firstName, lastName }));
+      } catch (error) {
+        console.error("Save personal info error:", error);
+        // Error is already handled in the hooks
+      } finally {
+        setSavingPersonal(false);
       }
+    },
+    [formData, avatarFile, currentUser, updateUser, updateProfileImage, watchPersonalInfo]
+  );
 
-      // Update user profile (firstName, lastName, role)
-      const userUpdatePayload: any = {
-        firstName: firstName,
-        lastName: lastName,
-        role: currentUser.role, // Include role from current user state
-      };
+  const handleSaveBusinessInfo = useCallback(
+    async (data?: BusinessInfoData) => {
+      if (!currentUser || !currentUser.businessProfile) return;
 
-      await updateUser(userUpdatePayload);
+      const businessName = data?.businessName || watchBusinessInfo("businessName") || formData.businessName;
 
-      // Update local form data
-      setFormData(prev => ({ ...prev, firstName, lastName }));
-    } catch (error) {
-      console.error("Save personal info error:", error);
-      // Error is already handled in the hooks
-    } finally {
-      setSavingPersonal(false);
-    }
-  }, [formData, avatarFile, currentUser, updateUser, updateProfileImage, watchPersonalInfo]);
+      setSavingBusiness(true);
+      try {
+        // Update business profile only
+        const businessUpdatePayload = {
+          businessName: businessName,
+          businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
+          annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
+          marketplaces:
+            formData.marketplaces?.length > 0 ? formData.marketplaces : currentUser.businessProfile.marketplaces || [],
+          tools:
+            formData.accountingStack.integrations?.length > 0
+              ? formData.accountingStack.integrations
+              : currentUser.businessProfile.tools || [],
+          useXero: formData.accountingStack.hasXero,
+          useMultipleCurrencies: formData.accountingStack.multiCurrency
+        };
 
-  const handleSaveBusinessInfo = useCallback(async (data?: BusinessInfoData) => {
-    if (!currentUser || !currentUser.businessProfile) return;
+        await updateBusinessProfile(businessUpdatePayload);
 
-    const businessName = data?.businessName || watchBusinessInfo("businessName") || formData.businessName;
-
-    setSavingBusiness(true);
-    try {
-      // Update business profile only
-      const businessUpdatePayload = {
-        businessName: businessName,
-        businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
-        annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
-        marketplaces: formData.marketplaces?.length > 0 ? formData.marketplaces : currentUser.businessProfile.marketplaces || [],
-        tools: formData.accountingStack.integrations?.length > 0 ? formData.accountingStack.integrations : currentUser.businessProfile.tools || [],
-        useXero: formData.accountingStack.hasXero,
-        useMultipleCurrencies: formData.accountingStack.multiCurrency,
-      };
-
-      await updateBusinessProfile(businessUpdatePayload);
-
-      // Update local form data
-      setFormData(prev => ({ ...prev, businessName }));
-    } catch (error) {
-      console.error("Save business info error:", error);
-      // Error is already handled in the hooks
-    } finally {
-      setSavingBusiness(false);
-    }
-  }, [formData, currentUser, updateBusinessProfile, watchBusinessInfo]);
+        // Update local form data
+        setFormData((prev) => ({ ...prev, businessName }));
+      } catch (error) {
+        console.error("Save business info error:", error);
+        // Error is already handled in the hooks
+      } finally {
+        setSavingBusiness(false);
+      }
+    },
+    [formData, currentUser, updateBusinessProfile, watchBusinessInfo]
+  );
 
   const handleSaveMarketplaces = useCallback(async () => {
     if (!currentUser || !currentUser.businessProfile) return;
@@ -332,9 +315,12 @@ export const AccountSettings = () => {
         businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
         annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
         marketplaces: formData.marketplaces,
-        tools: formData.accountingStack.integrations?.length > 0 ? formData.accountingStack.integrations : currentUser.businessProfile.tools || [],
+        tools:
+          formData.accountingStack.integrations?.length > 0
+            ? formData.accountingStack.integrations
+            : currentUser.businessProfile.tools || [],
         useXero: formData.accountingStack.hasXero,
-        useMultipleCurrencies: formData.accountingStack.multiCurrency,
+        useMultipleCurrencies: formData.accountingStack.multiCurrency
       };
 
       await updateBusinessProfile(businessUpdatePayload);
@@ -354,10 +340,11 @@ export const AccountSettings = () => {
         businessName: formData.businessName || currentUser.businessProfile.businessName,
         businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
         annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
-        marketplaces: formData.marketplaces?.length > 0 ? formData.marketplaces : currentUser.businessProfile.marketplaces || [],
+        marketplaces:
+          formData.marketplaces?.length > 0 ? formData.marketplaces : currentUser.businessProfile.marketplaces || [],
         tools: formData.accountingStack.integrations,
         useXero: formData.accountingStack.hasXero,
-        useMultipleCurrencies: formData.accountingStack.multiCurrency,
+        useMultipleCurrencies: formData.accountingStack.multiCurrency
       };
 
       await updateBusinessProfile(businessUpdatePayload);
@@ -412,43 +399,22 @@ export const AccountSettings = () => {
                     }}
                     className="gap-2 "
                   >
-                    <svg
-                      className="w-4 h-4 "
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
+                    <svg className="w-4 h-4 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                     Go to Dashboard
                   </Button>
                 </div>
               </CardTitle>
-              <CardDescription>
-                Update your profile picture to help others recognize you
-              </CardDescription>
+              <CardDescription>Update your profile picture to help others recognize you</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-6">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage
-                    src={
-                      avatarPreview || currentUser?.profileImage || undefined
-                    }
-                    alt="Profile"
-                  />
+                  <AvatarImage src={avatarPreview || currentUser?.profileImage || undefined} alt="Profile" />
                   <AvatarFallback className="text-2xl">
-                    {formData.firstName?.charAt(0) ||
-                      currentUser?.firstName?.charAt(0) ||
-                      ""}
-                    {formData.lastName?.charAt(0) ||
-                      currentUser?.lastName?.charAt(0) ||
-                      ""}
+                    {formData.firstName?.charAt(0) || currentUser?.firstName?.charAt(0) || ""}
+                    {formData.lastName?.charAt(0) || currentUser?.lastName?.charAt(0) || ""}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex gap-2">
@@ -481,10 +447,7 @@ export const AccountSettings = () => {
                   <Button
                     variant="ghost"
                     onClick={handleRemoveAvatar}
-                    disabled={
-                      uploading ||
-                      (!avatarPreview && !currentUser?.profileImage)
-                    }
+                    disabled={uploading || (!avatarPreview && !currentUser?.profileImage)}
                   >
                     Remove
                   </Button>
@@ -497,9 +460,7 @@ export const AccountSettings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
-              <CardDescription>
-                Update your personal details and contact information
-              </CardDescription>
+              <CardDescription>Update your personal details and contact information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <form onSubmit={handleSubmitPersonalInfo(handleSavePersonalInfo)}>
@@ -511,16 +472,14 @@ export const AccountSettings = () => {
                       {...registerPersonalInfo("firstName", {
                         onChange: (e) => {
                           updateFormData("firstName", e.target.value);
-                        },
+                        }
                       })}
                       disabled={savingPersonal}
                     />
                     {personalInfoErrors.firstName && (
                       <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>
-                          {personalInfoErrors.firstName.message}
-                        </AlertDescription>
+                        <AlertDescription>{personalInfoErrors.firstName.message}</AlertDescription>
                       </Alert>
                     )}
                   </div>
@@ -531,16 +490,14 @@ export const AccountSettings = () => {
                       {...registerPersonalInfo("lastName", {
                         onChange: (e) => {
                           updateFormData("lastName", e.target.value);
-                        },
+                        }
                       })}
                       disabled={savingPersonal}
                     />
                     {personalInfoErrors.lastName && (
                       <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>
-                          {personalInfoErrors.lastName.message}
-                        </AlertDescription>
+                        <AlertDescription>{personalInfoErrors.lastName.message}</AlertDescription>
                       </Alert>
                     )}
                   </div>
@@ -555,28 +512,22 @@ export const AccountSettings = () => {
                     disabled
                     className="bg-muted cursor-not-allowed"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Email cannot be changed
-                  </p>
+                  <p className="text-xs text-muted-foreground">Email cannot be changed</p>
                 </div>
 
                 {/* Save Personal Info Button */}
                 <div className="flex justify-end pt-4">
-                  <Button
-                    type="submit"
-                    disabled={savingPersonal}
-                    className="px-8"
-                  >
-                  {savingPersonal ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save"
-                  )}
-                </Button>
-              </div>
+                  <Button type="submit" disabled={savingPersonal} className="px-8">
+                    {savingPersonal ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save"
+                    )}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -586,9 +537,7 @@ export const AccountSettings = () => {
             <Card>
               <CardHeader>
                 <CardTitle>{"Tell us about your business"}</CardTitle>
-                <CardDescription>
-                  {"Help us understand your business structure"}
-                </CardDescription>
+                <CardDescription>{"Help us understand your business structure"}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -598,7 +547,7 @@ export const AccountSettings = () => {
                     {...registerBusinessInfo("businessName", {
                       onChange: (e) => {
                         updateFormData("businessName", e.target.value);
-                      },
+                      }
                     })}
                     placeholder="Your business or trading name"
                     disabled={savingBusiness}
@@ -606,9 +555,7 @@ export const AccountSettings = () => {
                   {businessInfoErrors.businessName && (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        {businessInfoErrors.businessName.message}
-                      </AlertDescription>
+                      <AlertDescription>{businessInfoErrors.businessName.message}</AlertDescription>
                     </Alert>
                   )}
                 </div>
@@ -617,9 +564,7 @@ export const AccountSettings = () => {
                   <Label htmlFor="entityType">Business Entity Type</Label>
                   <Select
                     value={formData.entityType}
-                    onValueChange={(value) =>
-                      updateFormData("entityType", value)
-                    }
+                    onValueChange={(value) => updateFormData("entityType", value)}
                     disabled={savingBusiness}
                   >
                     <SelectTrigger className="w-full">
@@ -628,12 +573,8 @@ export const AccountSettings = () => {
                     <SelectContent>
                       <SelectItem value="sole-trader">Sole Trader</SelectItem>
                       <SelectItem value="partnership">Partnership</SelectItem>
-                      <SelectItem value="limited-company">
-                        Limited Company
-                      </SelectItem>
-                      <SelectItem value="llp">
-                        Limited Liability Partnership (LLP)
-                      </SelectItem>
+                      <SelectItem value="limited-company">Limited Company</SelectItem>
+                      <SelectItem value="llp">Limited Liability Partnership (LLP)</SelectItem>
                       <SelectItem value="charity">Charity</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
@@ -644,21 +585,15 @@ export const AccountSettings = () => {
                   <Label htmlFor="revenueBand">Annual Revenue Band</Label>
                   <Select
                     value={formData.revenueBand}
-                    onValueChange={(value) =>
-                      updateFormData("revenueBand", value)
-                    }
+                    onValueChange={(value) => updateFormData("revenueBand", value)}
                     disabled={savingBusiness}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select revenue band" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0-90k">
-                        £0 to £90,000 (Below VAT threshold)
-                      </SelectItem>
-                      <SelectItem value="90k-750k">
-                        £90,000 - £750,000
-                      </SelectItem>
+                      <SelectItem value="0-90k">£0 to £90,000 (Below VAT threshold)</SelectItem>
+                      <SelectItem value="90k-750k">£90,000 - £750,000</SelectItem>
                       <SelectItem value="750k-2m">£750,000 - £2m</SelectItem>
                       <SelectItem value="2m-5m">£2-5m</SelectItem>
                       <SelectItem value="5m-10m">£5-10m</SelectItem>
@@ -693,9 +628,7 @@ export const AccountSettings = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Online Marketplaces</CardTitle>
-                <CardDescription>
-                  Select which online marketplaces you use for your business
-                </CardDescription>
+                <CardDescription>Select which online marketplaces you use for your business</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-3">
@@ -708,12 +641,9 @@ export const AccountSettings = () => {
                     "Etsy",
                     "Facebook Marketplace",
                     "Instagram Shopping",
-                    "Other",
+                    "Other"
                   ].map((marketplace: string) => (
-                    <div
-                      key={marketplace}
-                      className="flex items-center space-x-2"
-                    >
+                    <div key={marketplace} className="flex items-center space-x-2">
                       <Checkbox
                         id={marketplace}
                         checked={formData.marketplaces.includes(marketplace)}
@@ -725,9 +655,7 @@ export const AccountSettings = () => {
                 </div>
                 {formData.marketplaces.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Selected marketplaces:
-                    </p>
+                    <p className="text-sm text-muted-foreground mb-2">Selected marketplaces:</p>
                     <div className="flex flex-wrap gap-2">
                       {formData.marketplaces.map((marketplace) => (
                         <Badge key={marketplace} variant="secondary">
@@ -740,11 +668,7 @@ export const AccountSettings = () => {
 
                 {/* Save Marketplaces Button */}
                 <div className="flex justify-end pt-4">
-                  <Button
-                    onClick={handleSaveMarketplaces}
-                    disabled={savingMarketplaces}
-                    className="px-8"
-                  >
+                  <Button onClick={handleSaveMarketplaces} disabled={savingMarketplaces} className="px-8">
                     {savingMarketplaces ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -764,17 +688,13 @@ export const AccountSettings = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Tech Stack & Integrations</CardTitle>
-                <CardDescription>
-                  Tell us about your current accounting and payment setup
-                </CardDescription>
+                <CardDescription>Tell us about your current accounting and payment setup</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4"></div>
 
                 <div>
-                  <Label className="text-base font-medium">
-                    Payment Gateways & Integrations:
-                  </Label>
+                  <Label className="text-base font-medium">Payment Gateways & Integrations:</Label>
                   <div className="grid grid-cols-2 gap-3 mt-3">
                     {[
                       "Klarna",
@@ -787,17 +707,12 @@ export const AccountSettings = () => {
                       "Clearpay",
                       "PayPal",
                       "GoCardless",
-                      "Other",
+                      "Other"
                     ].map((integration: string) => (
-                      <div
-                        key={integration}
-                        className="flex items-center space-x-2"
-                      >
+                      <div key={integration} className="flex items-center space-x-2">
                         <Checkbox
                           id={integration}
-                          checked={formData.accountingStack.integrations.includes(
-                            integration
-                          )}
+                          checked={formData.accountingStack.integrations.includes(integration)}
                           onCheckedChange={() => toggleIntegration(integration)}
                         />
                         <Label htmlFor={integration}>{integration}</Label>
@@ -808,28 +723,20 @@ export const AccountSettings = () => {
 
                 {formData.accountingStack.integrations.length > 0 && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Selected integrations:
-                    </p>
+                    <p className="text-sm text-muted-foreground mb-2">Selected integrations:</p>
                     <div className="flex flex-wrap gap-2">
-                      {formData.accountingStack.integrations.map(
-                        (integration) => (
-                          <Badge key={integration} variant="secondary">
-                            {integration}
-                          </Badge>
-                        )
-                      )}
+                      {formData.accountingStack.integrations.map((integration) => (
+                        <Badge key={integration} variant="secondary">
+                          {integration}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 )}
 
                 {/* Save Tech Stack Button */}
                 <div className="flex justify-end pt-4">
-                  <Button
-                    onClick={handleSaveTechStack}
-                    disabled={savingTechStack}
-                    className="px-8"
-                  >
+                  <Button onClick={handleSaveTechStack} disabled={savingTechStack} className="px-8">
                     {savingTechStack ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -850,9 +757,7 @@ export const AccountSettings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Subscription & Plan</CardTitle>
-              <CardDescription>
-                View your current subscription status and plan details
-              </CardDescription>
+              <CardDescription>View your current subscription status and plan details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -875,9 +780,7 @@ export const AccountSettings = () => {
           <Card className="border-destructive/20">
             <CardHeader>
               <CardTitle className="text-destructive">Danger Zone</CardTitle>
-              <CardDescription>
-                Permanently delete your account and all associated data
-              </CardDescription>
+              <CardDescription>Permanently delete your account and all associated data</CardDescription>
             </CardHeader>
             <CardContent>
               <AlertDialog>
@@ -889,18 +792,14 @@ export const AccountSettings = () => {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      your account and remove all your data from our servers.
+                      This action cannot be undone. This will permanently delete your account and remove all your data
+                      from our servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel disabled={deleting}>
-                      Cancel
-                    </AlertDialogCancel>
+                    <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDeleteAccount}
                       className="bg-destructive text-white hover:bg-destructive/90"

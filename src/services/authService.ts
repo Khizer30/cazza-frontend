@@ -11,7 +11,7 @@ import type {
   SETNEWPASSWORD_PAYLOAD,
   SETNEWPASSWORD_RESPONSE,
   SIGNUP_PAYLOAD,
-  SIGNUP_RESPONSE,
+  SIGNUP_RESPONSE
 } from "@/types/auth";
 
 export const signInService = (paylaod: LOGIN_PAYLOAD) => {
@@ -23,19 +23,11 @@ export const signUpService = (paylaod: SIGNUP_PAYLOAD) => {
 };
 
 export const forgotPasswordService = (paylaod: FORGOTPASSWORD_PAYLOAD) => {
-  return apiInvoker<FORGOTPASSWORD_RESPONSE>(
-    END_POINT.auth.forgotPassword,
-    "POST",
-    paylaod
-  );
+  return apiInvoker<FORGOTPASSWORD_RESPONSE>(END_POINT.auth.forgotPassword, "POST", paylaod);
 };
 
 export const setNewPasswordService = (paylaod: SETNEWPASSWORD_PAYLOAD) => {
-  return apiInvoker<SETNEWPASSWORD_RESPONSE>(
-    END_POINT.auth.setNewPassowrd,
-    "POST",
-    paylaod
-  );
+  return apiInvoker<SETNEWPASSWORD_RESPONSE>(END_POINT.auth.setNewPassowrd, "POST", paylaod);
 };
 
 export const getGoogleAuthUrlService = () => {
@@ -43,16 +35,9 @@ export const getGoogleAuthUrlService = () => {
 };
 
 export const googleCallbackService = (payload: GOOGLE_CALLBACK_PAYLOAD) => {
-  return apiInvoker<GOOGLE_CALLBACK_RESPONSE>(
-    END_POINT.auth.googleCallback,
-    "POST",
-    payload
-  );
+  return apiInvoker<GOOGLE_CALLBACK_RESPONSE>(END_POINT.auth.googleCallback, "POST", payload);
 };
 
 export const logoutService = () => {
-  return apiInvoker<{ success: boolean; message: string }>(
-    END_POINT.auth.logout,
-    "GET"
-  );
+  return apiInvoker<{ success: boolean; message: string }>(END_POINT.auth.logout, "GET");
 };

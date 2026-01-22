@@ -32,12 +32,7 @@ export const BlogLayout = () => {
             <NavBar onNavigate={toggleSidebar} />
           </div>
 
-          {isSidebarOpen && (
-            <div
-              className="lg:hidden fixed inset-0 bg-black/50 z-40"
-              onClick={toggleSidebar}
-            />
-          )}
+          {isSidebarOpen && <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={toggleSidebar} />}
 
           <div className="flex-1 overflow-hidden">
             <Outlet />
@@ -59,34 +54,19 @@ export const BlogLayout = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <Link
-                to="/#solution"
-                className="text-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/#solution" className="text-foreground hover:text-primary transition-colors">
                 Solution
               </Link>
-              <Link
-                to="/#platforms"
-                className="text-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/#platforms" className="text-foreground hover:text-primary transition-colors">
                 Integrations
               </Link>
-              <Link
-                to="/blog"
-                className="text-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/blog" className="text-foreground hover:text-primary transition-colors">
                 Blog
               </Link>
-              <Link
-                to="/#pricing"
-                className="text-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/#pricing" className="text-foreground hover:text-primary transition-colors">
                 Pricing
               </Link>
-              <Link
-                to="/#faq"
-                className="text-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/#faq" className="text-foreground hover:text-primary transition-colors">
                 FAQ
               </Link>
             </div>

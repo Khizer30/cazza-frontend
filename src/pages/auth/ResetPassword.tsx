@@ -1,19 +1,10 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useauth } from "@/hooks/useauth";
-import {
-  resetPasswordSchema,
-  type ResetPasswordData,
-} from "@/validators/auth-validator";
+import { resetPasswordSchema, type ResetPasswordData } from "@/validators/auth-validator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -27,13 +18,13 @@ export const ResetPassword = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<ResetPasswordData>({
     resolver: zodResolver(resetPasswordSchema),
     mode: "onBlur",
     defaultValues: {
-      email: "",
-    },
+      email: ""
+    }
   });
 
   const onSubmit = async (data: ResetPasswordData) => {
@@ -50,12 +41,8 @@ export const ResetPassword = () => {
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-semibold">
-            Reset Your Password
-          </CardTitle>
-          <CardDescription>
-            Enter your email to receive reset instructions
-          </CardDescription>
+          <CardTitle className="text-2xl font-semibold">Reset Your Password</CardTitle>
+          <CardDescription>Enter your email to receive reset instructions</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">

@@ -8,11 +8,7 @@ import { getBlogDetailService } from "@/services/blogService";
 import type { BlogDetail as BlogDetailType } from "@/types/auth";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
-
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const getAuthorInitials = (name: string) => {
   return name
@@ -23,17 +19,8 @@ const getAuthorInitials = (name: string) => {
 };
 
 const getAvatarColor = (name: string) => {
-  const colors = [
-    "bg-emerald-500",
-    "bg-blue-500",
-    "bg-purple-500",
-    "bg-orange-500",
-    "bg-pink-500",
-    "bg-cyan-500",
-  ];
-  const index =
-    name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
-    colors.length;
+  const colors = ["bg-emerald-500", "bg-blue-500", "bg-purple-500", "bg-orange-500", "bg-pink-500", "bg-cyan-500"];
+  const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
   return colors[index];
 };
 
@@ -80,7 +67,7 @@ export const BlogDetail = () => {
       weekday: "long",
       year: "numeric",
       month: "long",
-      day: "numeric",
+      day: "numeric"
     });
   };
 
@@ -102,18 +89,21 @@ export const BlogDetail = () => {
     setSelectedImageIndex(null);
   }, []);
 
-  const navigateImage = useCallback((direction: "prev" | "next") => {
-    const allImages = getAllImages();
-    if (selectedImageIndex === null || allImages.length === 0) return;
+  const navigateImage = useCallback(
+    (direction: "prev" | "next") => {
+      const allImages = getAllImages();
+      if (selectedImageIndex === null || allImages.length === 0) return;
 
-    if (direction === "prev") {
-      const newIndex = selectedImageIndex > 0 ? selectedImageIndex - 1 : allImages.length - 1;
-      setSelectedImageIndex(newIndex);
-    } else {
-      const newIndex = selectedImageIndex < allImages.length - 1 ? selectedImageIndex + 1 : 0;
-      setSelectedImageIndex(newIndex);
-    }
-  }, [selectedImageIndex, blog]);
+      if (direction === "prev") {
+        const newIndex = selectedImageIndex > 0 ? selectedImageIndex - 1 : allImages.length - 1;
+        setSelectedImageIndex(newIndex);
+      } else {
+        const newIndex = selectedImageIndex < allImages.length - 1 ? selectedImageIndex + 1 : 0;
+        setSelectedImageIndex(newIndex);
+      }
+    },
+    [selectedImageIndex, blog]
+  );
 
   useEffect(() => {
     if (!isLightboxOpen) return;
@@ -144,12 +134,8 @@ export const BlogDetail = () => {
     return (
       <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">
-            Blog Post Not Found
-          </h1>
-          <p className="text-muted-foreground">
-            The blog post you're looking for doesn't exist.
-          </p>
+          <h1 className="text-4xl font-bold text-foreground">Blog Post Not Found</h1>
+          <p className="text-muted-foreground">The blog post you're looking for doesn't exist.</p>
           <Button onClick={handleBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Blogs
@@ -178,24 +164,18 @@ export const BlogDetail = () => {
               <time>{formatDate(blog.date)}</time>
             </div>
 
-            <h1 className="text-3xl lg:text-4xl font-bold text-foreground leading-tight">
-              {blog.title}
-            </h1>
+            <h1 className="text-3xl lg:text-4xl font-bold text-foreground leading-tight">{blog.title}</h1>
 
             <div className="space-y-3">
               <span className="text-sm text-muted-foreground">Posted by</span>
               <div className="flex items-center gap-3">
                 <Avatar className="w-10 h-10">
-                  <AvatarFallback
-                    className={`text-sm text-white ${getAvatarColor(blog.authorName)}`}
-                  >
+                  <AvatarFallback className={`text-sm text-white ${getAvatarColor(blog.authorName)}`}>
                     {getAuthorInitials(blog.authorName)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-foreground">
-                    {blog.authorName}
-                  </p>
+                  <p className="font-medium text-foreground">{blog.authorName}</p>
                   <p className="text-sm text-muted-foreground">
                     {blog.user.firstName} {blog.user.lastName}
                   </p>
@@ -208,18 +188,12 @@ export const BlogDetail = () => {
 
           {blog.blogImage && (
             <div className="w-full">
-              <img
-                src={blog.blogImage}
-                alt={blog.title}
-                className="w-full h-auto rounded-lg object-cover"
-              />
+              <img src={blog.blogImage} alt={blog.title} className="w-full h-auto rounded-lg object-cover" />
             </div>
           )}
 
           <div className="prose prose-invert max-w-none text-foreground/90 leading-relaxed">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {blog.body}
-            </ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{blog.body}</ReactMarkdown>
           </div>
 
           {blog.images && blog.images.length > 0 && (

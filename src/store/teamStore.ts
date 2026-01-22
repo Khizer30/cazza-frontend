@@ -44,18 +44,18 @@ export const useTeamStore = create<TeamState>((set) => ({
 
   addInvitation: (invitation) =>
     set((state) => ({
-      invitations: [...state.invitations, invitation],
+      invitations: [...state.invitations, invitation]
     })),
 
   removeInvitation: (invitationId) =>
     set((state) => ({
       invitations: state.invitations.filter((inv) => inv.id !== invitationId),
-      invitationsRefreshTrigger: state.invitationsRefreshTrigger + 1,
+      invitationsRefreshTrigger: state.invitationsRefreshTrigger + 1
     })),
 
   removeMember: (memberId) =>
     set((state) => ({
-      members: state.members.filter((member) => member.id !== memberId),
+      members: state.members.filter((member) => member.id !== memberId)
     })),
 
   clearTeam: () =>
@@ -64,14 +64,13 @@ export const useTeamStore = create<TeamState>((set) => ({
       invitations: [],
       analytics: null,
       invitationsRefreshTrigger: 0,
-      pendingInvitationsCount: 0,
+      pendingInvitationsCount: 0
     }),
 
   triggerInvitationsRefresh: () =>
     set((state) => ({
-      invitationsRefreshTrigger: state.invitationsRefreshTrigger + 1,
+      invitationsRefreshTrigger: state.invitationsRefreshTrigger + 1
     })),
 
-  setPendingInvitationsCount: (count) =>
-    set({ pendingInvitationsCount: count }),
+  setPendingInvitationsCount: (count) => set({ pendingInvitationsCount: count })
 }));

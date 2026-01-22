@@ -25,12 +25,7 @@ export const ClientLayout = () => {
           <NavBar onNavigate={toggleSidebar} />
         </div>
 
-        {isSidebarOpen && (
-          <div
-            className="lg:hidden fixed inset-0 bg-black/50 z-40"
-            onClick={toggleSidebar}
-          />
-        )}
+        {isSidebarOpen && <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={toggleSidebar} />}
 
         <div className="flex-1 overflow-y-auto">
           <Outlet />

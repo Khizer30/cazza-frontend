@@ -1,12 +1,6 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +36,7 @@ export const SignUp = () => {
     formState: { errors },
     control,
     setValue,
-    reset,
+    reset
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
     mode: "onBlur",
@@ -53,8 +47,8 @@ export const SignUp = () => {
       password: "",
       confirmPassword: "",
       invitationId: invitationId || "",
-      acceptedTerms: false,
-    },
+      acceptedTerms: false
+    }
   });
 
   // Fetch invitation details if invitation ID is present
@@ -92,9 +86,7 @@ export const SignUp = () => {
           console.error("Fetch invitation error:", error);
           if (error instanceof AxiosError) {
             const errorMessage =
-              error.response?.data?.message ||
-              error.response?.data?.error ||
-              "Invalid or expired invitation";
+              error.response?.data?.message || error.response?.data?.error || "Invalid or expired invitation";
             showToast(errorMessage, "error");
           } else if (error instanceof Error) {
             showToast(error.message, "error");
@@ -126,8 +118,7 @@ export const SignUp = () => {
     setLoading(true);
     try {
       // Extract form data (firstName, lastName, email, password)
-      const { confirmPassword, acceptedTerms, invitationId, ...formData } =
-        data;
+      const { confirmPassword, acceptedTerms, invitationId, ...formData } = data;
 
       // Build signup payload with form data and invitationId (if exists)
       const payload: SIGNUP_PAYLOAD = {
@@ -135,8 +126,7 @@ export const SignUp = () => {
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
-        ...(invitationId &&
-          invitationId.trim() && { invitationId: invitationId.trim() }),
+        ...(invitationId && invitationId.trim() && { invitationId: invitationId.trim() })
       };
 
       const result = await signUp(payload);
@@ -244,9 +234,7 @@ export const SignUp = () => {
                 {loadingInvitation ? (
                   <div className="flex items-center pl-10 h-10 border border-input rounded-md bg-background">
                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />
-                    <span className="text-sm text-muted-foreground">
-                      Loading invitation...
-                    </span>
+                    <span className="text-sm text-muted-foreground">Loading invitation...</span>
                   </div>
                 ) : (
                   <Input
@@ -266,9 +254,7 @@ export const SignUp = () => {
                 </Alert>
               )}
               {isInvitedUser && !errors.email && (
-                <p className="text-xs text-muted-foreground">
-                  Email is pre-filled from your team invitation
-                </p>
+                <p className="text-xs text-muted-foreground">Email is pre-filled from your team invitation</p>
               )}
             </div>
 
@@ -290,11 +276,7 @@ export const SignUp = () => {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   disabled={loading}
                 >
-                  {showPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
+                  {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </button>
               </div>
               {errors.password && (
@@ -323,11 +305,7 @@ export const SignUp = () => {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   disabled={loading}
                 >
-                  {showConfirmPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
+                  {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </button>
               </div>
               {errors.confirmPassword && (
@@ -343,12 +321,7 @@ export const SignUp = () => {
                 name="acceptedTerms"
                 control={control}
                 render={({ field }) => (
-                  <Checkbox
-                    id="terms"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={loading}
-                  />
+                  <Checkbox id="terms" checked={field.value} onCheckedChange={field.onChange} disabled={loading} />
                 )}
               />
               <Label
@@ -356,19 +329,11 @@ export const SignUp = () => {
                 className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-wrap"
               >
                 By signing up, you agree to our{" "}
-                <a
-                  href="/terms-and-conditions"
-                  target="_blank"
-                  className="text-primary hover:underline"
-                >
+                <a href="/terms-and-conditions" target="_blank" className="text-primary hover:underline">
                   Terms & Conditions
                 </a>{" "}
                 and{" "}
-                <a
-                  href="/privacy-policy"
-                  target="_blank"
-                  className="text-primary hover:underline"
-                >
+                <a href="/privacy-policy" target="_blank" className="text-primary hover:underline">
                   Privacy Policy
                 </a>
               </Label>

@@ -17,17 +17,8 @@ const getAuthorInitials = (name: string) => {
 };
 
 const getAvatarColor = (name: string) => {
-  const colors = [
-    "bg-emerald-500",
-    "bg-blue-500",
-    "bg-purple-500",
-    "bg-orange-500",
-    "bg-pink-500",
-    "bg-cyan-500",
-  ];
-  const index =
-    name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
-    colors.length;
+  const colors = ["bg-emerald-500", "bg-blue-500", "bg-purple-500", "bg-orange-500", "bg-pink-500", "bg-cyan-500"];
+  const index = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
   return colors[index];
 };
 
@@ -59,7 +50,7 @@ export const BlogDashboard = () => {
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
-      day: "numeric",
+      day: "numeric"
     });
   };
 
@@ -67,12 +58,9 @@ export const BlogDashboard = () => {
     <ScrollArea className="h-[calc(100vh-4rem)]">
       <div className="p-6 lg:p-8">
         <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-3">
-            The latest Cazza news
-          </h1>
+          <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-3">The latest Cazza news</h1>
           <p className="text-muted-foreground text-base max-w-2xl">
-            Stay updated with the latest features, tips, and insights for
-            e-commerce sellers and accountants.
+            Stay updated with the latest features, tips, and insights for e-commerce sellers and accountants.
           </p>
         </div>
 
@@ -94,11 +82,7 @@ export const BlogDashboard = () => {
               >
                 {blog.blogImage && (
                   <div className="relative w-full h-48 overflow-hidden bg-muted">
-                    <img
-                      src={blog.blogImage}
-                      alt={blog.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={blog.blogImage} alt={blog.title} className="w-full h-full object-cover" />
                   </div>
                 )}
                 <CardContent className="p-6 space-y-4">
@@ -108,9 +92,7 @@ export const BlogDashboard = () => {
                       <span>{formatDate(blog.createdAt)}</span>
                     </div>
                     <Avatar className="w-8 h-8 border-2 border-card">
-                      <AvatarFallback
-                        className={`text-xs text-white ${getAvatarColor(blog.authorName)}`}
-                      >
+                      <AvatarFallback className={`text-xs text-white ${getAvatarColor(blog.authorName)}`}>
                         {getAuthorInitials(blog.authorName)}
                       </AvatarFallback>
                     </Avatar>
@@ -120,9 +102,7 @@ export const BlogDashboard = () => {
                     {blog.title}
                   </h2>
 
-                  <p className="text-muted-foreground text-sm line-clamp-3">
-                    {blog.summary}
-                  </p>
+                  <p className="text-muted-foreground text-sm line-clamp-3">{blog.summary}</p>
 
                   <Button
                     variant="ghost"

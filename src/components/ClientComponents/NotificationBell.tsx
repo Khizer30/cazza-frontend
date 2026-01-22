@@ -2,11 +2,7 @@ import { useState } from "react";
 import { Bell, CheckCircle2, Circle } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ScrollArea } from "../ui/scroll-area";
 import { useNotifications } from "@/hooks/useNotifications";
 import { format } from "date-fns";
@@ -14,8 +10,7 @@ import { Loader2 } from "lucide-react";
 
 export const NotificationBell = () => {
   const [open, setOpen] = useState(false);
-  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } =
-    useNotifications();
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useNotifications();
 
   const handleNotificationClick = (notificationId: string) => {
     if (!notifications.find((n) => n.id === notificationId)?.isRead) {
@@ -45,11 +40,7 @@ export const NotificationBell = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative h-10 w-10"
-        >
+        <Button variant="ghost" size="icon" className="relative h-10 w-10">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge
@@ -61,29 +52,18 @@ export const NotificationBell = () => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-96 p-0 bg-background border shadow-lg z-50"
-        align="end"
-      >
+      <PopoverContent className="w-96 p-0 bg-background border shadow-lg z-50" align="end">
         <div className="flex items-center justify-between p-4 border-b border-border bg-card">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-base">Notifications</h3>
             {unreadCount > 0 && (
-              <Badge
-                variant="destructive"
-                className="h-5 px-2 text-xs font-medium"
-              >
+              <Badge variant="destructive" className="h-5 px-2 text-xs font-medium">
                 {unreadCount} new
               </Badge>
             )}
           </div>
           {unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs hover:bg-muted"
-              onClick={markAllAsRead}
-            >
+            <Button variant="ghost" size="sm" className="h-7 text-xs hover:bg-muted" onClick={markAllAsRead}>
               Mark all as read
             </Button>
           )}
@@ -97,12 +77,8 @@ export const NotificationBell = () => {
             <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
               <Bell className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-sm font-medium text-foreground mb-1">
-              No notifications
-            </p>
-            <p className="text-xs text-muted-foreground">
-              You're all caught up!
-            </p>
+            <p className="text-sm font-medium text-foreground mb-1">No notifications</p>
+            <p className="text-xs text-muted-foreground">You're all caught up!</p>
           </div>
         ) : notifications.length <= 3 ? (
           <div className="divide-y divide-border">
@@ -136,9 +112,7 @@ export const NotificationBell = () => {
                         <div className="flex items-start justify-between gap-2">
                           <h4
                             className={`text-sm font-bold leading-snug ${
-                              isUnread
-                                ? "text-foreground"
-                                : "text-foreground/70"
+                              isUnread ? "text-foreground" : "text-foreground/70"
                             }`}
                           >
                             {notification.subject}
@@ -146,9 +120,7 @@ export const NotificationBell = () => {
                         </div>
                         <p
                           className={`text-xs leading-relaxed ${
-                            isUnread
-                              ? "text-muted-foreground"
-                              : "text-muted-foreground/70"
+                            isUnread ? "text-muted-foreground" : "text-muted-foreground/70"
                           } line-clamp-2`}
                         >
                           {notification.message}
@@ -206,9 +178,7 @@ export const NotificationBell = () => {
                           <div className="flex items-start justify-between gap-2">
                             <h4
                               className={`text-sm font-bold leading-snug ${
-                                isUnread
-                                  ? "text-foreground"
-                                  : "text-foreground/70"
+                                isUnread ? "text-foreground" : "text-foreground/70"
                               }`}
                             >
                               {notification.subject}
@@ -216,9 +186,7 @@ export const NotificationBell = () => {
                           </div>
                           <p
                             className={`text-xs leading-relaxed ${
-                              isUnread
-                                ? "text-muted-foreground"
-                                : "text-muted-foreground/70"
+                              isUnread ? "text-muted-foreground" : "text-muted-foreground/70"
                             } line-clamp-2`}
                           >
                             {notification.message}

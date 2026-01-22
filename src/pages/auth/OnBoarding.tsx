@@ -4,22 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUser } from "@/hooks/useUser";
 import { Loader2, AlertCircle } from "lucide-react";
-import {
-  businessInfoSchema,
-  marketplacesSchema,
-  toolsSchema,
-} from "@/validators/auth-validator";
+import { businessInfoSchema, marketplacesSchema, toolsSchema } from "@/validators/auth-validator";
 
 interface OnboardingData {
   businessName: string;
@@ -54,7 +44,7 @@ const availableTools = [
   "Clearpay",
   "PayPal",
   "GoCardless",
-  "Other",
+  "Other"
 ];
 
 export function Onboarding() {
@@ -67,7 +57,7 @@ export function Onboarding() {
     annualRevenueBand: "",
     marketplaces: [],
     tools: [],
-    techStack: { useXero: false, multipleCurrencies: false },
+    techStack: { useXero: false, multipleCurrencies: false }
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -78,7 +68,7 @@ export function Onboarding() {
       const result = businessInfoSchema.safeParse({
         businessName: formData.businessName,
         businessEntityType: formData.businessEntityType,
-        annualRevenueBand: formData.annualRevenueBand,
+        annualRevenueBand: formData.annualRevenueBand
       });
 
       if (!result.success) {
@@ -96,7 +86,7 @@ export function Onboarding() {
 
     if (currentStep === 1) {
       const result = marketplacesSchema.safeParse({
-        marketplaces: formData.marketplaces,
+        marketplaces: formData.marketplaces
       });
 
       if (!result.success) {
@@ -115,7 +105,7 @@ export function Onboarding() {
     if (currentStep === 2) {
       const result = toolsSchema.safeParse({
         tools: formData.tools,
-        techStack: formData.techStack,
+        techStack: formData.techStack
       });
 
       if (!result.success) {
@@ -151,7 +141,7 @@ export function Onboarding() {
       const exists = arr.includes(value);
       return {
         ...prev,
-        [field]: exists ? arr.filter((v) => v !== value) : [...arr, value],
+        [field]: exists ? arr.filter((v) => v !== value) : [...arr, value]
       };
     });
     // Clear error when user makes a selection
@@ -169,7 +159,7 @@ export function Onboarding() {
     const step0Result = businessInfoSchema.safeParse({
       businessName: formData.businessName,
       businessEntityType: formData.businessEntityType,
-      annualRevenueBand: formData.annualRevenueBand,
+      annualRevenueBand: formData.annualRevenueBand
     });
 
     if (!step0Result.success) {
@@ -188,7 +178,7 @@ export function Onboarding() {
 
     // Validate step 1 (Marketplaces)
     const step1Result = marketplacesSchema.safeParse({
-      marketplaces: formData.marketplaces,
+      marketplaces: formData.marketplaces
     });
 
     if (!step1Result.success) {
@@ -208,7 +198,7 @@ export function Onboarding() {
     // Validate step 2 (Tools & Tech Stack)
     const step2Result = toolsSchema.safeParse({
       tools: formData.tools,
-      techStack: formData.techStack,
+      techStack: formData.techStack
     });
 
     if (!step2Result.success) {
@@ -232,7 +222,7 @@ export function Onboarding() {
         marketplaces: formData.marketplaces,
         tools: formData.tools,
         useXero: formData.techStack.useXero,
-        useMultipleCurrencies: formData.techStack.multipleCurrencies,
+        useMultipleCurrencies: formData.techStack.multipleCurrencies
       };
 
       await completeOnboarding(payload);
@@ -247,18 +237,11 @@ export function Onboarding() {
     <div className="min-h-screen flex items-center justify-center">
       <Card className="shadow-md rounded-2xl w-xl">
         <CardContent className="p-8">
-          <h2 className="text-2xl font-semibold mb-6 text-center">
-            {steps[step]}
-          </h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center">{steps[step]}</h2>
 
           <AnimatePresence mode="wait">
             {step === 0 && (
-              <motion.div
-                key="business"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
+              <motion.div key="business" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block">Business Name</label>
@@ -268,12 +251,12 @@ export function Onboarding() {
                       onChange={(e) => {
                         setFormData({
                           ...formData,
-                          businessName: e.target.value,
+                          businessName: e.target.value
                         });
                         if (errors.businessName) {
                           setErrors((prev) => ({
                             ...prev,
-                            businessName: undefined,
+                            businessName: undefined
                           }));
                         }
                       }}
@@ -288,9 +271,7 @@ export function Onboarding() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Business Entity Type
-                    </label>
+                    <label className="text-sm font-medium mb-2 block">Business Entity Type</label>
                     <Select
                       value={formData.businessEntityType}
                       onValueChange={(v) => {
@@ -298,7 +279,7 @@ export function Onboarding() {
                         if (errors.businessEntityType) {
                           setErrors((prev) => ({
                             ...prev,
-                            businessEntityType: undefined,
+                            businessEntityType: undefined
                           }));
                         }
                       }}
@@ -310,12 +291,8 @@ export function Onboarding() {
                       <SelectContent>
                         <SelectItem value="sole-trader">Sole Trader</SelectItem>
                         <SelectItem value="partnership">Partnership</SelectItem>
-                        <SelectItem value="limited-company">
-                          Limited Company
-                        </SelectItem>
-                        <SelectItem value="llp">
-                          Limited Liability Partnership (LLP)
-                        </SelectItem>
+                        <SelectItem value="limited-company">Limited Company</SelectItem>
+                        <SelectItem value="llp">Limited Liability Partnership (LLP)</SelectItem>
                         <SelectItem value="charity">Charity</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
@@ -329,9 +306,7 @@ export function Onboarding() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Annual Revenue Band
-                    </label>
+                    <label className="text-sm font-medium mb-2 block">Annual Revenue Band</label>
                     <Select
                       value={formData.annualRevenueBand}
                       onValueChange={(v) => {
@@ -339,7 +314,7 @@ export function Onboarding() {
                         if (errors.annualRevenueBand) {
                           setErrors((prev) => ({
                             ...prev,
-                            annualRevenueBand: undefined,
+                            annualRevenueBand: undefined
                           }));
                         }
                       }}
@@ -349,12 +324,8 @@ export function Onboarding() {
                         <SelectValue placeholder="Select revenue band" />
                       </SelectTrigger>
                       <SelectContent side="bottom" sideOffset={4} avoidCollisions={false}>
-                        <SelectItem value="0-90k">
-                          £0 to £90,000 (Below VAT threshold)
-                        </SelectItem>
-                        <SelectItem value="90k-750k">
-                          £90,000 - £750,000
-                        </SelectItem>
+                        <SelectItem value="0-90k">£0 to £90,000 (Below VAT threshold)</SelectItem>
+                        <SelectItem value="90k-750k">£90,000 - £750,000</SelectItem>
                         <SelectItem value="750k-2m">£750,000 - £2m</SelectItem>
                         <SelectItem value="2m-5m">£2-5m</SelectItem>
                         <SelectItem value="5m-10m">£5-10m</SelectItem>
@@ -373,15 +344,8 @@ export function Onboarding() {
             )}
 
             {step === 1 && (
-              <motion.div
-                key="marketplaces"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <p className="text-sm mb-3">
-                  Select which online marketplaces you use:
-                </p>
+              <motion.div key="marketplaces" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <p className="text-sm mb-3">Select which online marketplaces you use:</p>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     "Amazon",
@@ -392,14 +356,12 @@ export function Onboarding() {
                     "Shopify",
                     "Etsy",
                     "Instagram Shopping",
-                    "Other",
+                    "Other"
                   ].map((item) => (
                     <label key={item} className="flex items-center space-x-2">
                       <Checkbox
                         checked={formData.marketplaces.includes(item)}
-                        onCheckedChange={() =>
-                          handleCheckbox("marketplaces", item)
-                        }
+                        onCheckedChange={() => handleCheckbox("marketplaces", item)}
                         disabled={isLoading}
                       />
                       <span>{item}</span>
@@ -410,28 +372,16 @@ export function Onboarding() {
             )}
 
             {step === 2 && (
-              <motion.div
-                key="techstack"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
+              <motion.div key="techstack" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm mb-3">
-                      Select the tools you currently use:
-                    </p>
+                    <p className="text-sm mb-3">Select the tools you currently use:</p>
                     <div className="grid grid-cols-2 gap-2">
                       {availableTools.map((tool) => (
-                        <label
-                          key={tool}
-                          className="flex items-center space-x-2"
-                        >
+                        <label key={tool} className="flex items-center space-x-2">
                           <Checkbox
                             checked={formData.tools.includes(tool)}
-                            onCheckedChange={() =>
-                              handleCheckbox("tools", tool)
-                            }
+                            onCheckedChange={() => handleCheckbox("tools", tool)}
                             disabled={isLoading}
                           />
                           <span>{tool}</span>
@@ -463,11 +413,7 @@ export function Onboarding() {
 
           <div className={`flex mt-8 ${step === 0 ? "justify-end" : "justify-between"}`}>
             {step > 0 && (
-              <Button
-                variant="outline"
-                onClick={back}
-                disabled={isLoading}
-              >
+              <Button variant="outline" onClick={back} disabled={isLoading}>
                 Back
               </Button>
             )}

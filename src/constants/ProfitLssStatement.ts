@@ -7,7 +7,7 @@ export const expenseData = [
   { category: "Bank Fees", amount: 350, percentage: 1 },
   { category: "Software & Subscriptions", amount: 800, percentage: 2 },
   { category: "Utilities", amount: 600, percentage: 2 },
-  { category: "Other", amount: 1200, percentage: 4 },
+  { category: "Other", amount: 1200, percentage: 4 }
 ];
 
 export const monthlyPL = [
@@ -16,7 +16,7 @@ export const monthlyPL = [
   { month: "Sep", revenue: 29500, expenses: 18200, profit: 11300 },
   { month: "Oct", revenue: 34000, expenses: 21000, profit: 13000 },
   { month: "Nov", revenue: 36000, expenses: 22500, profit: 13500 },
-  { month: "Dec", revenue: 42000, expenses: 25000, profit: 17000 },
+  { month: "Dec", revenue: 42000, expenses: 25000, profit: 17000 }
 ];
 
 // P&L Table Data - Dynamic table with monthly breakdown
@@ -38,7 +38,7 @@ export const plTableColumns = [
   "July",
   "June",
   "May",
-  "April",
+  "April"
 ];
 
 export const plTableData: PLTableRow[] = [
@@ -54,8 +54,8 @@ export const plTableData: PLTableRow[] = [
       July: 15005.84,
       June: 15220.19,
       May: 16668.53,
-      April: 21187.78,
-    },
+      April: 21187.78
+    }
   },
   {
     parameter: "Units",
@@ -69,8 +69,8 @@ export const plTableData: PLTableRow[] = [
       July: 1643,
       June: 1659,
       May: 1798,
-      April: 2284,
-    },
+      April: 2284
+    }
   },
   {
     parameter: "Refunds",
@@ -83,8 +83,8 @@ export const plTableData: PLTableRow[] = [
       July: 50,
       June: 37,
       May: 48,
-      April: 54,
-    },
+      April: 54
+    }
   },
   {
     parameter: "Promo",
@@ -97,8 +97,8 @@ export const plTableData: PLTableRow[] = [
       July: 0.0,
       June: 0.0,
       May: 0.0,
-      April: 0.0,
-    },
+      April: 0.0
+    }
   },
   {
     parameter: "Advertising cost",
@@ -112,8 +112,8 @@ export const plTableData: PLTableRow[] = [
       July: -7439.72,
       June: -653.89,
       May: -2506.09,
-      April: -208.52,
-    },
+      April: -208.52
+    }
   },
   {
     parameter: "Shipping costs",
@@ -127,8 +127,8 @@ export const plTableData: PLTableRow[] = [
       July: -1273.49,
       June: -1205.38,
       May: -1396.81,
-      April: -2043.78,
-    },
+      April: -2043.78
+    }
   },
   {
     parameter: "Giftwrap",
@@ -141,8 +141,8 @@ export const plTableData: PLTableRow[] = [
       July: -2.11,
       June: -6.33,
       May: -4.18,
-      April: -4.22,
-    },
+      April: -4.22
+    }
   },
   {
     parameter: "Refund cost",
@@ -156,8 +156,8 @@ export const plTableData: PLTableRow[] = [
       July: -242.57,
       June: -189.21,
       May: 97.62,
-      April: -345.45,
-    },
+      April: -345.45
+    }
   },
   {
     parameter: "Amazon fees",
@@ -171,8 +171,8 @@ export const plTableData: PLTableRow[] = [
       July: -5604.06,
       June: -5738.26,
       May: -5412.6,
-      April: -7578.39,
-    },
+      April: -7578.39
+    }
   },
   {
     parameter: "Cost of goods",
@@ -186,8 +186,8 @@ export const plTableData: PLTableRow[] = [
       July: -6875.6,
       June: -7665.47,
       May: -7175.99,
-      April: -9618.21,
-    },
+      April: -9618.21
+    }
   },
   {
     parameter: "VAT",
@@ -200,8 +200,8 @@ export const plTableData: PLTableRow[] = [
       July: -2346.69,
       June: -2388.91,
       May: -2616.66,
-      April: -3323.28,
-    },
+      April: -3323.28
+    }
   },
   {
     parameter: "Gross profit",
@@ -216,8 +216,8 @@ export const plTableData: PLTableRow[] = [
       July: -8778.37,
       June: -2627.27,
       May: -2723.92,
-      April: -1934.03,
-    },
+      April: -1934.03
+    }
   },
   {
     parameter: "Indirect expenses",
@@ -231,8 +231,8 @@ export const plTableData: PLTableRow[] = [
       July: -299.22,
       June: -323.78,
       May: -299.22,
-      April: -298.78,
-    },
+      April: -298.78
+    }
   },
   {
     parameter: "Net profit",
@@ -247,8 +247,8 @@ export const plTableData: PLTableRow[] = [
       July: -9077.59,
       June: -2951.05,
       May: -3023.14,
-      April: -2232.81,
-    },
+      April: -2232.81
+    }
   },
   {
     parameter: "Estimated payout",
@@ -261,8 +261,8 @@ export const plTableData: PLTableRow[] = [
       July: 8162.76,
       June: 8671.87,
       May: 10237.91,
-      April: 12614.7,
-    },
+      April: 12614.7
+    }
   },
   {
     parameter: "Real ACOS",
@@ -275,8 +275,8 @@ export const plTableData: PLTableRow[] = [
       July: "49.58%",
       June: "4.30%",
       May: "15.03%",
-      April: "0.98%",
-    },
+      April: "0.98%"
+    }
   },
   {
     parameter: "% Refunds",
@@ -289,8 +289,8 @@ export const plTableData: PLTableRow[] = [
       July: "3.04%",
       June: "2.23%",
       May: "2.67%",
-      April: "2.36%",
-    },
+      April: "2.36%"
+    }
   },
   {
     parameter: "Sellable returns",
@@ -303,8 +303,8 @@ export const plTableData: PLTableRow[] = [
       July: "82.61%",
       June: "71.43%",
       May: "88.57%",
-      April: "89.13%",
-    },
+      April: "89.13%"
+    }
   },
   {
     parameter: "Margin",
@@ -318,7 +318,7 @@ export const plTableData: PLTableRow[] = [
       July: "-60.49%",
       June: "-19.39%",
       May: "-18.14%",
-      April: "-10.54%",
-    },
-  },
+      April: "-10.54%"
+    }
+  }
 ];

@@ -9,16 +9,14 @@ import type {
   UpdateBlogPayload,
   UpdateBlogResponse,
   DeleteBlogResponse,
-  DeleteBlogImageResponse,
+  DeleteBlogImageResponse
 } from "@/types/auth";
 
 export const getBlogsService = (status?: "PUBLISHED" | "DRAFT") => {
   const params = new URLSearchParams();
   if (status) params.append("status", status);
 
-  const url = status
-    ? `${END_POINT.blog.list}?${params.toString()}`
-    : END_POINT.blog.list;
+  const url = status ? `${END_POINT.blog.list}?${params.toString()}` : END_POINT.blog.list;
 
   return apiInvoker<BlogListResponse>(url, "GET");
 };
@@ -54,8 +52,8 @@ export const createBlogService = async (payload: CreateBlogPayload) => {
     method: "POST",
     data: formData,
     headers: {
-      "Content-Type": "multipart/form-data",
-    },
+      "Content-Type": "multipart/form-data"
+    }
   });
 
   return response.data as CreateBlogResponse;
@@ -88,8 +86,8 @@ export const updateBlogService = async (blogId: string, payload: UpdateBlogPaylo
     method: "PUT",
     data: formData,
     headers: {
-      "Content-Type": "multipart/form-data",
-    },
+      "Content-Type": "multipart/form-data"
+    }
   });
 
   return response.data as UpdateBlogResponse;
@@ -108,8 +106,8 @@ export const deleteBlogImageService = async (blogId: string, imageUrl: string) =
     method: "DELETE",
     data: params.toString(),
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
   });
 
   return response.data as DeleteBlogImageResponse;

@@ -2,13 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useauth } from "@/hooks/useauth";
 import { useUserStore } from "@/store/userStore";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
 export const GoogleCallback = () => {
@@ -24,11 +18,7 @@ export const GoogleCallback = () => {
       const errorDescription = searchParams.get("error_description");
 
       if (oauthError) {
-        setError(
-          errorDescription ||
-            oauthError ||
-            "Google authentication was cancelled or failed"
-        );
+        setError(errorDescription || oauthError || "Google authentication was cancelled or failed");
         setTimeout(() => {
           navigate("/login");
         }, 3000);
@@ -55,11 +45,7 @@ export const GoogleCallback = () => {
         // Check the user from store to determine redirect
         const currentUser = useUserStore.getState().user;
         // Only OWNER role users need onboarding, skip for other roles
-        if (
-          currentUser &&
-          !currentUser.businessProfile &&
-          currentUser.role === "OWNER"
-        ) {
+        if (currentUser && !currentUser.businessProfile && currentUser.role === "OWNER") {
           // Redirect to onboarding if business profile is missing and user is OWNER
           navigate("/onboarding");
         } else {
@@ -70,9 +56,7 @@ export const GoogleCallback = () => {
         console.error("Google callback error:", err);
         // Display the actual error message from the API
         const errorMessage =
-          err instanceof Error
-            ? err.message
-            : "Failed to complete Google authentication. Please try again.";
+          err instanceof Error ? err.message : "Failed to complete Google authentication. Please try again.";
         setError(errorMessage);
         setTimeout(() => {
           navigate("/login");
@@ -87,27 +71,19 @@ export const GoogleCallback = () => {
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-semibold">
-            Completing Google Sign In
-          </CardTitle>
-          <CardDescription>
-            Please wait while we complete your authentication...
-          </CardDescription>
+          <CardTitle className="text-2xl font-semibold">Completing Google Sign In</CardTitle>
+          <CardDescription>Please wait while we complete your authentication...</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center space-y-4 py-8">
           {error ? (
             <>
               <p className="text-destructive text-center">{error}</p>
-              <p className="text-sm text-muted-foreground text-center">
-                Redirecting to login page...
-              </p>
+              <p className="text-sm text-muted-foreground text-center">Redirecting to login page...</p>
             </>
           ) : (
             <>
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground text-center">
-                Processing your Google authentication...
-              </p>
+              <p className="text-sm text-muted-foreground text-center">Processing your Google authentication...</p>
             </>
           )}
         </CardContent>

@@ -5,18 +5,12 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 
@@ -26,11 +20,7 @@ interface TeamInviteDialogProps {
   onInviteSuccess?: () => void;
 }
 
-export const TeamInviteDialog = ({
-  open,
-  onOpenChange,
-  onInviteSuccess,
-}: TeamInviteDialogProps) => {
+export const TeamInviteDialog = ({ open, onOpenChange, onInviteSuccess }: TeamInviteDialogProps) => {
   const { inviteTeamMember, isLoading } = useUser();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"MEMBER" | "ADMIN">("MEMBER");
@@ -66,7 +56,7 @@ export const TeamInviteDialog = ({
     try {
       await inviteTeamMember({
         email: email.trim().toLowerCase(),
-        role,
+        role
       });
 
       // Reset form and close dialog on success
@@ -98,8 +88,7 @@ export const TeamInviteDialog = ({
         <DialogHeader>
           <DialogTitle>Invite Team Member</DialogTitle>
           <DialogDescription>
-            Send an invitation to add a new member to your team. They will
-            receive an email with instructions to join.
+            Send an invitation to add a new member to your team. They will receive an email with instructions to join.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -120,9 +109,7 @@ export const TeamInviteDialog = ({
                 className={errors.email ? "border-destructive" : ""}
                 disabled={isLoading}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
             </div>
 
             <div className="grid gap-2">
@@ -145,22 +132,14 @@ export const TeamInviteDialog = ({
                   <SelectItem value="ADMIN">Admin</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.role && (
-                <p className="text-sm text-destructive">{errors.role}</p>
-              )}
+              {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
               <p className="text-xs text-muted-foreground">
-                Members have standard access. Admins can manage team members and
-                settings.
+                Members have standard access. Admins can manage team members and settings.
               </p>
             </div>
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isLoading}
-            >
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>

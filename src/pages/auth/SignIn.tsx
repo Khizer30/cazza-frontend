@@ -1,12 +1,6 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -23,14 +17,14 @@ export const SignIn = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<LoginData>({
     resolver: zodResolver(logInSchema),
     mode: "onBlur",
     defaultValues: {
       email: "",
-      password: "",
-    },
+      password: ""
+    }
   });
   const navigate = useNavigate();
   const { signIn, getGoogleAuthUrl } = useauth();
@@ -60,11 +54,7 @@ export const SignIn = () => {
         const currentUser = useUserStore.getState().user;
 
         // Check if user needs onboarding
-        if (
-          currentUser &&
-          !currentUser.businessProfile &&
-          currentUser.role === "OWNER"
-        ) {
+        if (currentUser && !currentUser.businessProfile && currentUser.role === "OWNER") {
           navigate("/onboarding");
         } else {
           navigate("/dashboard");
@@ -81,12 +71,8 @@ export const SignIn = () => {
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-semibold">
-            Sign in to your account
-          </CardTitle>
-          <CardDescription>
-            Welcome back! Please enter your details.
-          </CardDescription>
+          <CardTitle className="text-2xl font-semibold">Sign in to your account</CardTitle>
+          <CardDescription>Welcome back! Please enter your details.</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -128,9 +114,7 @@ export const SignIn = () => {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or
-              </span>
+              <span className="bg-background px-2 text-muted-foreground">Or</span>
             </div>
           </div>
 
@@ -174,11 +158,7 @@ export const SignIn = () => {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   disabled={loading || googleLoading}
                 >
-                  {showPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
+                  {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </button>
               </div>
               {errors.password && (
@@ -189,11 +169,7 @@ export const SignIn = () => {
               )}
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading || googleLoading}
-            >
+            <Button type="submit" className="w-full" disabled={loading || googleLoading}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

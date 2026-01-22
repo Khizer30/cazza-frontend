@@ -1,16 +1,5 @@
 import { Button } from "./ui/button";
-import {
-  Calendar,
-  CreditCard,
-  FileEdit,
-  HelpCircle,
-  LogOut,
-  Menu,
-  Moon,
-  Settings,
-  Sun,
-  Users,
-} from "lucide-react";
+import { Calendar, CreditCard, FileEdit, HelpCircle, LogOut, Menu, Moon, Settings, Sun, Users } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logoWhite from "@/assets/imgs/logoWhite.png";
 import logoBlack from "@/assets/imgs/logoBlack.png";
@@ -19,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useTheme } from "./theme-provider";
@@ -32,7 +21,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "./ui/alert-dialog";
 import { useauth } from "@/hooks/useauth";
 import { useUserStore } from "@/store/userStore";
@@ -70,12 +59,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
       <div className="flex items-center gap-6">
         {/* Mobile Menu Button */}
         {onToggleSidebar && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleSidebar}
-            className="lg:hidden h-10 w-10 p-0"
-          >
+          <Button variant="ghost" size="sm" onClick={onToggleSidebar} className="lg:hidden h-10 w-10 p-0">
             <Menu className="h-5 w-5" />
           </Button>
         )}
@@ -85,16 +69,8 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
           onClick={() => navigate("/dashboard")}
         >
           {/* <Logo size="md" /> */}
-          <img
-            src={logoWhite}
-            alt="Cazza"
-            className="w-[120px] hidden dark:block"
-          />
-          <img
-            src={logoBlack}
-            alt="Cazza"
-            className="w-[120px] block dark:hidden"
-          />
+          <img src={logoWhite} alt="Cazza" className="w-[120px] hidden dark:block" />
+          <img src={logoBlack} alt="Cazza" className="w-[120px] block dark:hidden" />
         </div>
       </div>
 
@@ -103,9 +79,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
         {/* Book a Call Button - Only for Accountant Portal */}
         {location.pathname.startsWith("/accountant") && (
           <Button
-            onClick={() =>
-              window.open("https://calendly.com/your-calendar-link", "_blank")
-            }
+            onClick={() => window.open("https://calendly.com/your-calendar-link", "_blank")}
             className="bg-primary hover:bg-primary/90"
           >
             <Calendar className="h-4 w-4 mr-2" />
@@ -122,10 +96,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               <Avatar className="h-10 w-10">
                 <AvatarImage
                   src={user?.profileImage || undefined}
-                  alt={
-                    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
-                    "User avatar"
-                  }
+                  alt={`${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "User avatar"}
                 />
                 <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                   {getUserInitials()}
@@ -134,48 +105,29 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent
-            className="w-56 bg-background border shadow-lg z-50"
-            align="end"
-            forceMount
-          >
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => navigate("/settings")}
-            >
+          <DropdownMenuContent className="w-56 bg-background border shadow-lg z-50" align="end" forceMount>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/settings")}>
               <Settings className="mr-2 h-4 w-4" />
               Account Settings
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => navigate("/billing")}
-            >
+            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/billing")}>
               <CreditCard className="mr-2 h-4 w-4" />
               Billing
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => navigate("/support")}
-            >
+            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/support")}>
               <HelpCircle className="mr-2 h-4 w-4" />
               Support
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => navigate("/teams")}
-            >
+            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/teams")}>
               <Users className="mr-2 h-4 w-4" />
               Teams
             </DropdownMenuItem>
 
             {user?.role === "SUPERADMIN" && (
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => navigate("/manage-blogs")}
-              >
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/manage-blogs")}>
                 <FileEdit className="mr-2 h-4 w-4" />
                 Manage Blogs
               </DropdownMenuItem>
@@ -184,10 +136,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             <DropdownMenuSeparator />
 
             {/* Theme Toggle */}
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            >
+            <DropdownMenuItem className="cursor-pointer" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
               {theme === "light" ? (
                 <>
                   <Moon className="mr-2 h-4 w-4" />
@@ -215,19 +164,14 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Are you sure you want to sign out?
-                  </AlertDialogTitle>
+                  <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
                   <AlertDialogDescription>
                     You will need to sign in again to access your account.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={logout}
-                    className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-                  >
+                  <AlertDialogAction onClick={logout} className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
                     Sign Out
                   </AlertDialogAction>
                 </AlertDialogFooter>

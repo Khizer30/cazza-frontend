@@ -24,24 +24,15 @@ interface ChatState {
 
   createNewConversation: () => string;
   setCurrentConversation: (id: string | null) => void;
-  addMessageToConversation: (
-    conversationId: string,
-    message: ChatMessage
-  ) => void;
+  addMessageToConversation: (conversationId: string, message: ChatMessage) => void;
   updateConversationTitle: (conversationId: string, title: string) => void;
   deleteConversation: (conversationId: string) => void;
   getCurrentConversation: () => ChatConversation | null;
   getConversationMessages: (conversationId: string) => ChatMessage[];
   loadChatHistoryFromBackend: (apiMessages: ApiChatMessage[]) => void;
   loadChatsFromBackend: (chats: Chat[]) => void;
-  loadChatMessagesFromBackend: (
-    chatId: string,
-    messages: ApiChatMessage[]
-  ) => void;
-  removeMessageFromConversation: (
-    conversationId: string,
-    messageId: string
-  ) => void;
+  loadChatMessagesFromBackend: (chatId: string, messages: ApiChatMessage[]) => void;
+  removeMessageFromConversation: (conversationId: string, messageId: string) => void;
   setLoadingHistory: (loading: boolean) => void;
 }
 
@@ -57,12 +48,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
       title: "New Chat",
       messages: [],
       createdAt: new Date(),
-      updatedAt: new Date(),
+      updatedAt: new Date()
     };
 
     set((state) => ({
       conversations: [newConversation, ...state.conversations],
-      currentConversationId: newId,
+      currentConversationId: newId
     }));
 
     return newId;
@@ -80,15 +71,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
           // Auto-generate title from first user message if still "New Chat"
           let title = conv.title;
           if (title === "New Chat" && message.type === "user") {
-            title =
-              message.content.slice(0, 50) +
-              (message.content.length > 50 ? "..." : "");
+            title = message.content.slice(0, 50) + (message.content.length > 50 ? "..." : "");
           }
           return {
             ...conv,
             messages: updatedMessages,
             title,
-            updatedAt: new Date(),
+            updatedAt: new Date()
           };
         }
         return conv;
@@ -101,18 +90,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
   updateConversationTitle: (conversationId, title) => {
     set((state) => ({
       conversations: state.conversations.map((conv) =>
-        conv.id === conversationId
-          ? { ...conv, title, updatedAt: new Date() }
-          : conv
-      ),
+        conv.id === conversationId ? { ...conv, title, updatedAt: new Date() } : conv
+      )
     }));
   },
 
   deleteConversation: (conversationId) => {
     set((state) => {
-      const updatedConversations = state.conversations.filter(
-        (conv) => conv.id !== conversationId
-      );
+      const updatedConversations = state.conversations.filter((conv) => conv.id !== conversationId);
       const newCurrentId =
         state.currentConversationId === conversationId
           ? updatedConversations.length > 0
@@ -122,23 +107,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
       return {
         conversations: updatedConversations,
-        currentConversationId: newCurrentId,
+        currentConversationId: newCurrentId
       };
     });
   },
 
   getCurrentConversation: () => {
     const { conversations, currentConversationId } = get();
-    return (
-      conversations.find((conv) => conv.id === currentConversationId) || null
-    );
+    return conversations.find((conv) => conv.id === currentConversationId) || null;
   },
 
   getConversationMessages: (conversationId) => {
     const { conversations } = get();
-    const conversation = conversations.find(
-      (conv) => conv.id === conversationId
-    );
+    const conversation = conversations.find((conv) => conv.id === conversationId);
     return conversation?.messages || [];
   },
 
@@ -160,7 +141,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         type: "user",
         content: apiMsg.question,
         timestamp: new Date(apiMsg.createdAt),
-        backendId: apiMsg.id,
+        backendId: apiMsg.id
       });
       // Add assistant message
       storeMessages.push({
@@ -168,7 +149,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         type: "assistant",
         content: apiMsg.answer,
         timestamp: new Date(apiMsg.updatedAt),
-        backendId: apiMsg.id,
+        backendId: apiMsg.id
       });
     });
 
@@ -179,14 +160,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const conversationId = "main-chat";
     const title =
       storeMessages.length > 0
-        ? storeMessages[0].content.slice(0, 50) +
-          (storeMessages[0].content.length > 50 ? "..." : "")
+        ? storeMessages[0].content.slice(0, 50) + (storeMessages[0].content.length > 50 ? "..." : "")
         : "Chat History";
 
     set((state) => {
-      const existingConv = state.conversations.find(
-        (conv) => conv.id === conversationId
-      );
+      const existingConv = state.conversations.find((conv) => conv.id === conversationId);
 
       if (existingConv) {
         // Update existing conversation
@@ -197,11 +175,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
                   ...conv,
                   messages: storeMessages,
                   title,
-                  updatedAt: new Date(),
+                  updatedAt: new Date()
                 }
               : conv
           ),
-          currentConversationId: conversationId,
+          currentConversationId: conversationId
         };
       } else {
         // Create new conversation
@@ -211,13 +189,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
               id: conversationId,
               title,
               messages: storeMessages,
-              createdAt: new Date(
-                apiMessages[apiMessages.length - 1]?.createdAt || Date.now()
-              ),
-              updatedAt: new Date(),
-            },
+              createdAt: new Date(apiMessages[apiMessages.length - 1]?.createdAt || Date.now()),
+              updatedAt: new Date()
+            }
           ],
-          currentConversationId: conversationId,
+          currentConversationId: conversationId
         };
       }
     });
@@ -229,9 +205,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const updatedConversations = state.conversations.map((conv) => {
         if (conv.id === conversationId) {
           // Remove both user and assistant messages with the same backendId
-          const messageToDelete = conv.messages.find(
-            (msg) => msg.id === messageId
-          );
+          const messageToDelete = conv.messages.find((msg) => msg.id === messageId);
           const backendId = messageToDelete?.backendId;
 
           const updatedMessages = backendId
@@ -241,7 +215,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           return {
             ...conv,
             messages: updatedMessages,
-            updatedAt: new Date(),
+            updatedAt: new Date()
           };
         }
         return conv;
@@ -261,13 +235,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
       title: chat.title,
       messages: [],
       createdAt: new Date(chat.createdAt),
-      updatedAt: new Date(chat.updatedAt),
+      updatedAt: new Date(chat.updatedAt)
     }));
 
     set({
-      conversations: conversations.sort(
-        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
-      ),
+      conversations: conversations.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
     });
   },
 
@@ -279,14 +251,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
         type: "user",
         content: apiMsg.question,
         timestamp: new Date(apiMsg.createdAt),
-        backendId: apiMsg.id,
+        backendId: apiMsg.id
       });
       storeMessages.push({
         id: `assistant-${apiMsg.id}`,
         type: "assistant",
         content: apiMsg.answer,
         timestamp: new Date(apiMsg.updatedAt),
-        backendId: apiMsg.id,
+        backendId: apiMsg.id
       });
     });
 
@@ -298,10 +270,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
           ? {
               ...conv,
               messages: storeMessages,
-              updatedAt: new Date(),
+              updatedAt: new Date()
             }
           : conv
-      ),
+      )
     }));
-  },
+  }
 }));

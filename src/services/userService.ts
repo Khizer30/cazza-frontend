@@ -17,7 +17,7 @@ import type {
   GET_SUBSCRIPTION_RESPONSE,
   UNSUBSCRIBE_RESPONSE,
   SUPPORT_TICKET_PAYLOAD,
-  SUPPORT_TICKET_RESPONSE,
+  SUPPORT_TICKET_RESPONSE
 } from "@/types/auth";
 
 export const getUserProfileService = () => {
@@ -25,24 +25,14 @@ export const getUserProfileService = () => {
 };
 
 export const onboardingService = (payload: ONBOARDING_PAYLOAD) => {
-  return apiInvoker<ONBOARDING_RESPONSE>(
-    END_POINT.user.onboarding,
-    "POST",
-    payload
-  );
+  return apiInvoker<ONBOARDING_RESPONSE>(END_POINT.user.onboarding, "POST", payload);
 };
 
 export const updateUserService = (payload: UPDATE_USER_PAYLOAD) => {
-  return apiInvoker<UPDATE_USER_RESPONSE>(
-    END_POINT.user.profile,
-    "PUT",
-    payload
-  );
+  return apiInvoker<UPDATE_USER_RESPONSE>(END_POINT.user.profile, "PUT", payload);
 };
 
-export const updateProfileImageService = async (
-  payload: UPDATE_PROFILE_IMAGE_PAYLOAD
-) => {
+export const updateProfileImageService = async (payload: UPDATE_PROFILE_IMAGE_PAYLOAD) => {
   const formData = new FormData();
   formData.append("profileImage", payload.profileImage);
 
@@ -51,21 +41,15 @@ export const updateProfileImageService = async (
     method: "PUT",
     data: formData,
     headers: {
-      "Content-Type": "multipart/form-data",
-    },
+      "Content-Type": "multipart/form-data"
+    }
   });
 
   return response.data as UPDATE_PROFILE_IMAGE_RESPONSE;
 };
 
-export const updateBusinessProfileService = (
-  payload: UPDATE_BUSINESS_PROFILE_PAYLOAD
-) => {
-  return apiInvoker<UPDATE_BUSINESS_PROFILE_RESPONSE>(
-    END_POINT.user.businessProfile,
-    "PUT",
-    payload
-  );
+export const updateBusinessProfileService = (payload: UPDATE_BUSINESS_PROFILE_PAYLOAD) => {
+  return apiInvoker<UPDATE_BUSINESS_PROFILE_RESPONSE>(END_POINT.user.businessProfile, "PUT", payload);
 };
 
 export const deleteUserService = () => {
@@ -73,20 +57,11 @@ export const deleteUserService = () => {
 };
 
 export const getSubscriptionService = () => {
-  return apiInvoker<GET_SUBSCRIPTION_RESPONSE>(
-    END_POINT.user.subscription,
-    "GET"
-  );
+  return apiInvoker<GET_SUBSCRIPTION_RESPONSE>(END_POINT.user.subscription, "GET");
 };
 
-export const startSubscriptionService = (
-  payload: START_SUBSCRIPTION_PAYLOAD
-) => {
-  return apiInvoker<START_SUBSCRIPTION_RESPONSE>(
-    END_POINT.user.checkout,
-    "POST",
-    payload
-  );
+export const startSubscriptionService = (payload: START_SUBSCRIPTION_PAYLOAD) => {
+  return apiInvoker<START_SUBSCRIPTION_RESPONSE>(END_POINT.user.checkout, "POST", payload);
 };
 
 export const unsubscribeService = () => {
@@ -94,9 +69,5 @@ export const unsubscribeService = () => {
 };
 
 export const createSupportTicketService = (payload: SUPPORT_TICKET_PAYLOAD) => {
-  return apiInvoker<SUPPORT_TICKET_RESPONSE>(
-    END_POINT.user.support,
-    "POST",
-    payload
-  );
+  return apiInvoker<SUPPORT_TICKET_RESPONSE>(END_POINT.user.support, "POST", payload);
 };

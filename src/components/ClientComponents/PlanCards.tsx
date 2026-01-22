@@ -8,8 +8,7 @@ export const plans = [
     price: "Free 30-day trial",
     period: "",
     subtitle: "Then pay what you think it's worth.",
-    description:
-      "Perfect for founders who want instant clarity without the jargon.",
+    description: "Perfect for founders who want instant clarity without the jargon.",
     features: [
       "AI assistant trained in UK tax and e-commerce",
       "Ask anything, like:",
@@ -19,13 +18,13 @@ export const plans = [
       "Unlimited AI searches + full chat history",
       "Connect Amazon Seller Central, Shopify, TikTok Shop, Xero",
       "Personalised dashboard with live revenue, P&L, expenses",
-      "Invite your team and create dedicated finance channels (like Slack, built for your books)",
+      "Invite your team and create dedicated finance channels (like Slack, built for your books)"
     ],
     pricing: {
       trial: "Free for 30 days",
-      after: "Afterwards: Pay what you think it's worth, monthly.",
+      after: "Afterwards: Pay what you think it's worth, monthly."
     },
-    type: "rookie",
+    type: "rookie"
   },
   {
     name: "Master",
@@ -43,10 +42,10 @@ export const plans = [
       "Payroll setup and management (including RTI and pensions)",
       "Director tax efficiency planning",
       "Monthly reconciliations including stock, payment gateways, deferred income, etc",
-      "Xero integration setup with any eCommerce software",
+      "Xero integration setup with any eCommerce software"
     ],
-    type: "master",
-  },
+    type: "master"
+  }
 ];
 
 interface PlanCardsProps {
@@ -62,7 +61,7 @@ export const PlanCards = ({
   selectedPlan,
   currentPlan,
   loading = false,
-  showActions = true,
+  showActions = true
 }: PlanCardsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -88,32 +87,18 @@ export const PlanCards = ({
 
             <div className="mb-3">
               <div className="text-lg font-semibold">{plan.price}</div>
-              {plan.period && (
-                <div className="text-sm text-muted-foreground">
-                  {plan.period}
-                </div>
-              )}
-              {plan.subtitle && (
-                <div className="text-sm text-muted-foreground mt-1">
-                  {plan.subtitle}
-                </div>
-              )}
+              {plan.period && <div className="text-sm text-muted-foreground">{plan.period}</div>}
+              {plan.subtitle && <div className="text-sm text-muted-foreground mt-1">{plan.subtitle}</div>}
             </div>
 
-            {plan.description && (
-              <p className="text-sm text-muted-foreground mb-4">
-                {plan.description}
-              </p>
-            )}
+            {plan.description && <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>}
 
             {plan.pricing && (
               <div className="space-y-1 pt-2 border-t border-border mb-4">
                 <p className="text-xs text-muted-foreground">
                   <strong>{plan.pricing.trial}</strong>
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {plan.pricing.after}
-                </p>
+                <p className="text-xs text-muted-foreground">{plan.pricing.after}</p>
               </div>
             )}
 
@@ -123,9 +108,7 @@ export const PlanCards = ({
           <ul className="space-y-2.5 mb-6 flex-1">
             {plan.features.map((feature, index) => (
               <li key={index} className="flex items-start gap-2 text-sm">
-                {feature.startsWith('"') ||
-                feature.includes("Everything in") ||
-                feature.includes("Ask anything") ? (
+                {feature.startsWith('"') || feature.includes("Everything in") || feature.includes("Ask anything") ? (
                   <span className="text-muted-foreground ml-5">{feature}</span>
                 ) : (
                   <>
@@ -144,11 +127,7 @@ export const PlanCards = ({
               disabled={loading || currentPlan === plan.name}
               variant={selectedPlan === plan.type ? "default" : "outline"}
             >
-              {currentPlan === plan.name
-                ? "Current Plan"
-                : plan.type === "master"
-                  ? "Book call"
-                  : "Subscribe now"}
+              {currentPlan === plan.name ? "Current Plan" : plan.type === "master" ? "Book call" : "Subscribe now"}
             </Button>
           )}
         </div>

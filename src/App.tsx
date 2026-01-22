@@ -44,10 +44,7 @@ const App = () => {
             <Route element={<PublicRoute />}>
               <Route index element={<LandingPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route
-                path="/terms-and-conditions"
-                element={<TermsAndConditions />}
-              />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
               <Route path="/cookie-policy" element={<CookiePolicy />} />
               <Route path="/disclaimer" element={<Disclaimer />} />
               <Route path="/data-protection" element={<DataProtection />} />
@@ -57,10 +54,7 @@ const App = () => {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/set-new-password" element={<SetNewPassword />} />
-              <Route
-                path="/auth/google/callback"
-                element={<GoogleCallback />}
-              />
+              <Route path="/auth/google/callback" element={<GoogleCallback />} />
             </Route>
 
             {/* Public blog routes with conditional layout */}

@@ -1,18 +1,15 @@
-node_modules
-dist
-build
-.next
-.nuxt
-.vscode
-.idea
+# Logs
 *.log
-*.lock
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-coverage
-.env
-.env.local
-.env.*.local
-public
 
+# Dependency Directories
+node_modules
+package-lock.json
+
+# Environment Variable Files
+.env
+.env.*
+!.env.example
+
+# Developer Directories
+.Extras
+uploads

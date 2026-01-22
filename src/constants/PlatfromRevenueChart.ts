@@ -7,7 +7,7 @@ export const PLATFORM_COLORS = {
   facebook: "#1877F2",
   woocommerce: "#96588A",
   magento: "#EE672F",
-  other: "#8B5CF6",
+  other: "#8B5CF6"
 };
 export const platformDummy = [
   {
@@ -16,7 +16,7 @@ export const platformDummy = [
     total_revenue: 28750,
     transaction_count: 234,
     currency: "GBP",
-    last_sync: "2025-10-20T23:30:00Z",
+    last_sync: "2025-10-20T23:30:00Z"
   },
   {
     platform: "amazon",
@@ -24,7 +24,7 @@ export const platformDummy = [
     total_revenue: 19340,
     transaction_count: 156,
     currency: "GBP",
-    last_sync: "2025-10-20T23:30:00Z",
+    last_sync: "2025-10-20T23:30:00Z"
   },
   {
     platform: "ebay",
@@ -32,7 +32,7 @@ export const platformDummy = [
     total_revenue: 12680,
     transaction_count: 89,
     currency: "GBP",
-    last_sync: "2025-10-20T23:30:00Z",
+    last_sync: "2025-10-20T23:30:00Z"
   },
   {
     platform: "tiktok_shop",
@@ -40,8 +40,8 @@ export const platformDummy = [
     total_revenue: 875,
     transaction_count: 67,
     currency: "GBP",
-    last_sync: "2025-10-20T23:30:00Z",
-  },
+    last_sync: "2025-10-20T23:30:00Z"
+  }
 ];
 export const MonthlyRevenueDummy = [
   {
@@ -51,8 +51,8 @@ export const MonthlyRevenueDummy = [
       shopify: 22000.5,
       amazon: 16000.25,
       ebay: 10000.0,
-      tiktok_shop: 8000.0,
-    },
+      tiktok_shop: 8000.0
+    }
   },
   {
     month: "2025-09",
@@ -61,8 +61,8 @@ export const MonthlyRevenueDummy = [
       shopify: 23000.75,
       amazon: 17000.25,
       ebay: 10500.0,
-      tiktok_shop: 8250.0,
-    },
+      tiktok_shop: 8250.0
+    }
   },
   {
     month: "2025-10",
@@ -71,7 +71,7 @@ export const MonthlyRevenueDummy = [
       shopify: 28750.5,
       amazon: 19340.25,
       ebay: 12680.75,
-      tiktok_shop: 8750.0,
-    },
-  },
+      tiktok_shop: 8750.0
+    }
+  }
 ];
