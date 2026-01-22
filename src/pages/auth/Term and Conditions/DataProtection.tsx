@@ -9,7 +9,7 @@ export const DataProtection = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 py-16 flex items-center justify-center">
       <div className="relative bg-white max-w-4xl mx-4 w-full border-[10px] border-gray-800 rounded-xl shadow-[0_0_60px_rgba(0,0,0,0.1)] p-10">
         {/* Decorative inner border */}
-        <div className="absolute inset-3 border-[3px] border-gray-500 rounded-lg pointer-events-none"></div>
+        <div className="absolute inset-3 border-[3px] border-gray-500 rounded-lg pointer-events-none" />
 
         <h1 className="text-4xl font-serif text-gray-900 mb-8 text-center uppercase tracking-wide">
           Data Protection &amp; Security
@@ -113,7 +113,7 @@ export const DataProtection = () => {
         {/* Footer line */}
         <div className="mt-12 text-center text-gray-700 italic text-sm">
           <p>Issued by Cazza • Protecting Your Data with Integrity</p>
-          <div className="mt-2 border-t border-gray-600 w-40 mx-auto"></div>
+          <div className="mt-2 border-t border-gray-600 w-40 mx-auto" />
         </div>
       </div>
     </div>

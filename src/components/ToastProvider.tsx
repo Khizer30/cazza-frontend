@@ -1,7 +1,7 @@
 // ToastProvider.tsx
 import * as Toast from "@radix-ui/react-toast";
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
 type ToastType = "success" | "error" | "info";
 

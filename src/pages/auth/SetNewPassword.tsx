@@ -1,16 +1,17 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertCircle, ArrowLeft, Eye, EyeOff, Lock, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, ArrowLeft, Eye, EyeOff, Lock, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { setNewPasswordSchema, type SetNewPasswordData } from "@/validators/auth-validator";
 import { useauth } from "@/hooks/useauth";
 import type { SETNEWPASSWORD_PAYLOAD } from "@/types/auth";
+import { setNewPasswordSchema, type SetNewPasswordData } from "@/validators/auth-validator";
 
 export const SetNewPassword = () => {
   const navigate = useNavigate();

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import type { ChatMessage as ApiChatMessage, Chat } from "@/types/auth";
 
 export interface ChatMessage {

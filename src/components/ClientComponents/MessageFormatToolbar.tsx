@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Italic, Underline, Strikethrough, Link as LinkIcon, List, Bold } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface MessageFormatToolbarProps {

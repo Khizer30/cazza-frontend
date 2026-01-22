@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Italic,
   Underline,
@@ -13,6 +12,8 @@ import {
   FileCode,
   Quote
 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface BlogFormatToolbarProps {

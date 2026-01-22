@@ -1,42 +1,20 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-
+import { format } from "date-fns";
+import { signInWithCustomToken, signOut, onAuthStateChanged } from "firebase/auth";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+  collection,
+  query,
+  onSnapshot,
+  addDoc,
+  serverTimestamp,
+  limit,
+  Timestamp,
+  doc,
+  setDoc,
+  where,
+  updateDoc,
+  arrayUnion,
+  arrayRemove
+} from "firebase/firestore";
 import {
   Plus,
   Hash,
@@ -75,32 +53,57 @@ import {
   Smile,
   type LucideIcon
 } from "lucide-react";
-import { format } from "date-fns";
+import { Loader2 } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+
+import { MarkdownMessage } from "@/components/ClientComponents/MarkdownMessage";
+import { MessageFormatToolbar } from "@/components/ClientComponents/MessageFormatToolbar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useChat } from "@/hooks/useChat";
 import { useTeam } from "@/hooks/useTeam";
-import { useUserStore } from "@/store/userStore";
-import { Loader2 } from "lucide-react";
-import { MessageFormatToolbar } from "@/components/ClientComponents/MessageFormatToolbar";
-import { MarkdownMessage } from "@/components/ClientComponents/MarkdownMessage";
-import type { ChatGroup } from "@/services/chatService";
-import type { TeamMember as TeamMemberType } from "@/types/auth";
-import { signInWithCustomToken, signOut, onAuthStateChanged } from "firebase/auth";
-import {
-  collection,
-  query,
-  onSnapshot,
-  addDoc,
-  serverTimestamp,
-  limit,
-  Timestamp,
-  doc,
-  setDoc,
-  where,
-  updateDoc,
-  arrayUnion,
-  arrayRemove
-} from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import type { ChatGroup } from "@/services/chatService";
+import { useUserStore } from "@/store/userStore";
+import type { TeamMember as TeamMemberType } from "@/types/auth";
+
+
 
 interface TeamMember {
   id: string;

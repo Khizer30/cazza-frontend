@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 import { useToast } from "@/components/ToastProvider";
 import {
   createChatService,
@@ -9,7 +11,6 @@ import {
   getChatHistoryService,
   deleteMessageService
 } from "@/services/chatbotService";
-import { AxiosError } from "axios";
 import type { CREATE_CHAT_PAYLOAD, UPDATE_CHAT_TITLE_PAYLOAD } from "@/types/auth";
 
 export const useChatbot = () => {

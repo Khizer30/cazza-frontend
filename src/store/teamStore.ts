@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import type { TeamMember, TeamInvitation } from "@/types/auth";
 
 interface TeamAnalytics {

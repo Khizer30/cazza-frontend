@@ -1,37 +1,38 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import { CanonicalManager } from "./components/CanonicalManager";
+import { ThemeProvider } from "./components/theme-provider";
+import { ToastProvider } from "./components/ToastProvider";
+import { BlogLayout } from "./layouts/BlogLayout";
+import { ClientLayout } from "./layouts/ClientLayout";
+import { GoogleCallback } from "./pages/auth/GoogleCallback";
+import { Onboarding } from "./pages/auth/OnBoarding";
 import { ResetPassword } from "./pages/auth/ResetPassword";
 import { SetNewPassword } from "./pages/auth/SetNewPassword";
 import { SignIn } from "./pages/auth/SignIn";
 import { SignUp } from "./pages/auth/SignUp";
-import { GoogleCallback } from "./pages/auth/GoogleCallback";
+import { CookiePolicy } from "./pages/auth/Term and Conditions/CookiePolicy";
 import { DataProtection } from "./pages/auth/Term and Conditions/DataProtection";
-import NotFound from "./pages/NotFound";
-import { LandingPage } from "./pages/landingPage/LandingPage";
-import { AmazonSellers } from "./pages/landingPage/AmazonSellers";
-import { ThemeProvider } from "./components/theme-provider";
-import { ClientLayout } from "./layouts/ClientLayout";
 import { ClientDashboard } from "./pages/ClientDashboard/ClientDashboard";
+import { AmazonSellers } from "./pages/landingPage/AmazonSellers";
+import { LandingPage } from "./pages/landingPage/LandingPage";
+import NotFound from "./pages/NotFound";
 import { ClientPlatforms } from "./pages/ClientDashboard/ClientPlatforms";
 import { AIChat } from "./pages/ClientDashboard/AIChat";
 import { Channels } from "./pages/ClientDashboard/Channels";
+import { AccountSettings } from "./pages/Settings/AccountSettings";
 import { BillingSettings } from "./pages/Settings/BillingSettings";
 import { SupportSettings } from "./pages/Settings/SupportSettings";
-import { AccountSettings } from "./pages/Settings/AccountSettings";
 import { TeamSettings } from "./pages/Settings/TeamSettings";
-import { Onboarding } from "./pages/auth/OnBoarding";
 import { PrivacyPolicy } from "./pages/auth/Term and Conditions/PrivacyPolicy";
 import { TermsAndConditions } from "./pages/auth/Term and Conditions/TermsAndConditions";
-import { CookiePolicy } from "./pages/auth/Term and Conditions/CookiePolicy";
 import { Disclaimer } from "./pages/auth/Term and Conditions/Disclaimer";
-import { ToastProvider } from "./components/ToastProvider";
 import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
 import { BlogDashboard } from "./pages/Blog/BlogDashboard";
 import { BlogDetail } from "./pages/Blog/BlogDetail";
 import { BlogManagement } from "./pages/Blog/BlogManagement";
 import { BlogForm } from "./pages/Blog/BlogForm";
-import { BlogLayout } from "./layouts/BlogLayout";
-import { CanonicalManager } from "./components/CanonicalManager";
 
 const App = () => {
   return (

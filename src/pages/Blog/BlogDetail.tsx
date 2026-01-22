@@ -1,14 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ArrowLeft, Calendar, Loader2, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
+import { useNavigate, useParams } from "react-router-dom";
+import remarkGfm from "remark-gfm";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { getBlogDetailService } from "@/services/blogService";
 import type { BlogDetail as BlogDetailType } from "@/types/auth";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const getAuthorInitials = (name: string) => {
   return name

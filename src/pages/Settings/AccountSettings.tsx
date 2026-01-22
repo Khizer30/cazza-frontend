@@ -1,3 +1,12 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Camera, Loader2, Trash2, Upload, AlertCircle } from "lucide-react";
+import React, { useCallback, useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+
+import { SettingsSidebar } from "@/components/SettingsSidebar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,17 +27,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Camera, Loader2, Trash2, Upload, AlertCircle } from "lucide-react";
-import React, { useCallback, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useauth } from "@/hooks/useauth";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
-import { useauth } from "@/hooks/useauth";
-import { SettingsSidebar } from "@/components/SettingsSidebar";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+
 
 const personalInfoSchema = z.object({
   firstName: z
@@ -536,8 +538,8 @@ export const AccountSettings = () => {
           {currentUser?.businessProfile && (
             <Card>
               <CardHeader>
-                <CardTitle>{"Tell us about your business"}</CardTitle>
-                <CardDescription>{"Help us understand your business structure"}</CardDescription>
+                <CardTitle>Tell us about your business</CardTitle>
+                <CardDescription>Help us understand your business structure</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -691,7 +693,7 @@ export const AccountSettings = () => {
                 <CardDescription>Tell us about your current accounting and payment setup</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4"></div>
+                <div className="space-y-4" />
 
                 <div>
                   <Label className="text-base font-medium">Payment Gateways & Integrations:</Label>

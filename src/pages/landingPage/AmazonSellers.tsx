@@ -1,7 +1,8 @@
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { Button } from "@/components/ui/button";
 
 export const AmazonSellers = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export const AmazonSellers = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 py-16 flex items-center justify-center">
       <div className="relative bg-white max-w-4xl mx-4 w-full border-[10px] border-gray-800 rounded-xl shadow-[0_0_60px_rgba(0,0,0,0.1)] p-10 text-center">
         {/* Decorative inner border */}
-        <div className="absolute inset-3 border-[3px] border-gray-500 rounded-lg pointer-events-none"></div>
+        <div className="absolute inset-3 border-[3px] border-gray-500 rounded-lg pointer-events-none" />
 
         <h1 className="text-5xl font-serif text-gray-900 mb-4 tracking-wide uppercase">Cazza for Amazon Sellers</h1>
         <p className="text-gray-700 italic mb-8 text-lg">
@@ -91,7 +92,7 @@ export const AmazonSellers = () => {
         {/* Signature / Footer */}
         <div className="mt-12 text-gray-700 italic text-sm">
           <p>Issued by Cazza • Empowering Amazon Sellers Worldwide</p>
-          <div className="mt-2 border-t border-gray-600 w-40 mx-auto"></div>
+          <div className="mt-2 border-t border-gray-600 w-40 mx-auto" />
         </div>
       </div>
     </div>

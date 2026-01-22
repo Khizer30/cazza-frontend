@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
-import logoWhite from "@/assets/imgs/logoWhite.png";
 import logoBlack from "@/assets/imgs/logoBlack.png";
+import logoWhite from "@/assets/imgs/logoWhite.png";
+import { cn } from "@/lib/utils";
 
 interface LogoProps {
   className?: string;

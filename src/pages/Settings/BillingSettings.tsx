@@ -1,14 +1,16 @@
+import { Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+
+import { SettingsSidebar } from "@/components/SettingsSidebar";
+import { useToast } from "@/components/ToastProvider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
-import { useToast } from "@/components/ToastProvider";
 import type { SubscriptionDetails } from "@/types/auth";
-import { SettingsSidebar } from "@/components/SettingsSidebar";
-import { Loader2 } from "lucide-react";
+
 
 export const BillingSettings = () => {
   const { getSubscription, startSubscription, unsubscribe, isLoading, fetchUserProfile } = useUser();

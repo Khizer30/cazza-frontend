@@ -1,8 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
 import { Settings, CreditCard, HelpCircle, Users, Menu, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
 
 interface SettingsSidebarProps {
   className?: string;

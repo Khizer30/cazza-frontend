@@ -1,18 +1,20 @@
+import { BarChart3, Calendar, DollarSign, PieChart, RefreshCw, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
 import { DateRangePicker } from "@/components/ClientComponents/DateRangePicker";
 import { PlatformRevenueChart } from "@/components/ClientComponents/PlatformRevenueChart";
 import { ProfitLossStatement } from "@/components/ClientComponents/ProfitLossStatement";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getDashboardSummaryService, getDashboardDetailService } from "@/services/dashboardService";
-import type { DashboardSummaryData, DashboardDetailItem } from "@/types/auth";
-import { BarChart3, Calendar, DollarSign, PieChart, RefreshCw, TrendingUp } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/userStore";
+import type { DashboardSummaryData, DashboardDetailItem } from "@/types/auth";
 
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import type { DateRange } from "react-day-picker";
+
 
 export const ClientDashboard = () => {
   const { user } = useUserStore();

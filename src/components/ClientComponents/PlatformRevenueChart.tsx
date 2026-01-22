@@ -1,8 +1,10 @@
-import { DollarSign, Zap } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import type { DashboardSummaryData } from "@/types/auth";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShopify, faAmazon, faTiktok } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { DollarSign, Zap } from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+
+import type { DashboardSummaryData } from "@/types/auth";
 
 interface PlatformRevenue {
   platform: string;

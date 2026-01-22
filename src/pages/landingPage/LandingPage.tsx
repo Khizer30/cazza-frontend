@@ -1,8 +1,5 @@
-import { Logo } from "@/assets/svgs/Logo";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { faAmazon, faTiktok, faShopify, faMixer } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ArrowRight,
   CheckCircle2,
@@ -19,9 +16,14 @@ import {
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+import { Logo } from "@/assets/svgs/Logo";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { tempRevenueData } from "@/constants/ClientDashboard";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAmazon, faTiktok, faShopify, faMixer } from "@fortawesome/free-brands-svg-icons";
+
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -417,19 +419,19 @@ export const LandingPage = () => {
                       <FontAwesomeIcon icon={faAmazon} className="text-3xl" />
                     </div>
                     <div className="flex-1 h-0.5 bg-primary/50 relative">
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse" />
                     </div>
                     <div className="w-16 h-16 bg-foreground/10 rounded-lg flex items-center justify-center">
                       <FontAwesomeIcon icon={faTiktok} className="text-3xl" />
                     </div>
                     <div className="flex-1 h-0.5 bg-primary/50 relative">
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse" />
                     </div>
                     <div className="w-16 h-16 bg-foreground/10 rounded-lg flex items-center justify-center">
                       <FontAwesomeIcon icon={faShopify} className="text-3xl" />
                     </div>
                     <div className="flex-1 h-0.5 bg-primary/50 relative">
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse" />
                     </div>
                     <div className="w-16 h-16 bg-primary/20 rounded-lg flex items-center justify-center">
                       <FontAwesomeIcon icon={faMixer} className="text-3xl text-primary" />
@@ -595,11 +597,11 @@ export const LandingPage = () => {
                   <CardContent>
                     <div className="mb-4 flex justify-center gap-6">
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded bg-[#96BF47]"></div>
+                        <div className="w-4 h-4 rounded bg-[#96BF47]" />
                         <span className="text-sm font-medium text-foreground">TikTok</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded bg-[#4A90E2]"></div>
+                        <div className="w-4 h-4 rounded bg-[#4A90E2]" />
                         <span className="text-sm font-medium text-foreground">Shopify</span>
                       </div>
                     </div>
@@ -813,7 +815,7 @@ export const LandingPage = () => {
                       {/* Toggle Switch */}
                       <div className="relative inline-flex items-center">
                         <div className="w-14 h-7 bg-primary rounded-full relative cursor-pointer">
-                          <div className="absolute top-0.5 right-1 w-6 h-6 bg-white rounded-full shadow-sm transition-transform"></div>
+                          <div className="absolute top-0.5 right-1 w-6 h-6 bg-white rounded-full shadow-sm transition-transform" />
                           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-primary-foreground">
                             ON
                           </span>
@@ -822,7 +824,7 @@ export const LandingPage = () => {
                     </div>
                     <div className="pt-2 border-t border-border">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
                         <span>Active connection</span>
                       </div>
                     </div>
@@ -865,7 +867,7 @@ export const LandingPage = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="absolute -bottom-1 left-4 w-2 h-2 bg-primary rotate-45 border-l border-b border-primary/30"></div>
+                      <div className="absolute -bottom-1 left-4 w-2 h-2 bg-primary rotate-45 border-l border-b border-primary/30" />
                     </div>
 
                     <div className="text-xs text-muted-foreground text-center pt-2">

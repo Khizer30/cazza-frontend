@@ -1,11 +1,12 @@
+import { useState } from "react";
+
 import { AmazonConnectionForm } from "@/components/ConectionForms/AmazonConnectionForm";
 import { ShopifyConnectionForm } from "@/components/ConectionForms/ShopifyConnectionForm";
 import { TikTokConnectionForm } from "@/components/ConectionForms/TikTokConnectionForm";
 import { XeroConnectionForm } from "@/components/ConectionForms/XeroConnectionForm";
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useState } from "react";
+
 interface PlatformConnectionModalProps {
   isOpen: boolean;
   onClose: () => void;

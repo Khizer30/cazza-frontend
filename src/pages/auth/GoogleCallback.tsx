@@ -1,9 +1,10 @@
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useauth } from "@/hooks/useauth";
 import { useUserStore } from "@/store/userStore";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
 
 export const GoogleCallback = () => {
   const [searchParams] = useSearchParams();

@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 import { useToast } from "@/components/ToastProvider";
 import {
   forgotPasswordService,
@@ -18,7 +20,6 @@ import type {
   SIGNUP_PAYLOAD
 } from "@/types/auth";
 // Removed localStorage imports - using cookies only
-import { AxiosError } from "axios";
 
 export const useauth = () => {
   const { showToast } = useToast();

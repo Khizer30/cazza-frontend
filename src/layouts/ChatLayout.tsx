@@ -1,8 +1,4 @@
 // ChatLayout.tsx
-import { useState, useEffect, type ReactNode } from "react";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
 import {
   MessageSquare,
   Plus,
@@ -15,6 +11,11 @@ import {
   X,
   Loader2
 } from "lucide-react";
+import { useState, useEffect, type ReactNode } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ChatHistoryItem {
   id: string;

@@ -1,21 +1,23 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
+import { AlertCircle, Eye, EyeOff, Mail, User, Lock, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+import { useToast } from "@/components/ToastProvider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Eye, EyeOff, Mail, User, Lock, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signUpSchema } from "@/validators/auth-validator";
-import type { SignUpData } from "@/validators/auth-validator";
-import type { SIGNUP_PAYLOAD } from "@/types/auth";
 import { useauth } from "@/hooks/useauth";
 import { getInvitationService } from "@/services/teamService";
-import { useToast } from "@/components/ToastProvider";
-import { AxiosError } from "axios";
+import type { SIGNUP_PAYLOAD } from "@/types/auth";
+import { signUpSchema } from "@/validators/auth-validator";
+import type { SignUpData } from "@/validators/auth-validator";
+
 
 export const SignUp = () => {
   const navigate = useNavigate();

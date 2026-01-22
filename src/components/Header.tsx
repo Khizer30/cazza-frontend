@@ -1,16 +1,7 @@
-import { Button } from "./ui/button";
 import { Calendar, CreditCard, FileEdit, HelpCircle, LogOut, Menu, Moon, Settings, Sun, Users } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import logoWhite from "@/assets/imgs/logoWhite.png";
-import logoBlack from "@/assets/imgs/logoBlack.png";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "./ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
+import { NotificationBell } from "./ClientComponents/NotificationBell";
 import { useTheme } from "./theme-provider";
 import {
   AlertDialog,
@@ -23,9 +14,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "./ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "./ui/dropdown-menu";
+
+import logoBlack from "@/assets/imgs/logoBlack.png";
+import logoWhite from "@/assets/imgs/logoWhite.png";
 import { useauth } from "@/hooks/useauth";
 import { useUserStore } from "@/store/userStore";
-import { NotificationBell } from "./ClientComponents/NotificationBell";
+
 
 interface HeaderProps {
   onToggleSidebar?: () => void;

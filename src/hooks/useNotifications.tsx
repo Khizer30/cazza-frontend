@@ -1,9 +1,10 @@
+import { AxiosError } from "axios";
 import { useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
+
 import { useToast } from "@/components/ToastProvider";
 import { getNotificationsService, markNotificationsReadService } from "@/services/notificationService";
 import { useNotificationStore } from "@/store/notificationStore";
-import { AxiosError } from "axios";
-import { useLocation } from "react-router-dom";
 
 export const useNotifications = () => {
   const { showToast } = useToast();

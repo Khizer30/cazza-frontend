@@ -1,15 +1,18 @@
+import { AxiosError } from "axios";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+
+import { SettingsSidebar } from "@/components/SettingsSidebar";
+import { useToast } from "@/components/ToastProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
 import { submitSupportTicketService } from "@/services/supportService";
-import { useToast } from "@/components/ToastProvider";
-import { Loader2 } from "lucide-react";
-import { AxiosError } from "axios";
-import { SettingsSidebar } from "@/components/SettingsSidebar";
+
+
 
 // Map form category values to API category values
 const categoryMap: Record<string, string> = {

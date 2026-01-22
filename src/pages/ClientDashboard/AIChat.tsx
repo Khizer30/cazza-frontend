@@ -1,15 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ChatLayout } from "@/layouts/ChatLayout";
+import { formatDistanceToNow } from "date-fns";
 import { Send, Loader2, Trash2, Copy, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
+
 import ZZLogo from "@/assets/imgs/ZZ logo.png";
-import { suggestedPrompts } from "@/constants/AiChat";
-import { useChatStore, type ChatMessage } from "@/store/chatStore";
-import { useChatbot } from "@/hooks/useChatbot";
-import { formatDistanceToNow } from "date-fns";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +15,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { suggestedPrompts } from "@/constants/AiChat";
+import { useChatbot } from "@/hooks/useChatbot";
+import { ChatLayout } from "@/layouts/ChatLayout";
+import { useChatStore, type ChatMessage } from "@/store/chatStore";
 
 const markdownComponents: Components = {
   p: ({ children }) => <p className="mb-3 last:mb-0 text-foreground leading-relaxed">{children}</p>,
@@ -431,7 +432,7 @@ export const AIChat = () => {
                 <div className="p-8">
                   <div className="flex items-center gap-3 mb-8">
                     <div className="w-5 h-5 bg-foreground/20 rounded-sm flex items-center justify-center">
-                      <div className="w-3 h-3 bg-foreground/40 rounded-sm"></div>
+                      <div className="w-3 h-3 bg-foreground/40 rounded-sm" />
                     </div>
                     <span className="text-sm font-medium text-card-foreground">Ask Cazza</span>
                   </div>

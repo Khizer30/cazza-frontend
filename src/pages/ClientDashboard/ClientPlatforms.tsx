@@ -1,14 +1,15 @@
+import { faShopify, faAmazon, faTiktok } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Plug2, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
+
+import { useToast } from "@/components/ToastProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { PlatformConnectionModal } from "@/modals/PlatformConnectionModal";
-import { Plug2, RefreshCw } from "lucide-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShopify, faAmazon, faTiktok } from "@fortawesome/free-brands-svg-icons";
-import { useState, useEffect } from "react";
 import { useUser } from "@/hooks/useUser";
+import { PlatformConnectionModal } from "@/modals/PlatformConnectionModal";
 import { useUserStore } from "@/store/userStore";
-import { useToast } from "@/components/ToastProvider";
 
 const analyticsData = [
   {

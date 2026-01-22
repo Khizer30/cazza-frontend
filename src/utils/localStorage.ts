@@ -13,7 +13,7 @@ export const setUser = (user: string) => {
 };
 
 export const getToken = () => {
-  var data = localStorage.getItem(localStorageVariables.access_token);
+  const data = localStorage.getItem(localStorageVariables.access_token);
   if (data) {
     return data;
   } else return null;

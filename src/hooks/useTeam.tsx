@@ -1,4 +1,6 @@
+import { AxiosError } from "axios";
 import { useCallback } from "react";
+
 import { useToast } from "@/components/ToastProvider";
 import {
   getTeamInvitationsService,
@@ -12,7 +14,6 @@ import {
   acceptInvitationService
 } from "@/services/teamService";
 import { useTeamStore } from "@/store/teamStore";
-import { AxiosError } from "axios";
 
 export const useTeam = () => {
   const { showToast } = useToast();

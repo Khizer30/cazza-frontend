@@ -1,16 +1,10 @@
+import { Mail, Shield, Users, Loader2, X, CreditCard } from "lucide-react";
 import { useCallback, useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Shield, Users, Loader2, X, CreditCard } from "lucide-react";
-import { TeamInviteDialog } from "@/components/TeamInviteDialog";
-import { useTeam } from "@/hooks/useTeam";
-import { useUser } from "@/hooks/useUser";
-import { useUserStore } from "@/store/userStore";
-import { useToast } from "@/components/ToastProvider";
+
 import { SettingsSidebar } from "@/components/SettingsSidebar";
+import { TeamInviteDialog } from "@/components/TeamInviteDialog";
+import { useToast } from "@/components/ToastProvider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +15,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTeam } from "@/hooks/useTeam";
+import { useUser } from "@/hooks/useUser";
+import { useUserStore } from "@/store/userStore";
 
 const roles = [
   {

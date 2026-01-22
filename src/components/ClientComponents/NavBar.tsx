@@ -1,8 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
-import { Button } from "../ui/button";
 import { BarChart3, Bot, ShoppingCart, Hash, FileText } from "lucide-react";
-import { ScrollArea } from "../ui/scroll-area";
 import { useState, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
+
+import { Button } from "../ui/button";
+import { ScrollArea } from "../ui/scroll-area";
+
 
 interface ClientSidebarProps {
   onNavigate?: () => void;

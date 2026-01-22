@@ -1,12 +1,14 @@
+import { format } from "date-fns";
+import { Bell, CheckCircle2, Circle , Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Bell, CheckCircle2, Circle } from "lucide-react";
-import { Button } from "../ui/button";
+
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ScrollArea } from "../ui/scroll-area";
+
 import { useNotifications } from "@/hooks/useNotifications";
-import { format } from "date-fns";
-import { Loader2 } from "lucide-react";
+
 
 export const NotificationBell = () => {
   const [open, setOpen] = useState(false);

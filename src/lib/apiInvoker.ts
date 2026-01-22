@@ -1,5 +1,6 @@
-import axiosInstance from "./axiosInstance";
 import { AxiosError } from "axios";
+
+import axiosInstance from "./axiosInstance";
 
 async function apiInvoker<T>(
   url: string,

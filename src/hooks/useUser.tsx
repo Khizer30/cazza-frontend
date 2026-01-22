@@ -1,4 +1,7 @@
+import { AxiosError } from "axios";
+
 import { useToast } from "@/components/ToastProvider";
+import { inviteTeamMemberService } from "@/services/teamService";
 import {
   getUserProfileService,
   onboardingService,
@@ -11,9 +14,8 @@ import {
   unsubscribeService,
   createSupportTicketService
 } from "@/services/userService";
-import { inviteTeamMemberService } from "@/services/teamService";
-import { useUserStore } from "@/store/userStore";
 import { useTeamStore } from "@/store/teamStore";
+import { useUserStore } from "@/store/userStore";
 import type {
   ONBOARDING_PAYLOAD,
   UPDATE_USER_PAYLOAD,
@@ -23,7 +25,6 @@ import type {
   START_SUBSCRIPTION_PAYLOAD,
   SUPPORT_TICKET_PAYLOAD
 } from "@/types/auth";
-import { AxiosError } from "axios";
 
 export const useUser = () => {
   const { showToast } = useToast();

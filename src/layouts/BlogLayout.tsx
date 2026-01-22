@@ -1,10 +1,11 @@
-import { Logo } from "@/assets/svgs/Logo";
-import { Button } from "@/components/ui/button";
-import { Header } from "@/components/Header";
-import { NavBar } from "@/components/ClientComponents/NavBar";
-import { getToken } from "@/utils/localStorage";
 import { useState } from "react";
 import { Outlet, useNavigate, Link } from "react-router-dom";
+
+import { Logo } from "@/assets/svgs/Logo";
+import { NavBar } from "@/components/ClientComponents/NavBar";
+import { Header } from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import { getToken } from "@/utils/localStorage";
 
 export const BlogLayout = () => {
   const token = getToken();

@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 import { useToast } from "@/components/ToastProvider";
 import {
   createChatGroupService,
@@ -11,7 +13,6 @@ import {
   updateMemberRoleService,
   type CreateChatGroupPayload
 } from "@/services/chatService";
-import { AxiosError } from "axios";
 
 export const useChat = () => {
   const { showToast } = useToast();

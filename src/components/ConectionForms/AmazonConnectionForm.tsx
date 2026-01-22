@@ -1,9 +1,10 @@
+import { ExternalLink, Loader2 } from "lucide-react";
 import { useState } from "react";
+
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { ExternalLink, Loader2 } from "lucide-react";
 
 export const AmazonConnectionForm = ({
   onSubmit,
