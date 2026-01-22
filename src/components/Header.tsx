@@ -29,7 +29,6 @@ import logoWhite from "@/assets/imgs/logoWhite.png";
 import { useauth } from "@/hooks/useauth";
 import { useUserStore } from "@/store/userStore";
 
-
 interface HeaderProps {
   onToggleSidebar?: () => void;
 }

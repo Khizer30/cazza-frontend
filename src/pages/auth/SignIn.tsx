@@ -15,7 +15,6 @@ import { useUserStore } from "@/store/userStore";
 import type { LOGIN_PAYLOAD } from "@/types/auth";
 import { logInSchema, type LoginData } from "@/validators/auth-validator";
 
-
 export const SignIn = () => {
   const {
     register,

@@ -12,8 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { submitSupportTicketService } from "@/services/supportService";
 
-
-
 // Map form category values to API category values
 const categoryMap: Record<string, string> = {
   technical: "Technical Issue",

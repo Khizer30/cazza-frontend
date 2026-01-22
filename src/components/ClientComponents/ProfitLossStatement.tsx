@@ -19,7 +19,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { type PLTableRow } from "@/constants/ProfitLssStatement";
 import type { DashboardDetailItem, DashboardSummaryData } from "@/types/auth";
 
-
 // Helper function to format currency values
 const formatValue = (value: number | string): string => {
   if (typeof value === "string") return value;

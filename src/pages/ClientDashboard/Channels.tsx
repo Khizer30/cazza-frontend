@@ -103,8 +103,6 @@ import type { ChatGroup } from "@/services/chatService";
 import { useUserStore } from "@/store/userStore";
 import type { TeamMember as TeamMemberType } from "@/types/auth";
 
-
-
 interface TeamMember {
   id: string;
   name: string;

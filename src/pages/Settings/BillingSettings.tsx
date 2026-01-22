@@ -11,7 +11,6 @@ import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
 import type { SubscriptionDetails } from "@/types/auth";
 
-
 export const BillingSettings = () => {
   const { getSubscription, startSubscription, unsubscribe, isLoading, fetchUserProfile } = useUser();
   const { user } = useUserStore();

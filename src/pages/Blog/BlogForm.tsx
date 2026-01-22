@@ -27,7 +27,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-
 import { cn } from "@/lib/utils";
 import {
   createBlogService,
@@ -36,7 +35,6 @@ import {
   deleteBlogImageService
 } from "@/services/blogService";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
 
 interface BlogFormData {
   title: string;

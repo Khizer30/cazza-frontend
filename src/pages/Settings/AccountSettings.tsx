@@ -31,7 +31,6 @@ import { useauth } from "@/hooks/useauth";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
 
-
 const personalInfoSchema = z.object({
   firstName: z
     .string()

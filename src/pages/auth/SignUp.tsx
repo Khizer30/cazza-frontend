@@ -18,7 +18,6 @@ import type { SIGNUP_PAYLOAD } from "@/types/auth";
 import { signUpSchema } from "@/validators/auth-validator";
 import type { SignUpData } from "@/validators/auth-validator";
 
-
 export const SignUp = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

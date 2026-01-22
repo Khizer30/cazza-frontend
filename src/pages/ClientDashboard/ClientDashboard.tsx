@@ -14,8 +14,6 @@ import { getDashboardSummaryService, getDashboardDetailService } from "@/service
 import { useUserStore } from "@/store/userStore";
 import type { DashboardSummaryData, DashboardDetailItem } from "@/types/auth";
 
-
-
 export const ClientDashboard = () => {
   const { user } = useUserStore();
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
