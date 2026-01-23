@@ -1282,15 +1282,29 @@ export const Channels = () => {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">
+                      Description
+                      <span className="text-xs text-muted-foreground ml-2">
+                        ({channelDescription.length}/500 characters)
+                      </span>
+                    </Label>
                     <Textarea
                       id="description"
                       placeholder="What is this channel about? (Optional)"
                       value={channelDescription}
-                      onChange={(e) => setChannelDescription(e.target.value)}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 500) {
+                          setChannelDescription(e.target.value);
+                        }
+                      }}
                       rows={4}
                       className="resize-none max-h-32"
                     />
+                    {channelDescription.length >= 500 && (
+                      <p className="text-xs text-destructive">
+                        Description cannot exceed 500 characters
+                      </p>
+                    )}
                   </div>
                   <div className="grid gap-2">
                     <Label>Channel Icon</Label>
@@ -1409,9 +1423,9 @@ export const Channels = () => {
                         }}
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className={`font-medium truncate ${isSelected ? "text-primary-foreground" : ""}`}>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <div className="flex items-center gap-2">
+                        <p className={`font-medium truncate flex-1 ${isSelected ? "text-primary-foreground" : ""}`}>
                           {channel.name}
                         </p>
                         {isCreatorOrAdmin(channel) && (
@@ -1473,12 +1487,14 @@ export const Channels = () => {
                       </div>
                       {channel.description && (
                         <p
-                          className={`text-xs truncate mt-1 ${
+                          className={`text-xs mt-1 truncate ${
                             isSelected ? "text-primary-foreground/70" : "text-muted-foreground"
                           }`}
                           title={channel.description}
                         >
-                          {channel.description}
+                          {channel.description.length > 40
+                            ? `${channel.description.substring(0, 40)}...`
+                            : channel.description}
                         </p>
                       )}
                     </div>
@@ -1494,13 +1510,13 @@ export const Channels = () => {
         {selectedChannel ? (
           <>
             <div className="p-4 border-b border-border bg-card">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
                   {(() => {
                     const IconComponent = selectedChannel.icon;
                     return (
                       <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
+                        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                         style={{
                           backgroundColor: `${selectedChannel.color}20`
                         }}
@@ -1509,12 +1525,18 @@ export const Channels = () => {
                       </div>
                     );
                   })()}
-                  <div>
-                    <h2 className="font-semibold">{selectedChannel.name}</h2>
-                    <p className="text-sm text-muted-foreground">{selectedChannel.description}</p>
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <h2 className="font-semibold truncate">{selectedChannel.name}</h2>
+                    {selectedChannel.description && (
+                      <p className="text-sm text-muted-foreground truncate" title={selectedChannel.description}>
+                        {selectedChannel.description.length > 150
+                          ? `${selectedChannel.description.substring(0, 150)}...`
+                          : selectedChannel.description}
+                      </p>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   <Badge variant="secondary" className="gap-1">
                     <Users className="h-3 w-3" />
                     {isLoadingChannelDetails ? (

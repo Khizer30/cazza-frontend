@@ -30,7 +30,21 @@ export const useChat = () => {
       throw new Error("Invalid response from server");
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || "Failed to create chat group";
+        let errorMessage = error.response?.data?.message || "Failed to create chat group";
+
+        // Handle validation errors more specifically
+        if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+          const validationMessages = error.response.data.errors
+            .map((err: any) => err.message || err.msg)
+            .join(", ");
+          errorMessage = validationMessages || errorMessage;
+        }
+
+        // Check for description length validation specifically
+        if (errorMessage.toLowerCase().includes("description") && errorMessage.toLowerCase().includes("characters")) {
+          errorMessage = "Description cannot exceed 500 characters";
+        }
+
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
@@ -85,7 +99,21 @@ export const useChat = () => {
       return false;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || "Failed to update chat group";
+        let errorMessage = error.response?.data?.message || "Failed to update chat group";
+
+        // Handle validation errors more specifically
+        if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+          const validationMessages = error.response.data.errors
+            .map((err: any) => err.message || err.msg)
+            .join(", ");
+          errorMessage = validationMessages || errorMessage;
+        }
+
+        // Check for description length validation specifically
+        if (errorMessage.toLowerCase().includes("description") && errorMessage.toLowerCase().includes("characters")) {
+          errorMessage = "Description cannot exceed 500 characters";
+        }
+
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {
