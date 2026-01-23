@@ -4,6 +4,11 @@
 # Dependency Directories
 node_modules
 
+# Build Output
+dist
+build
+.vite
+
 # Prisma
 /src/generated/prisma
 

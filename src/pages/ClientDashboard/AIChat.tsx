@@ -91,6 +91,7 @@ export const AIChat = () => {
     getCurrentConversation,
     deleteConversation,
     loadChatsFromBackend,
+    addNewChatFromBackend,
     loadChatMessagesFromBackend,
     removeMessageFromConversation,
     updateConversationTitle,
@@ -171,7 +172,7 @@ export const AIChat = () => {
         const chatTitle = userInput.slice(0, 50) + (userInput.length > 50 ? "..." : "");
         const newChat = await createChat({ title: chatTitle });
         if (newChat) {
-          loadChatsFromBackend([newChat]);
+          addNewChatFromBackend(newChat);
           setCurrentConversation(newChat.id);
           activeChatId = newChat.id;
         } else {
@@ -239,25 +240,10 @@ export const AIChat = () => {
     }
   };
 
-  const handleNewChat = async () => {
-    try {
-      const newChat = await createChat();
-      if (newChat) {
-        loadChatsFromBackend([
-          ...conversations.map((c) => ({
-            id: c.id,
-            title: c.title,
-            userId: "",
-            createdAt: c.createdAt.toISOString(),
-            updatedAt: c.updatedAt.toISOString()
-          })),
-          newChat
-        ]);
-        setCurrentConversation(newChat.id);
-      }
-    } catch (error) {
-      console.error("Failed to create new chat:", error);
-    }
+  const handleNewChat = () => {
+    // Don't create chat in backend yet - just clear current conversation
+    // Chat will be created when user sends first message
+    setCurrentConversation(null);
   };
 
   const handleSelectChat = (chatId: string) => {

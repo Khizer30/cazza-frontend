@@ -32,6 +32,7 @@ interface ChatState {
   getConversationMessages: (conversationId: string) => ChatMessage[];
   loadChatHistoryFromBackend: (apiMessages: ApiChatMessage[]) => void;
   loadChatsFromBackend: (chats: Chat[]) => void;
+  addNewChatFromBackend: (chat: Chat) => void;
   loadChatMessagesFromBackend: (chatId: string, messages: ApiChatMessage[]) => void;
   removeMessageFromConversation: (conversationId: string, messageId: string) => void;
   setLoadingHistory: (loading: boolean) => void;
@@ -242,6 +243,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({
       conversations: conversations.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
     });
+  },
+
+  addNewChatFromBackend: (chat: Chat) => {
+    const newConversation: ChatConversation = {
+      id: chat.id,
+      title: chat.title,
+      messages: [],
+      createdAt: new Date(chat.createdAt),
+      updatedAt: new Date(chat.updatedAt)
+    };
+
+    set((state) => ({
+      conversations: [newConversation, ...state.conversations].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    }));
   },
 
   loadChatMessagesFromBackend: (chatId, apiMessages) => {
