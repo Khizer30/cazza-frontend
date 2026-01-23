@@ -72,9 +72,8 @@ export const AccountSettings = () => {
   const isClient = !!currentUser?.businessProfile;
 
   // Avatar upload state
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [uploading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Form and saving state
   const [savingPersonal, setSavingPersonal] = useState(false);
@@ -219,17 +218,31 @@ export const AccountSettings = () => {
     });
   }, []);
 
-  const handleAvatarUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAvatarFile(file);
-    // Create preview URL
-    const url = URL.createObjectURL(file);
-    setAvatarPreview(url);
-  }, []);
+  const handleAvatarUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Create preview URL
+      const url = URL.createObjectURL(file);
+      setAvatarPreview(url);
+
+      // Upload immediately
+      setUploadingImage(true);
+      try {
+        await updateProfileImage({ profileImage: file });
+      } catch (error) {
+        console.error("Profile image upload error:", error);
+        // Reset preview on error
+        setAvatarPreview(currentUser?.profileImage || null);
+      } finally {
+        setUploadingImage(false);
+      }
+    },
+    [currentUser?.profileImage, updateProfileImage]
+  );
 
   const handleRemoveAvatar = useCallback(() => {
-    setAvatarFile(null);
     setAvatarPreview(null);
   }, []);
 
@@ -242,12 +255,6 @@ export const AccountSettings = () => {
 
       setSavingPersonal(true);
       try {
-        // Upload profile image first if a new one is selected
-        if (avatarFile) {
-          await updateProfileImage({ profileImage: avatarFile });
-          setAvatarFile(null);
-        }
-
         // Update user profile (firstName, lastName, role)
         const userUpdatePayload: any = {
           firstName: firstName,
@@ -266,7 +273,7 @@ export const AccountSettings = () => {
         setSavingPersonal(false);
       }
     },
-    [formData, avatarFile, currentUser, updateUser, updateProfileImage, watchPersonalInfo]
+    [formData, currentUser, updateUser, watchPersonalInfo]
   );
 
   const handleSaveBusinessInfo = useCallback(
@@ -324,7 +331,7 @@ export const AccountSettings = () => {
         useMultipleCurrencies: formData.accountingStack.multiCurrency
       };
 
-      await updateBusinessProfile(businessUpdatePayload);
+      await updateBusinessProfile(businessUpdatePayload, "Marketplaces updated successfully");
     } catch (error) {
       console.error("Save marketplaces error:", error);
     } finally {
@@ -348,7 +355,7 @@ export const AccountSettings = () => {
         useMultipleCurrencies: formData.accountingStack.multiCurrency
       };
 
-      await updateBusinessProfile(businessUpdatePayload);
+      await updateBusinessProfile(businessUpdatePayload, "Tech stack updated successfully");
     } catch (error) {
       console.error("Save tech stack error:", error);
     } finally {
@@ -425,16 +432,16 @@ export const AccountSettings = () => {
                       accept="image/*"
                       onChange={handleAvatarUpload}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      disabled={uploading}
+                      disabled={uploadingImage}
                     />
                     <Button
                       variant="outline"
                       className="gap-2"
-                      //   disabled={uploading}
+                      disabled={uploadingImage}
                     >
-                      {uploading ? (
+                      {uploadingImage ? (
                         <>
-                          <Upload className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-4 w-4 animate-spin" />
                           Uploading...
                         </>
                       ) : (
@@ -448,7 +455,7 @@ export const AccountSettings = () => {
                   <Button
                     variant="ghost"
                     onClick={handleRemoveAvatar}
-                    disabled={uploading || (!avatarPreview && !currentUser?.profileImage)}
+                    disabled={uploadingImage || (!avatarPreview && !currentUser?.profileImage)}
                   >
                     Remove
                   </Button>

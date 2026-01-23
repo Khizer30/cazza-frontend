@@ -105,16 +105,20 @@ export const useUser = () => {
       if (res && res.success) {
         // Fetch updated user profile after update
         await fetchUserProfile();
-        showToast(res.message || "Profile updated successfully", "success");
+        // Show specific message instead of generic backend message
+        const customMessage = res.message?.toLowerCase().includes("user updated")
+          ? "Personal information updated successfully"
+          : res.message || "Personal information updated successfully";
+        showToast(customMessage, "success");
         return res;
       } else if (res && !res.success) {
-        showToast(res.message || "Failed to update profile", "error");
+        showToast(res.message || "Failed to update personal information", "error");
         throw new Error(res.message || "Update failed");
       }
     } catch (error: unknown) {
       console.error("Update user error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to update profile";
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to update personal information";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");
@@ -127,14 +131,16 @@ export const useUser = () => {
     }
   };
 
-  const updateBusinessProfile = async (payload: UPDATE_BUSINESS_PROFILE_PAYLOAD) => {
+  const updateBusinessProfile = async (payload: UPDATE_BUSINESS_PROFILE_PAYLOAD, customSuccessMessage?: string) => {
     try {
       setLoading(true);
       const res = await updateBusinessProfileService(payload);
       if (res && res.success) {
         // Fetch updated user profile after update
         await fetchUserProfile();
-        showToast(res.message || "Business profile updated successfully", "success");
+        // Use custom message if provided, otherwise use generic message
+        const message = customSuccessMessage || "Business profile updated successfully";
+        showToast(message, "success");
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to update business profile", "error");
@@ -326,7 +332,11 @@ export const useUser = () => {
       if (res && res.success) {
         // Fetch updated user profile after update
         await fetchUserProfile();
-        showToast(res.message || "Profile image updated successfully", "success");
+        // Show specific message instead of generic backend message
+        const customMessage = res.message?.toLowerCase().includes("user updated")
+          ? "Profile image updated successfully"
+          : res.message || "Profile image updated successfully";
+        showToast(customMessage, "success");
         return res;
       } else if (res && !res.success) {
         showToast(res.message || "Failed to update profile image", "error");

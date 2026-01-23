@@ -10,6 +10,7 @@ export const END_POINT = {
   },
   user: {
     profile: "/user",
+    profileImage: "/user",
     onboarding: "/user/onboarding",
     businessProfile: "/user/business-profile",
     support: "/user/support",

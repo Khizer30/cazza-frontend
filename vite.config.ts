@@ -23,6 +23,13 @@ export default defineConfig(() => ({
         changeOrigin: true,
         secure: false,
         cookieDomainRewrite: 'localhost',
+        rewrite: (path) => path,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            // Optimize connection reuse
+            proxyReq.setHeader('Connection', 'keep-alive');
+          });
+        },
       }
     }
   },

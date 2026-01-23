@@ -36,14 +36,10 @@ export const updateProfileImageService = async (payload: UPDATE_PROFILE_IMAGE_PA
   const formData = new FormData();
   formData.append("profileImage", payload.profileImage);
 
-  const response = await axiosInstance({
-    url: END_POINT.user.profile,
-    method: "PUT",
-    data: formData,
-    headers: {
-      "Content-Type": "multipart/form-data"
-    }
-  });
+  const response = await axiosInstance.put(
+    END_POINT.user.profileImage,
+    formData
+  );
 
   return response.data as UPDATE_PROFILE_IMAGE_RESPONSE;
 };
