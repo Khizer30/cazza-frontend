@@ -1656,7 +1656,7 @@ export const Channels = () => {
                             </div>
                             {!message.deleted && (
                               <div
-                                className={`absolute top-0 ${isCurrentUser ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1`}
+                                className={`absolute top-1/2 -translate-y-1/2 ${isCurrentUser ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1`}
                               >
                                 <Popover
                                   open={openReactionPopoverId === message.id}
