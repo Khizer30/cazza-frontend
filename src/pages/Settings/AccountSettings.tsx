@@ -759,8 +759,6 @@ export const AccountSettings = () => {
             </Card>
           )}
 
-          <Separator />
-
           {/* Subscription & Plan */}
           <Card>
             <CardHeader>
@@ -781,8 +779,6 @@ export const AccountSettings = () => {
               </div>
             </CardContent>
           </Card>
-
-          <Separator />
 
           {/* Danger Zone */}
           <Card className="border-destructive/20">
