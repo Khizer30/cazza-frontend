@@ -115,10 +115,10 @@ export const BillingSettings = () => {
   const isTeamMember = !isOwner;
 
   return (
-    <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
+    <div className="h-full overflow-hidden flex">
       <SettingsSidebar />
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl space-y-6 mx-auto my-4 p-4 md:p-6">
+      <div className="flex-1 h-full overflow-y-auto">
+        <div className="max-w-[1400px] w-full space-y-6 mx-auto my-4 px-6 md:px-8 lg:px-12 py-4 md:py-6">
           {loadingSubscription ? (
             <Card>
               <CardContent className="p-12">

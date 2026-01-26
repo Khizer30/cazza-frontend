@@ -31,10 +31,10 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
         <div className="p-2 lg:p-3 space-y-2">
           <div
             ref={(el) => {
-              iconRefs.current["insights"] = el;
+              iconRefs.current["Dashboard"] = el;
             }}
             className="relative"
-            onMouseEnter={() => setHoveredItem("insights")}
+            onMouseEnter={() => setHoveredItem("Dashboard")}
             onMouseLeave={() => setHoveredItem(null)}
           >
             <Link to="/dashboard" onClick={onNavigate} className="block">
@@ -146,12 +146,12 @@ export const NavBar = ({ onNavigate }: ClientSidebarProps) => {
         </div>
       </ScrollArea>
 
-      {hoveredItem === "insights" && (
+      {hoveredItem === "Dashboard" && (
         <div
           className="fixed bg-popover text-popover-foreground text-xs px-2.5 py-1.5 rounded shadow-md pointer-events-none whitespace-nowrap z-[9999] border border-border/50 backdrop-blur-sm"
-          style={getTooltipStyle("insights")}
+          style={getTooltipStyle("Dashboard")}
         >
-          Insights
+          Dashboard
         </div>
       )}
 
