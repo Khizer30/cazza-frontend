@@ -9,6 +9,7 @@ import type {
   UPDATE_USER_RESPONSE,
   UPDATE_PROFILE_IMAGE_PAYLOAD,
   UPDATE_PROFILE_IMAGE_RESPONSE,
+  DELETE_PROFILE_IMAGE_RESPONSE,
   UPDATE_BUSINESS_PROFILE_PAYLOAD,
   UPDATE_BUSINESS_PROFILE_RESPONSE,
   DELETE_USER_RESPONSE,
@@ -42,6 +43,10 @@ export const updateProfileImageService = async (payload: UPDATE_PROFILE_IMAGE_PA
   );
 
   return response.data as UPDATE_PROFILE_IMAGE_RESPONSE;
+};
+
+export const deleteProfileImageService = () => {
+  return apiInvoker<DELETE_PROFILE_IMAGE_RESPONSE>(END_POINT.user.deleteProfileImage, "DELETE");
 };
 
 export const updateBusinessProfileService = (payload: UPDATE_BUSINESS_PROFILE_PAYLOAD) => {

@@ -11,6 +11,7 @@ export const END_POINT = {
   user: {
     profile: "/user",
     profileImage: "/user",
+    deleteProfileImage: "/user/profile-image",
     onboarding: "/user/onboarding",
     businessProfile: "/user/business-profile",
     support: "/user/support",

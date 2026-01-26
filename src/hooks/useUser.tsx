@@ -7,6 +7,7 @@ import {
   onboardingService,
   updateUserService,
   updateProfileImageService,
+  deleteProfileImageService,
   updateBusinessProfileService,
   deleteUserService,
   getSubscriptionService,
@@ -359,6 +360,35 @@ export const useUser = () => {
     }
   };
 
+  const deleteProfileImage = async () => {
+    try {
+      setLoading(true);
+      const res = await deleteProfileImageService();
+      if (res && res.success) {
+        await fetchUserProfile();
+        showToast(res.message || "Profile image deleted successfully", "success");
+        return res;
+      } else if (res && !res.success) {
+        showToast(res.message || "Failed to delete profile image", "error");
+        throw new Error(res.message || "Delete profile image failed");
+      }
+    } catch (error: unknown) {
+      console.error("Delete profile image error:", error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message || error.response?.data?.error || "Failed to delete profile image";
+        showToast(errorMessage, "error");
+      } else if (error instanceof Error) {
+        showToast(error.message, "error");
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const createSupportTicket = async (payload: SUPPORT_TICKET_PAYLOAD) => {
     try {
       setLoading(true);
@@ -394,6 +424,7 @@ export const useUser = () => {
     completeOnboarding,
     updateUser,
     updateProfileImage,
+    deleteProfileImage,
     updateBusinessProfile,
     inviteTeamMember,
     deleteUser,
