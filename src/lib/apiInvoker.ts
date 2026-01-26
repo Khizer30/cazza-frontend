@@ -20,6 +20,9 @@ async function apiInvoker<T>(
       if (status === 400) {
         throw error;
       }
+      if (status === 404 && url.includes("/auth/logout")) {
+        throw error;
+      }
       console.error(`API call to ${url} failed: `, error);
     } else {
       console.error(`API call to ${url} failed: `, error);

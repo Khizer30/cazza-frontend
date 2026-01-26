@@ -216,27 +216,22 @@ export const useauth = () => {
 
   const logout = async () => {
     try {
-      // Call backend logout API to clear cookies
       await logoutService();
-
-      // Clear local user state
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const status = error.response?.status;
+        if (status === 404) {
+        } else {
+          console.error("Logout error:", error);
+        }
+      } else {
+        console.error("Logout error:", error);
+      }
+    } finally {
       setUser(null);
-
-      // Clear any localStorage items
       localStorage.clear();
 
       showToast("Successfully signed out", "success");
-
-      // Navigate to login page
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Logout error:", error);
-
-      // Even if backend call fails, clear local state and redirect
-      setUser(null);
-      localStorage.clear();
-
-      showToast("Signed out", "success");
       window.location.href = "/login";
     }
   };
