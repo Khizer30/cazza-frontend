@@ -170,6 +170,11 @@ export interface UPDATE_PROFILE_IMAGE_RESPONSE {
   data?: User;
 }
 
+export interface DELETE_PROFILE_IMAGE_RESPONSE {
+  success: boolean;
+  message: string;
+}
+
 export interface UPDATE_USER_RESPONSE {
   success: boolean;
   message: string;

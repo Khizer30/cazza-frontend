@@ -60,7 +60,7 @@ type BusinessInfoData = z.infer<typeof businessInfoSchema>;
 
 export const AccountSettings = () => {
   const navigate = useNavigate();
-  const { user, fetchUserProfile, updateUser, updateProfileImage, updateBusinessProfile, deleteUser, isLoading } =
+  const { user, fetchUserProfile, updateUser, updateProfileImage, deleteProfileImage, updateBusinessProfile, deleteUser, isLoading } =
     useUser();
   const { user: storeUser } = useUserStore();
   const { logout } = useauth();
@@ -73,6 +73,7 @@ export const AccountSettings = () => {
   // Avatar upload state
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [deletingImage, setDeletingImage] = useState(false);
 
   // Form and saving state
   const [savingPersonal, setSavingPersonal] = useState(false);
@@ -241,9 +242,19 @@ export const AccountSettings = () => {
     [currentUser?.profileImage, updateProfileImage]
   );
 
-  const handleRemoveAvatar = useCallback(() => {
-    setAvatarPreview(null);
-  }, []);
+  const handleRemoveAvatar = useCallback(async () => {
+    if (!currentUser?.profileImage && !avatarPreview) return;
+    
+    setDeletingImage(true);
+    try {
+      await deleteProfileImage();
+      setAvatarPreview(null);
+    } catch (error) {
+      console.error("Remove avatar error:", error);
+    } finally {
+      setDeletingImage(false);
+    }
+  }, [currentUser?.profileImage, avatarPreview, deleteProfileImage]);
 
   const handleSavePersonalInfo = useCallback(
     async (data?: PersonalInfoData) => {
@@ -452,11 +463,22 @@ export const AccountSettings = () => {
                     </Button>
                   </div>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={handleRemoveAvatar}
-                    disabled={uploadingImage || (!avatarPreview && !currentUser?.profileImage)}
+                    disabled={uploadingImage || deletingImage || (!avatarPreview && !currentUser?.profileImage)}
+                    className="gap-2"
                   >
-                    Remove
+                    {deletingImage ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Removing...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>
