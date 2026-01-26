@@ -54,11 +54,11 @@ export const SettingsSidebar = ({ className }: SettingsSidebarProps) => {
       {/* Sidebar */}
       <div
         className={cn(
-          "w-64 border-r border-border bg-card flex-col",
-          "fixed md:relative top-16 md:top-0 left-0 bottom-0 z-50 md:z-auto",
+          "w-64 border-r border-border bg-card flex-col flex-shrink-0",
+          "fixed md:relative top-16 md:top-0 left-0 bottom-0 md:bottom-auto md:h-full h-[calc(100vh-4rem)] z-50",
           "transform transition-transform duration-300",
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
-          "md:flex",
+          "md:flex md:overflow-hidden",
           className
         )}
       >

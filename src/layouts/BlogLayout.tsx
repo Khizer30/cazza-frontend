@@ -1,27 +1,54 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate, Link } from "react-router-dom";
 
 import { Logo } from "@/assets/svgs/Logo";
 import { NavBar } from "@/components/ClientComponents/NavBar";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/hooks/useUser";
+import { useUserStore } from "@/store/userStore";
 import { getToken } from "@/utils/localStorage";
 
 export const BlogLayout = () => {
-  const token = getToken();
+  const { user } = useUserStore();
+  const { fetchUserProfile } = useUser();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = getToken();
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+      if (token && !user) {
+        await fetchUserProfile();
+      }
+      setIsLoading(false);
+    };
+    checkAuth();
+  }, [user, fetchUserProfile]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  if (token) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-sidebar-accent">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  if (user) {
+    return (
+      <div className="h-screen flex flex-col bg-sidebar-accent overflow-hidden">
         <Header onToggleSidebar={toggleSidebar} />
-        <div className="flex flex-1 overflow-hidden">
-          <div className="hidden lg:block">
+        <div className="flex flex-1 min-h-0">
+          <div className="hidden lg:block h-full">
             <NavBar />
           </div>
 
@@ -35,7 +62,7 @@ export const BlogLayout = () => {
 
           {isSidebarOpen && <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={toggleSidebar} />}
 
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
             <Outlet />
           </div>
         </div>
