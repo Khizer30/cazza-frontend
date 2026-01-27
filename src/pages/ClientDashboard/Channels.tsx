@@ -242,6 +242,7 @@ export const Channels = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const previousMessageCountRef = useRef<number>(0);
   const [showFormatToolbar, setShowFormatToolbar] = useState(false);
+  const [expandedDescription, setExpandedDescription] = useState(false);
 
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
@@ -754,6 +755,10 @@ export const Channels = () => {
       setIsLoadingMessages(false);
     };
   }, [selectedChannelId, loggedInUser, updateTypingStatus]);
+
+  useEffect(() => {
+    setExpandedDescription(false);
+  }, [selectedChannelId]);
 
   useEffect(() => {
     if (!selectedChannelId) {
@@ -1485,18 +1490,6 @@ export const Channels = () => {
                           </DropdownMenu>
                         )}
                       </div>
-                      {channel.description && (
-                        <p
-                          className={`text-xs mt-1 truncate ${
-                            isSelected ? "text-primary-foreground/70" : "text-muted-foreground"
-                          }`}
-                          title={channel.description}
-                        >
-                          {channel.description.length > 40
-                            ? `${channel.description.substring(0, 40)}...`
-                            : channel.description}
-                        </p>
-                      )}
                     </div>
                   </div>
                 );
@@ -1511,12 +1504,12 @@ export const Channels = () => {
           <>
             <div className="p-4 border-b border-border bg-card">
               <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
+                <div className="flex items-start gap-3 min-w-0 flex-1">
                   {(() => {
                     const IconComponent = selectedChannel.icon;
                     return (
                       <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
                         style={{
                           backgroundColor: `${selectedChannel.color}20`
                         }}
@@ -1525,14 +1518,38 @@ export const Channels = () => {
                       </div>
                     );
                   })()}
-                  <div className="min-w-0 flex-1 overflow-hidden">
-                    <h2 className="font-semibold truncate">{selectedChannel.name}</h2>
+                  <div className="min-w-0 flex-1" style={{ maxWidth: 'calc(100% - 200px)' }}>
+                    <h2 className="font-semibold truncate mb-0.5">{selectedChannel.name}</h2>
                     {selectedChannel.description && (
-                      <p className="text-sm text-muted-foreground truncate" title={selectedChannel.description}>
-                        {selectedChannel.description.length > 150
-                          ? `${selectedChannel.description.substring(0, 150)}...`
-                          : selectedChannel.description}
-                      </p>
+                      <div className="text-sm text-muted-foreground break-words">
+                        {selectedChannel.description.length > 80 ? (
+                          <div>
+                            {expandedDescription ? (
+                              <p className="break-words whitespace-normal">
+                                {selectedChannel.description}
+                                <button
+                                  onClick={() => setExpandedDescription(false)}
+                                  className="ml-1 text-primary hover:underline font-medium whitespace-nowrap"
+                                >
+                                  see less
+                                </button>
+                              </p>
+                            ) : (
+                              <p className="break-words">
+                                {selectedChannel.description.substring(0, 80)}
+                                <button
+                                  onClick={() => setExpandedDescription(true)}
+                                  className="ml-1 text-primary hover:underline font-medium whitespace-nowrap"
+                                >
+                                  see more...
+                                </button>
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="break-words">{selectedChannel.description}</p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
