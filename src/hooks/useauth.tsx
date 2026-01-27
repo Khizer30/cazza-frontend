@@ -214,7 +214,7 @@ export const useauth = () => {
     }
   };
 
-  const logout = async () => {
+  const logout = async (suppressToast = false) => {
     try {
       await logoutService();
     } catch (error) {
@@ -231,7 +231,9 @@ export const useauth = () => {
       setUser(null);
       localStorage.clear();
 
-      showToast("Successfully signed out", "success");
+      if (!suppressToast) {
+        showToast("Successfully signed out", "success");
+      }
       window.location.href = "/login";
     }
   };

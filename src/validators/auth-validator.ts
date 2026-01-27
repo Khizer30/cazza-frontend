@@ -105,7 +105,7 @@ export const marketplacesSchema = z.object({
 });
 
 export const toolsSchema = z.object({
-  tools: z.array(z.string()),
+  tools: z.array(z.string()).min(1, { message: "Please select at least one tool" }),
   techStack: z.object({
     useXero: z.boolean(),
     multipleCurrencies: z.boolean()
@@ -124,7 +124,7 @@ export const onboardingSchema = z.object({
   businessEntityType: z.string().min(1, { message: "Please select a business entity type" }),
   annualRevenueBand: z.string().min(1, { message: "Please select an annual revenue band" }),
   marketplaces: z.array(z.string()).min(1, { message: "Please select at least one marketplace" }),
-  tools: z.array(z.string()),
+  tools: z.array(z.string()).min(1, { message: "Please select at least one tool" }),
   techStack: z.object({
     useXero: z.boolean(),
     multipleCurrencies: z.boolean()

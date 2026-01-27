@@ -39,11 +39,11 @@ export const useUser = () => {
         setUser(res.data);
         return res.data;
       } else {
-        showToast(res.message || "Failed to fetch user profile", "error");
+        showToast(res.message || "Failed to fetch profile", "error");
         return null;
       }
     } catch (error: unknown) {
-      console.error("Fetch user profile error:", error);
+      console.error("Fetch profile error:", error);
       if (error instanceof AxiosError) {
         const status = error.response?.status;
         if (status === 401 || status === 403) {
