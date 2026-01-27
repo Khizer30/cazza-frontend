@@ -173,7 +173,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={logout} className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
+                  <AlertDialogAction onClick={() => logout()} className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
                     Sign Out
                   </AlertDialogAction>
                 </AlertDialogFooter>
