@@ -14,11 +14,11 @@ import { submitSupportTicketService } from "@/services/supportService";
 
 // Map form category values to API category values
 const categoryMap: Record<string, string> = {
-  technical: "Technical Issue",
-  billing: "Billing Question",
-  feature: "Feature Request",
-  integration: "Integration Issue",
-  other: "Other"
+  technical: "TECHNICAL_ISSUE",
+  billing: "BILLING_QUESTION",
+  feature: "FEATURE_REQUEST",
+  integration: "INTEGRATION_ISSUE",
+  other: "OTHER"
 };
 
 // Map form priority values to API priority values
@@ -84,8 +84,16 @@ export const SupportSettings = () => {
     } catch (error: unknown) {
       console.error("Submit support ticket error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage =
+        let errorMessage =
           error.response?.data?.message || error.response?.data?.error || "Failed to submit support ticket";
+
+        if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+          const validationMessages = error.response.data.errors
+            .map((err: any) => err.message || err.msg || err)
+            .join(", ");
+          errorMessage = validationMessages || errorMessage;
+        }
+
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");

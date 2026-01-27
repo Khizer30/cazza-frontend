@@ -379,13 +379,11 @@ export const AccountSettings = () => {
     try {
       setDeleting(true);
       await deleteUser();
-      // Logout and redirect to login after successful deletion
       setTimeout(() => {
-        logout();
+        logout(true);
       }, 1000);
     } catch (error) {
       console.error("Delete account error:", error);
-      // Error is already handled in the deleteUser hook
     } finally {
       setDeleting(false);
     }

@@ -21,16 +21,16 @@ export const useChat = () => {
     try {
       const res = await createChatGroupService(payload);
       if (res && res.success && res.data?.group) {
-        showToast(res.message || "Chat group created successfully", "success");
+        showToast(res.message || "Channel created successfully", "success");
         return res.data.group;
       } else if (res && !res.success) {
-        showToast(res.message || "Failed to create chat group", "error");
-        throw new Error(res.message || "Failed to create chat group");
+        showToast(res.message || "Failed to create channel", "error");
+        throw new Error(res.message || "Failed to create channel");
       }
       throw new Error("Invalid response from server");
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        let errorMessage = error.response?.data?.message || "Failed to create chat group";
+        let errorMessage = error.response?.data?.message || "Failed to create channel";
 
         // Handle validation errors more specifically
         if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
@@ -63,7 +63,7 @@ export const useChat = () => {
       return [];
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || "Failed to fetch chat groups";
+        const errorMessage = error.response?.data?.message || "Failed to fetch channels";
         showToast(errorMessage, "error");
       }
       return [];
@@ -79,7 +79,7 @@ export const useChat = () => {
       return null;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || "Failed to fetch chat group";
+        const errorMessage = error.response?.data?.message || "Failed to fetch channel";
         showToast(errorMessage, "error");
       }
       return null;
@@ -90,16 +90,16 @@ export const useChat = () => {
     try {
       const res = await updateChatGroupService(groupId, data);
       if (res && res.success) {
-        showToast(res.message || "Chat group updated successfully", "success");
+        showToast(res.message || "Channel updated successfully", "success");
         return true;
       } else if (res && !res.success) {
-        showToast(res.message || "Failed to update chat group", "error");
-        throw new Error(res.message || "Failed to update chat group");
+        showToast(res.message || "Failed to update channel", "error");
+        throw new Error(res.message || "Failed to update channel");
       }
       return false;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        let errorMessage = error.response?.data?.message || "Failed to update chat group";
+        let errorMessage = error.response?.data?.message || "Failed to update channel";
 
         // Handle validation errors more specifically
         if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
@@ -127,16 +127,16 @@ export const useChat = () => {
     try {
       const res = await deleteChatGroupService(groupId);
       if (res && res.success) {
-        showToast(res.message || "Chat group deleted successfully", "success");
+        showToast(res.message || "Channel deleted successfully", "success");
         return true;
       } else if (res && !res.success) {
-        showToast(res.message || "Failed to delete chat group", "error");
-        throw new Error(res.message || "Failed to delete chat group");
+        showToast(res.message || "Failed to delete channel", "error");
+        throw new Error(res.message || "Failed to delete channel");
       }
       return false;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || "Failed to delete chat group";
+        const errorMessage = error.response?.data?.message || "Failed to delete channel";
         showToast(errorMessage, "error");
         throw new Error(errorMessage);
       } else if (error instanceof Error) {

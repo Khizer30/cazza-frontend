@@ -203,6 +203,7 @@ export function Onboarding() {
     });
 
     if (!step2Result.success) {
+      setStep(2);
       const newErrors: FormErrors = {};
       step2Result.error.issues.forEach((issue) => {
         const field = issue.path[0] as keyof FormErrors;
