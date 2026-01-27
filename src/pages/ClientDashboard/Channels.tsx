@@ -1298,8 +1298,11 @@ export const Channels = () => {
                       placeholder="What is this channel about? (Optional)"
                       value={channelDescription}
                       onChange={(e) => {
-                        if (e.target.value.length <= 500) {
-                          setChannelDescription(e.target.value);
+                        const newValue = e.target.value;
+                        if (newValue.length <= 500) {
+                          setChannelDescription(newValue);
+                        } else {
+                          setChannelDescription(newValue.slice(0, 500));
                         }
                       }}
                       rows={4}
