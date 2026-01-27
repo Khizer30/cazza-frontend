@@ -246,6 +246,7 @@ export const Channels = () => {
 
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
+  const [descriptionExceedsLimit, setDescriptionExceedsLimit] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<{
     name: string;
     icon: LucideIcon;
@@ -1129,6 +1130,7 @@ export const Channels = () => {
     setEditingChannel(channel);
     setChannelName(channel.name);
     setChannelDescription(channel.description);
+    setDescriptionExceedsLimit(false);
     const icon = availableIcons.find((i) => i.name === channel.iconName);
     if (icon) setSelectedIcon(icon);
     setShowCreateDialog(true);
@@ -1139,6 +1141,7 @@ export const Channels = () => {
     setEditingChannel(null);
     setChannelName("");
     setChannelDescription("");
+    setDescriptionExceedsLimit(false);
     setSelectedIcon(availableIcons[0]);
     setShowIconPicker(false);
   };
@@ -1246,6 +1249,7 @@ export const Channels = () => {
                     setEditingChannel(null);
                     setChannelName("");
                     setChannelDescription("");
+                    setDescriptionExceedsLimit(false);
                     setSelectedIcon(availableIcons[0]);
                   }
                   setShowCreateDialog(true);
@@ -1260,6 +1264,7 @@ export const Channels = () => {
                     setEditingChannel(null);
                     setChannelName("");
                     setChannelDescription("");
+                    setDescriptionExceedsLimit(false);
                     setSelectedIcon(availableIcons[0]);
                     setShowCreateDialog(true);
                   }}
@@ -1267,7 +1272,14 @@ export const Channels = () => {
                   <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
+              <DialogContent 
+                className="sm:max-w-[500px]"
+                onOpenAutoFocus={(e) => {
+                  if (editingChannel) {
+                    e.preventDefault();
+                  }
+                }}
+              >
                 <DialogHeader>
                   <DialogTitle>{editingChannel ? "Edit Channel" : "Create New Channel"}</DialogTitle>
                   <DialogDescription>
@@ -1284,6 +1296,7 @@ export const Channels = () => {
                       placeholder="e.g., Sales Team"
                       value={channelName}
                       onChange={(e) => setChannelName(e.target.value)}
+                      autoFocus={false}
                     />
                   </div>
                   <div className="grid gap-2">
@@ -1301,14 +1314,16 @@ export const Channels = () => {
                         const newValue = e.target.value;
                         if (newValue.length <= 500) {
                           setChannelDescription(newValue);
+                          setDescriptionExceedsLimit(false);
                         } else {
                           setChannelDescription(newValue.slice(0, 500));
+                          setDescriptionExceedsLimit(true);
                         }
                       }}
                       rows={4}
                       className="resize-none max-h-32"
                     />
-                    {channelDescription.length >= 500 && (
+                    {descriptionExceedsLimit && (
                       <p className="text-xs text-destructive">
                         Description cannot exceed 500 characters
                       </p>
