@@ -494,6 +494,8 @@ export const Channels = () => {
   };
 
   const handleReply = (message: ChannelMessage) => {
+    setEditingMessageId(null);
+    setEditingMessageText("");
     setReplyingToMessage(message);
     messageInputRef.current?.focus();
   };
@@ -503,6 +505,7 @@ export const Channels = () => {
   };
 
   const startEditMessage = (message: ChannelMessage) => {
+    setReplyingToMessage(null);
     setEditingMessageId(message.id);
     setEditingMessageText(message.text);
     setTimeout(() => {
