@@ -1562,7 +1562,7 @@ export const Channels = () => {
                                   onClick={() => setExpandedDescription(true)}
                                   className="ml-1 text-primary hover:underline font-medium whitespace-nowrap"
                                 >
-                                  see more...
+                                  see more
                                 </button>
                               </p>
                             )}

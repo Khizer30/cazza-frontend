@@ -680,11 +680,11 @@ export const AccountSettings = () => {
                     </div>
                   ))}
                 </div>
-                {formData.marketplaces.length > 0 && (
+                {(currentUser?.businessProfile?.marketplaces?.length ?? 0) > 0 && (
                   <div className="mt-4">
                     <p className="text-sm text-muted-foreground mb-2">Selected marketplaces:</p>
                     <div className="flex flex-wrap gap-2">
-                      {formData.marketplaces.map((marketplace) => (
+                      {(currentUser?.businessProfile?.marketplaces ?? []).map((marketplace) => (
                         <Badge key={marketplace} variant="secondary">
                           {marketplace}
                         </Badge>
@@ -748,11 +748,11 @@ export const AccountSettings = () => {
                   </div>
                 </div>
 
-                {formData.accountingStack.integrations.length > 0 && (
+                {(currentUser?.businessProfile?.tools?.length ?? 0) > 0 && (
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">Selected integrations:</p>
                     <div className="flex flex-wrap gap-2">
-                      {formData.accountingStack.integrations.map((integration) => (
+                      {(currentUser?.businessProfile?.tools ?? []).map((integration) => (
                         <Badge key={integration} variant="secondary">
                           {integration}
                         </Badge>
