@@ -22,7 +22,6 @@ export default defineConfig(() => ({
         target: 'https://api.cazza.ai',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: 'localhost',
         rewrite: (path) => path,
         ws: true,
         configure: (proxy, _options) => {
@@ -33,8 +32,17 @@ export default defineConfig(() => ({
             console.log('Sending Request to the Target:', req.method, req.url);
             proxyReq.setHeader('Connection', 'keep-alive');
           });
-          proxy.on('proxyRes', (proxyRes, req, _res) => {
+          proxy.on('proxyRes', (proxyRes, req) => {
             console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+            const cookies = proxyRes.headers['set-cookie'];
+            if (cookies) {
+              proxyRes.headers['set-cookie'] = cookies.map((cookie: string) =>
+                cookie
+                  .replace(/;\s*Secure/gi, '')
+                  .replace(/;\s*SameSite=\w+/gi, '')
+                  .replace(/domain=[^;]+/gi, 'domain=localhost')
+              );
+            }
           });
         },
       }

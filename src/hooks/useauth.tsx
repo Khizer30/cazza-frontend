@@ -12,6 +12,7 @@ import {
 } from "@/services/authService";
 import { getUserProfileService } from "@/services/userService";
 import { useUserStore } from "@/store/userStore";
+import { removeToken } from "@/utils/localStorage";
 import type {
   FORGOTPASSWORD_PAYLOAD,
   GOOGLE_CALLBACK_PAYLOAD,
@@ -19,7 +20,6 @@ import type {
   SETNEWPASSWORD_PAYLOAD,
   SIGNUP_PAYLOAD
 } from "@/types/auth";
-// Removed localStorage imports - using cookies only
 
 export const useauth = () => {
   const { showToast } = useToast();
@@ -44,14 +44,8 @@ export const useauth = () => {
       const res = await signInService(paylaod);
 
       if (res && res.success) {
-        // Tokens are now managed via HTTP-only cookies from backend
-        // No need to manually store tokens in localStorage
-
-        // Fetch user profile after successful login
         const userData = await fetchUserProfile();
-        console.log("User Data:", userData);
 
-        // If fetchUserProfile returns null, try to use user from response as fallback
         if (!userData && res.data?.user) {
           setUser(res.data.user);
         }
@@ -179,13 +173,8 @@ export const useauth = () => {
       const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
       const res = await googleCallbackService(payload);
       if (res && res.success) {
-        // Tokens are now stored in HTTP-only cookies by the backend
-        // No need to manually store tokens in localStorage
-
-        // Fetch user profile after successful Google auth
         const userData = await fetchUserProfile();
 
-        // If fetchUserProfile returns null, try to use user from response as fallback
         if (!userData && res.data?.user) {
           setUser(res.data.user);
         }
@@ -229,7 +218,7 @@ export const useauth = () => {
       }
     } finally {
       setUser(null);
-      localStorage.clear();
+      removeToken();
 
       if (!suppressToast) {
         showToast("Successfully signed out", "success");

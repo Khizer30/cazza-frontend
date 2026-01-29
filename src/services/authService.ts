@@ -1,4 +1,5 @@
 import apiInvoker from "@/lib/apiInvoker";
+import axiosInstance from "@/lib/axiosInstance";
 import { END_POINT } from "@/lib/url";
 import type {
   FORGOTPASSWORD_PAYLOAD,
@@ -14,8 +15,18 @@ import type {
   SIGNUP_RESPONSE
 } from "@/types/auth";
 
-export const signInService = (paylaod: LOGIN_PAYLOAD) => {
-  return apiInvoker<LOGIN_RESPONSE>(END_POINT.auth.login, "POST", paylaod);
+export const signInService = (payload: LOGIN_PAYLOAD) => {
+  const formData = new URLSearchParams();
+  formData.append("email", payload.email);
+  formData.append("password", payload.password);
+  return axiosInstance({
+    url: END_POINT.auth.login,
+    method: "POST",
+    data: formData.toString(),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  }).then((res) => res.data as LOGIN_RESPONSE);
 };
 
 export const signUpService = (paylaod: SIGNUP_PAYLOAD) => {
