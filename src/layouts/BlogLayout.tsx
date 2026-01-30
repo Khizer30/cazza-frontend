@@ -7,29 +7,23 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { useUserStore } from "@/store/userStore";
-import { getToken } from "@/utils/localStorage";
 
 export const BlogLayout = () => {
   const { user } = useUserStore();
-  const { fetchUserProfile } = useUser();
+  const { checkLoggedIn } = useUser();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = getToken();
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-      if (token && !user) {
-        await fetchUserProfile();
+      if (!user) {
+        await checkLoggedIn();
       }
       setIsLoading(false);
     };
     checkAuth();
-  }, [user, fetchUserProfile]);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);

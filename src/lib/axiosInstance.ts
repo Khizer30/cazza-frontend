@@ -2,20 +2,10 @@ import axios, { type AxiosInstance } from "axios";
 
 import { useUserStore } from "@/store/userStore";
 
-const getBaseURL = () => {
-  const isProduction = window.location.hostname === "www.cazza.ai" || window.location.hostname === "cazza.ai";
-
-  if (isProduction) {
-    return "https://api.cazza.ai/api";
-  } else {
-    return "/api";
-  }
-};
-
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: getBaseURL(),
+  baseURL: "https://api.cazza.ai/api",
   timeout: 60000,
-  withCredentials: true
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(

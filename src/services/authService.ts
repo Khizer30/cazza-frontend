@@ -2,6 +2,7 @@ import apiInvoker from "@/lib/apiInvoker";
 import axiosInstance from "@/lib/axiosInstance";
 import { END_POINT } from "@/lib/url";
 import type {
+  AuthCheckResponse,
   FORGOTPASSWORD_PAYLOAD,
   FORGOTPASSWORD_RESPONSE,
   GOOGLE_AUTH_RESPONSE,
@@ -14,6 +15,12 @@ import type {
   SIGNUP_PAYLOAD,
   SIGNUP_RESPONSE
 } from "@/types/auth";
+
+export const checkLoggedInService = () => {
+  return axiosInstance
+    .get<AuthCheckResponse>(END_POINT.auth.check)
+    .then((res) => res.data);
+};
 
 export const signInService = (payload: LOGIN_PAYLOAD) => {
   const formData = new URLSearchParams();

@@ -7,15 +7,19 @@ import { useUserStore } from "@/store/userStore";
 const PrivateRoute = () => {
   const location = useLocation();
   const { user } = useUserStore();
-  const { fetchUserProfile } = useUser();
+  const { checkLoggedIn, fetchUserProfile } = useUser();
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
-      // Try to fetch user profile (cookies will be sent automatically)
       const currentUser = useUserStore.getState().user;
       if (!currentUser) {
+        const loggedInUser = await checkLoggedIn();
+        if (loggedInUser) {
+          await fetchUserProfile();
+        }
+      } else {
         await fetchUserProfile();
       }
       setAuthChecked(true);

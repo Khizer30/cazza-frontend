@@ -1,6 +1,7 @@
 export const END_POINT = {
   auth: {
     login: "/auth/signin",
+    check: "/auth/check",
     signup: "/auth/signup",
     forgotPassword: "/auth/forgot-password",
     setNewPassowrd: "/auth/reset-password",
