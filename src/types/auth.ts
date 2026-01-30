@@ -5,13 +5,14 @@ export interface LOGIN_PAYLOAD {
 
 export interface BusinessProfile {
   id?: string;
+  userId?: string;
   businessName: string;
   businessEntityType: string;
   annualRevenueBand: string;
   marketplaces: string[];
   tools: string[];
-  useXero: boolean;
-  useMultipleCurrencies: boolean;
+  useXero?: boolean;
+  useMultipleCurrencies?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -150,16 +151,12 @@ export interface ONBOARDING_PAYLOAD {
   annualRevenueBand: string;
   marketplaces: string[];
   tools: string[];
-  useXero: boolean;
-  useMultipleCurrencies: boolean;
 }
 
 export interface ONBOARDING_RESPONSE {
   success: boolean;
   message: string;
-  data?: {
-    businessProfile: BusinessProfile;
-  };
+  data?: BusinessProfile;
 }
 
 export interface USER_PROFILE_RESPONSE {
@@ -197,23 +194,17 @@ export interface UPDATE_USER_RESPONSE {
 }
 
 export interface UPDATE_BUSINESS_PROFILE_PAYLOAD {
-  firstName?: string;
-  lastName?: string;
-  businessName?: string;
-  businessEntityType?: string;
-  annualRevenueBand?: string;
-  marketplaces?: string[];
-  tools?: string[];
-  useXero?: boolean;
-  useMultipleCurrencies?: boolean;
+  businessName: string;
+  businessEntityType: string;
+  annualRevenueBand: string;
+  marketplaces: string[];
+  tools: string[];
 }
 
 export interface UPDATE_BUSINESS_PROFILE_RESPONSE {
   success: boolean;
   message: string;
-  data?: {
-    businessProfile: BusinessProfile;
-  };
+  data?: BusinessProfile;
 }
 
 export interface SUPPORT_TICKET_PAYLOAD {

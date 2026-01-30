@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
+import { buildBusinessProfilePayload } from "@/lib/businessProfileApiMap";
 import { businessInfoSchema, marketplacesSchema, toolsSchema } from "@/validators/auth-validator";
 
 interface OnboardingData {
@@ -216,16 +217,13 @@ export function Onboarding() {
     }
 
     try {
-      // Map form data to API payload
-      const payload = {
+      const payload = buildBusinessProfilePayload({
         businessName: formData.businessName,
         businessEntityType: formData.businessEntityType,
         annualRevenueBand: formData.annualRevenueBand,
         marketplaces: formData.marketplaces,
-        tools: formData.tools,
-        useXero: formData.techStack.useXero,
-        useMultipleCurrencies: formData.techStack.multipleCurrencies
-      };
+        tools: formData.tools
+      });
 
       await completeOnboarding(payload);
       // Navigate to dashboard after successful onboarding

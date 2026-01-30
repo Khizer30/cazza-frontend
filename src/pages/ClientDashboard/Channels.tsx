@@ -203,7 +203,9 @@ export const Channels = () => {
 
   const convertChatGroupToChannel = useCallback((chatGroup: ChatGroup): Channel => {
     const defaultIcon = availableIcons[0];
-    const iconFromApi = chatGroup.icon ? availableIcons.find((i) => i.name === chatGroup.icon) : null;
+    const iconFromApi = chatGroup.icon
+      ? availableIcons.find((i) => i.name.toLowerCase() === chatGroup.icon?.toLowerCase())
+      : null;
     const icon = iconFromApi || defaultIcon;
 
     return {
@@ -868,8 +870,8 @@ export const Channels = () => {
       setIsCreating(true);
       const createdGroup = await createChatGroup({
         name: channelName.trim(),
-        description: channelDescription.trim() || undefined,
-        icon: selectedIcon.name
+        description: channelDescription.trim() || "",
+        icon: selectedIcon.name.toLowerCase()
       });
 
       if (createdGroup) {
@@ -895,8 +897,8 @@ export const Channels = () => {
       setIsUpdating(true);
       await updateChatGroup(editingChannel.id, {
         name: channelName.trim(),
-        description: channelDescription.trim() || undefined,
-        icon: selectedIcon.name
+        description: channelDescription.trim() || "",
+        icon: selectedIcon.name.toLowerCase()
       });
 
       setChannels(
