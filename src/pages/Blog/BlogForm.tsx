@@ -36,6 +36,17 @@ import {
 } from "@/services/blogService";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpg", "image/jpeg"];
+const ALLOWED_EXTENSIONS = [".png", ".jpg", ".jpeg"];
+const ALLOWED_IMAGE_HINT = "Only PNG, JPG, and JPEG files are allowed.";
+
+const isAllowedImageFile = (file: File): boolean => {
+  const ext = "." + (file.name.split(".").pop() ?? "").toLowerCase();
+  const typeOk = ALLOWED_IMAGE_TYPES.includes(file.type);
+  const extOk = ALLOWED_EXTENSIONS.includes(ext);
+  return typeOk && extOk;
+};
+
 interface BlogFormData {
   title: string;
   summary: string;
@@ -128,17 +139,25 @@ export const BlogForm = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const clearBlogImageInput = () => {
+    if (blogImageInputRef.current) {
+      blogImageInputRef.current.value = "";
+    }
+  };
+
   const handleBlogImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      showToast("Please select an image file", "error");
+    if (!isAllowedImageFile(file)) {
+      showToast(ALLOWED_IMAGE_HINT, "error");
+      setTimeout(clearBlogImageInput, 0);
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
       showToast("Image size should be less than 10MB", "error");
+      setTimeout(clearBlogImageInput, 0);
       return;
     }
 
@@ -148,12 +167,13 @@ export const BlogForm = () => {
   };
 
   const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const input = e.target;
+    const files = Array.from(input.files || []);
     if (files.length === 0) return;
 
     const validFiles = files.filter((file) => {
-      if (!file.type.startsWith("image/")) {
-        showToast(`${file.name} is not an image file`, "error");
+      if (!isAllowedImageFile(file)) {
+        showToast(ALLOWED_IMAGE_HINT, "error");
         return false;
       }
       if (file.size > 10 * 1024 * 1024) {
@@ -163,7 +183,15 @@ export const BlogForm = () => {
       return true;
     });
 
-    if (validFiles.length === 0) return;
+    const clearInput = () => {
+      input.value = "";
+      if (imagesInputRef.current) imagesInputRef.current.value = "";
+    };
+    if (validFiles.length === 0) {
+      setTimeout(clearInput, 0);
+      return;
+    }
+    clearInput();
 
     setImages((prev) => [...prev, ...validFiles]);
     const previews = validFiles.map((file) => URL.createObjectURL(file));
@@ -571,6 +599,7 @@ export const BlogForm = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="blogImage">Blog Image *</Label>
+                <p className="text-xs text-muted-foreground">{ALLOWED_IMAGE_HINT}</p>
                 {existingBlogImage && !blogImage && (
                   <div className="relative inline-block mb-2">
                     <img
@@ -609,14 +638,22 @@ export const BlogForm = () => {
                   </div>
                 )}
                 {!existingBlogImage && !blogImage && (
-                  <Input
-                    id="blogImage"
-                    type="file"
-                    accept="image/*"
-                    ref={blogImageInputRef}
-                    onChange={handleBlogImageChange}
-                    className="cursor-pointer"
-                  />
+                  <div className="relative flex h-10 w-full items-center rounded-md border border-input bg-background">
+                    <span className="flex h-full shrink-0 items-center border-r border-input bg-muted/50 px-3 text-sm font-medium text-foreground">
+                      Choose File
+                    </span>
+                    <span className="flex-1 truncate px-3 text-sm text-muted-foreground">
+                      {blogImage ? blogImage.name : "No file chosen"}
+                    </span>
+                    <Input
+                      id="blogImage"
+                      type="file"
+                      accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
+                      ref={blogImageInputRef}
+                      onChange={handleBlogImageChange}
+                      className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                    />
+                  </div>
                 )}
                 {existingBlogImage && !blogImage && (
                   <AlertDialog open={deleteBlogImageDialog} onOpenChange={setDeleteBlogImageDialog}>
@@ -651,6 +688,7 @@ export const BlogForm = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="images">Content Images *</Label>
+                <p className="text-xs text-muted-foreground">{ALLOWED_IMAGE_HINT}</p>
                 {existingImages.length > 0 && images.length === 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
                     {existingImages.map((imageUrl, index) => (
@@ -696,26 +734,24 @@ export const BlogForm = () => {
                     ))}
                   </div>
                 )}
-                <div className="relative">
+                <div className="relative flex h-10 w-full items-center rounded-md border border-input bg-background">
+                  <span className="flex h-full shrink-0 items-center border-r border-input bg-muted/50 px-3 text-sm font-medium text-foreground">
+                    Choose Files
+                  </span>
+                  <span className="flex-1 truncate px-3 text-sm text-muted-foreground">
+                    {images.length > 0
+                      ? `${images.length} file${images.length > 1 ? "s" : ""} chosen`
+                      : "No files chosen"}
+                  </span>
                   <Input
                     id="images"
                     type="file"
-                    accept="image/*"
+                    accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
                     multiple
                     ref={imagesInputRef}
                     onChange={handleImagesChange}
-                    className="cursor-pointer opacity-0 absolute w-full h-full z-10"
+                    className="absolute inset-0 z-10 cursor-pointer opacity-0"
                   />
-                  <div
-                    onClick={() => imagesInputRef.current?.click()}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer items-center"
-                  >
-                    <span className="text-muted-foreground">
-                      {images.length > 0
-                        ? `${images.length} file${images.length > 1 ? "s" : ""} chosen`
-                        : "Choose Files"}
-                    </span>
-                  </div>
                 </div>
                 <AlertDialog
                   open={deleteContentImageDialog !== null}

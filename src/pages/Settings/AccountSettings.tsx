@@ -28,6 +28,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useauth } from "@/hooks/useauth";
 import { useUser } from "@/hooks/useUser";
+import {
+  buildBusinessProfilePayload,
+  fromApiEntityType,
+  fromApiMarketplaces,
+  fromApiRevenueBand,
+  fromApiTools
+} from "@/lib/businessProfileApiMap";
 import { useUserStore } from "@/store/userStore";
 
 const personalInfoSchema = z.object({
@@ -158,20 +165,15 @@ export const AccountSettings = () => {
         firstName: firstName,
         lastName: lastName,
         email: currentUser.email || "",
-        marketplaces: currentUser.businessProfile?.marketplaces || [],
+        marketplaces: fromApiMarketplaces(currentUser.businessProfile?.marketplaces || []),
         accountingStack: {
           hasXero: currentUser.businessProfile?.useXero || false,
           multiCurrency: currentUser.businessProfile?.useMultipleCurrencies || false,
-          integrations: currentUser.businessProfile?.tools || []
+          integrations: fromApiTools(currentUser.businessProfile?.tools || [])
         },
         businessName: currentUser.businessProfile?.businessName || "",
-        entityType: currentUser.businessProfile?.businessEntityType || "",
-        revenueBand:
-          currentUser.businessProfile?.annualRevenueBand === "0-85k"
-            ? "0-90k"
-            : currentUser.businessProfile?.annualRevenueBand === "85k-750k"
-              ? "90k-750k"
-              : currentUser.businessProfile?.annualRevenueBand || ""
+        entityType: fromApiEntityType(currentUser.businessProfile?.businessEntityType || ""),
+        revenueBand: fromApiRevenueBand(currentUser.businessProfile?.annualRevenueBand || "")
       });
 
       // Set avatar preview if profile image exists
@@ -295,19 +297,17 @@ export const AccountSettings = () => {
       setSavingBusiness(true);
       try {
         // Update business profile only
-        const businessUpdatePayload = {
+        const businessUpdatePayload = buildBusinessProfilePayload({
           businessName: businessName,
           businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
           annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
           marketplaces:
-            formData.marketplaces?.length > 0 ? formData.marketplaces : currentUser.businessProfile.marketplaces || [],
+            formData.marketplaces?.length > 0 ? formData.marketplaces : fromApiMarketplaces(currentUser.businessProfile.marketplaces || []),
           tools:
             formData.accountingStack.integrations?.length > 0
               ? formData.accountingStack.integrations
-              : currentUser.businessProfile.tools || [],
-          useXero: formData.accountingStack.hasXero,
-          useMultipleCurrencies: formData.accountingStack.multiCurrency
-        };
+              : fromApiTools(currentUser.businessProfile.tools || [])
+        });
 
         await updateBusinessProfile(businessUpdatePayload);
 
@@ -328,7 +328,7 @@ export const AccountSettings = () => {
 
     setSavingMarketplaces(true);
     try {
-      const businessUpdatePayload = {
+      const businessUpdatePayload = buildBusinessProfilePayload({
         businessName: formData.businessName || currentUser.businessProfile.businessName,
         businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
         annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
@@ -336,10 +336,8 @@ export const AccountSettings = () => {
         tools:
           formData.accountingStack.integrations?.length > 0
             ? formData.accountingStack.integrations
-            : currentUser.businessProfile.tools || [],
-        useXero: formData.accountingStack.hasXero,
-        useMultipleCurrencies: formData.accountingStack.multiCurrency
-      };
+            : fromApiTools(currentUser.businessProfile.tools || [])
+      });
 
       await updateBusinessProfile(businessUpdatePayload, "Marketplaces updated successfully");
     } catch (error) {
@@ -354,16 +352,14 @@ export const AccountSettings = () => {
 
     setSavingTechStack(true);
     try {
-      const businessUpdatePayload = {
+      const businessUpdatePayload = buildBusinessProfilePayload({
         businessName: formData.businessName || currentUser.businessProfile.businessName,
         businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
         annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
         marketplaces:
-          formData.marketplaces?.length > 0 ? formData.marketplaces : currentUser.businessProfile.marketplaces || [],
-        tools: formData.accountingStack.integrations,
-        useXero: formData.accountingStack.hasXero,
-        useMultipleCurrencies: formData.accountingStack.multiCurrency
-      };
+          formData.marketplaces?.length > 0 ? formData.marketplaces : fromApiMarketplaces(currentUser.businessProfile.marketplaces || []),
+        tools: formData.accountingStack.integrations || fromApiTools(currentUser.businessProfile.tools || [])
+      });
 
       await updateBusinessProfile(businessUpdatePayload, "Tech stack updated successfully");
     } catch (error) {

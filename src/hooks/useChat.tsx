@@ -86,7 +86,7 @@ export const useChat = () => {
     }
   };
 
-  const updateChatGroup = async (groupId: string, data: { name: string; description?: string; icon?: string }) => {
+  const updateChatGroup = async (groupId: string, data: { name: string; description: string; icon: string }) => {
     try {
       const res = await updateChatGroupService(groupId, data);
       if (res && res.success) {
