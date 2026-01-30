@@ -1,6 +1,8 @@
+import { useCallback } from "react";
 import { AxiosError } from "axios";
 
 import { useToast } from "@/components/ToastProvider";
+import { checkLoggedInService } from "@/services/authService";
 import { inviteTeamMemberService } from "@/services/teamService";
 import {
   getUserProfileService,
@@ -17,6 +19,7 @@ import {
 } from "@/services/userService";
 import { useTeamStore } from "@/store/teamStore";
 import { useUserStore } from "@/store/userStore";
+import type { User } from "@/types/auth";
 import type {
   ONBOARDING_PAYLOAD,
   UPDATE_USER_PAYLOAD,
@@ -30,6 +33,42 @@ import type {
 export const useUser = () => {
   const { showToast } = useToast();
   const { user, setUser, setLoading, isLoading } = useUserStore();
+
+  const checkLoggedIn = useCallback(async (): Promise<User | null> => {
+    try {
+      const res = await checkLoggedInService();
+      if (res?.success && res.data?.user) {
+        const u = res.data.user;
+        const userData: User = {
+          id: u.id,
+          email: u.email,
+          role: u.role,
+          isActive: u.isActive,
+          firstName: "",
+          lastName: "",
+          profileImage: null,
+          providers: [],
+          verified: false,
+          platforms: [],
+          createdAt: "",
+          updatedAt: "",
+          planId: null,
+          planExpiry: null,
+          ownerId: null,
+          subscription: null,
+          businessProfile: null,
+        };
+        setUser(userData);
+        return userData;
+      }
+      return null;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError && (error.response?.status === 401 || error.response?.status === 403)) {
+        return null;
+      }
+      return null;
+    }
+  }, [setUser]);
 
   const fetchUserProfile = async () => {
     try {
@@ -420,6 +459,7 @@ export const useUser = () => {
   return {
     user,
     isLoading,
+    checkLoggedIn,
     fetchUserProfile,
     completeOnboarding,
     updateUser,

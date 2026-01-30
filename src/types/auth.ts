@@ -67,6 +67,21 @@ export interface User {
   team?: Team | null;
 }
 
+export interface AuthCheckUser {
+  id: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+}
+
+export interface AuthCheckResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    user: AuthCheckUser;
+  };
+}
+
 export interface LOGIN_RESPONSE {
   success: boolean;
   message: string;
