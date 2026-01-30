@@ -16,14 +16,20 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
-      const isAuthEndpoint = error.config?.url?.includes("/auth/");
-      if (!isAuthEndpoint) {
-        useUserStore.getState().setUser(null);
-        const { removeToken } = await import("@/utils/localStorage");
-        removeToken();
-        window.location.href = "/login";
-      }
+    const status = error.response?.status;
+    const message = (error.response?.data?.message ?? error.response?.data?.error ?? "").toString().toLowerCase();
+    const isUserNotFound = status === 404 && message.includes("user not found");
+    const isAuthEndpoint = error.config?.url?.includes("/auth/");
+    const notOnLogin = window.location.pathname !== "/login";
+
+    if (notOnLogin && !isAuthEndpoint && (status === 401 || isUserNotFound)) {
+      useUserStore.getState().setUser(null);
+      const { removeToken } = await import("@/utils/localStorage");
+      removeToken();
+      try {
+        sessionStorage.setItem("account_removed", "1");
+      } catch (_) {}
+      window.location.href = "/login?message=account_removed";
     }
     return Promise.reject(error);
   }

@@ -85,7 +85,11 @@ export const useUser = () => {
       console.error("Fetch profile error:", error);
       if (error instanceof AxiosError) {
         const status = error.response?.status;
+        const msg = (error.response?.data?.message ?? error.response?.data?.error ?? "").toString().toLowerCase();
         if (status === 401 || status === 403) {
+          return null;
+        }
+        if (status === 404 && (msg.includes("user not found") || msg.includes("removed"))) {
           return null;
         }
         const errorMessage =

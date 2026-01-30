@@ -379,74 +379,70 @@ export const TeamSettings = () => {
                           </Badge>
                           {canManageTeam && (
                             <>
-                              {/* Pay for team member */}
-                              {member.role?.toUpperCase() !== "OWNER" && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handlePayForMember(member)}
-                                  disabled={
-                                    isLoading ||
-                                    isSubscriptionLoading ||
-                                    payingForMemberId === member.id ||
-                                    currentUser?.team?.subscriptionStatus === "ACTIVE"
-                                  }
-                                  className="gap-2"
-                                >
-                                  {payingForMemberId === member.id ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                      Processing...
-                                    </>
-                                  ) : currentUser?.team?.subscriptionStatus === "ACTIVE" ? (
-                                    <>
-                                      <CreditCard className="h-4 w-4" />
-                                      Already Paid
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CreditCard className="h-4 w-4" />
-                                      Pay for him
-                                    </>
-                                  )}
-                                </Button>
-                              )}
-                              {/* Only show role toggle for members (not OWNER) */}
-                              {member.role?.toUpperCase() !== "OWNER" && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={async () => {
-                                    try {
-                                      // The API expects the team member's ID (member.id) in the URL
-                                      // Based on endpoint: /team/member/{{userID}}/role where userID is the team member ID
-                                      const teamMemberId = member.id;
-
-                                      if (teamMemberId) {
-                                        await updateTeamMemberRole(teamMemberId, member.role || "MEMBER");
-                                      } else {
-                                        console.error("Team member ID not found:", member);
-                                      }
-                                    } catch (error) {
-                                      console.error("Error updating team member role:", error);
+                              {member.role?.toUpperCase() !== "OWNER" &&
+                                currentUser?.team?.subscriptionStatus !== "ACTIVE" && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePayForMember(member)}
+                                    disabled={
+                                      isLoading ||
+                                      isSubscriptionLoading ||
+                                      payingForMemberId === member.id
                                     }
-                                  }}
-                                  disabled={isLoading}
-                                >
-                                  {member.role?.toUpperCase() === "ADMIN" ? "Make Member" : "Make Admin"}
-                                </Button>
-                              )}
-                              {member.role?.toUpperCase() !== "OWNER" && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleRemoveMember(member.id)}
-                                  className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
-                                  disabled={isLoading}
-                                >
-                                  Remove
-                                </Button>
-                              )}
+                                    className="gap-2"
+                                  >
+                                    {payingForMemberId === member.id ? (
+                                      <>
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Processing...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <CreditCard className="h-4 w-4" />
+                                        Pay for him
+                                      </>
+                                    )}
+                                  </Button>
+                                )}
+                              {member.role?.toUpperCase() !== "OWNER" &&
+                                member.id !== currentUser?.id &&
+                                (currentUser?.role?.toUpperCase() === "OWNER" ||
+                                  member.role?.toUpperCase() === "MEMBER") && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={async () => {
+                                      try {
+                                        const teamMemberId = member.id;
+                                        if (teamMemberId) {
+                                          await updateTeamMemberRole(teamMemberId, member.role || "MEMBER");
+                                        } else {
+                                          console.error("Team member ID not found:", member);
+                                        }
+                                      } catch (error) {
+                                        console.error("Error updating team member role:", error);
+                                      }
+                                    }}
+                                    disabled={isLoading}
+                                  >
+                                    {member.role?.toUpperCase() === "ADMIN" ? "Make Member" : "Make Admin"}
+                                  </Button>
+                                )}
+                              {member.role?.toUpperCase() !== "OWNER" &&
+                                member.id !== currentUser?.id &&
+                                (currentUser?.role?.toUpperCase() === "OWNER" ||
+                                  member.role?.toUpperCase() === "MEMBER") && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleRemoveMember(member.id)}
+                                    className="text-destructive border border-destructive hover:bg-destructive hover:text-white"
+                                    disabled={isLoading}
+                                  >
+                                    Remove
+                                  </Button>
+                                )}
                             </>
                           )}
                         </div>

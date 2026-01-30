@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ToastProvider";
 import { useauth } from "@/hooks/useauth";
 import { useUserStore } from "@/store/userStore";
 import type { LOGIN_PAYLOAD } from "@/types/auth";
 import { logInSchema, type LoginData } from "@/validators/auth-validator";
 
 export const SignIn = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { showToast } = useToast();
   const {
     register,
     handleSubmit,
@@ -33,6 +36,16 @@ export const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const accountRemovedHandled = useRef(false);
+
+  useEffect(() => {
+    if (accountRemovedHandled.current) return;
+    if (searchParams.get("message") === "account_removed") {
+      accountRemovedHandled.current = true;
+      showToast("Your account got deleted", "error");
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, showToast]);
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
