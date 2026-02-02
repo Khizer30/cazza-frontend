@@ -14,6 +14,12 @@ const PublicRoute = () => {
     const checkSession = async () => {
       await checkLoggedIn();
       if (!cancelled) {
+        try {
+          if (sessionStorage.getItem("account_removed") === "1") {
+            useUserStore.getState().setUser(null);
+            sessionStorage.removeItem("account_removed");
+          }
+        } catch (_) {}
         setChecked(true);
       }
     };
