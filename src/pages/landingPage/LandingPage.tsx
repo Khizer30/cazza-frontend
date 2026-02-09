@@ -13,8 +13,8 @@ import {
   Send,
   Bot
 } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 import { Logo } from "@/assets/svgs/Logo";
@@ -24,9 +24,24 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { tempRevenueData } from "@/constants/ClientDashboard";
 
+const scrollToSection = (sectionId: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+  e.preventDefault();
+  document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+};
+
 export const LandingPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  useEffect(() => {
+    const scrollTo = (location.state as { scrollTo?: string })?.scrollTo;
+    if (scrollTo && typeof scrollTo === "string") {
+      const el = document.getElementById(scrollTo);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+      navigate(".", { replace: true, state: {} });
+    }
+  }, [location.state, navigate]);
   const testimonials = [
     {
       quote:
@@ -84,19 +99,19 @@ export const LandingPage = () => {
             </Link>
 
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#solution" className="text-foreground hover:text-primary transition-colors">
+              <a href="#solution" onClick={scrollToSection("solution")} className="text-foreground hover:text-primary transition-colors">
                 Solution
               </a>
-              <a href="#platforms" className="text-foreground hover:text-primary transition-colors">
+              <a href="#platforms" onClick={scrollToSection("platforms")} className="text-foreground hover:text-primary transition-colors">
                 Integrations
               </a>
               <Link to="/blog" className="text-foreground hover:text-primary transition-colors">
                 Blog
               </Link>
-              <a href="#pricing" className="text-foreground hover:text-primary transition-colors">
+              <a href="#pricing" onClick={scrollToSection("pricing")} className="text-foreground hover:text-primary transition-colors">
                 Pricing
               </a>
-              <a href="#faq" className="text-foreground hover:text-primary transition-colors">
+              <a href="#faq" onClick={scrollToSection("faq")} className="text-foreground hover:text-primary transition-colors">
                 FAQ
               </a>
             </div>
@@ -1160,17 +1175,17 @@ export const LandingPage = () => {
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-background/70">
                 <li>
-                  <a href="#solution" className="hover:text-background transition-colors">
+                  <a href="#solution" onClick={scrollToSection("solution")} className="hover:text-background transition-colors">
                     Solution
                   </a>
                 </li>
                 <li>
-                  <a href="#platforms" className="hover:text-background transition-colors">
+                  <a href="#platforms" onClick={scrollToSection("platforms")} className="hover:text-background transition-colors">
                     Integrations
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" className="hover:text-background transition-colors">
+                  <a href="#pricing" onClick={scrollToSection("pricing")} className="hover:text-background transition-colors">
                     Pricing
                   </a>
                 </li>
