@@ -99,19 +99,35 @@ export const LandingPage = () => {
             </Link>
 
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#solution" onClick={scrollToSection("solution")} className="text-foreground hover:text-primary transition-colors">
+              <a
+                href="#solution"
+                onClick={scrollToSection("solution")}
+                className="text-foreground hover:text-primary transition-colors"
+              >
                 Solution
               </a>
-              <a href="#platforms" onClick={scrollToSection("platforms")} className="text-foreground hover:text-primary transition-colors">
+              <a
+                href="#platforms"
+                onClick={scrollToSection("platforms")}
+                className="text-foreground hover:text-primary transition-colors"
+              >
                 Integrations
               </a>
               <Link to="/blog" className="text-foreground hover:text-primary transition-colors">
                 Blog
               </Link>
-              <a href="#pricing" onClick={scrollToSection("pricing")} className="text-foreground hover:text-primary transition-colors">
+              <a
+                href="#pricing"
+                onClick={scrollToSection("pricing")}
+                className="text-foreground hover:text-primary transition-colors"
+              >
                 Pricing
               </a>
-              <a href="#faq" onClick={scrollToSection("faq")} className="text-foreground hover:text-primary transition-colors">
+              <a
+                href="#faq"
+                onClick={scrollToSection("faq")}
+                className="text-foreground hover:text-primary transition-colors"
+              >
                 FAQ
               </a>
             </div>
@@ -1175,17 +1191,29 @@ export const LandingPage = () => {
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-background/70">
                 <li>
-                  <a href="#solution" onClick={scrollToSection("solution")} className="hover:text-background transition-colors">
+                  <a
+                    href="#solution"
+                    onClick={scrollToSection("solution")}
+                    className="hover:text-background transition-colors"
+                  >
                     Solution
                   </a>
                 </li>
                 <li>
-                  <a href="#platforms" onClick={scrollToSection("platforms")} className="hover:text-background transition-colors">
+                  <a
+                    href="#platforms"
+                    onClick={scrollToSection("platforms")}
+                    className="hover:text-background transition-colors"
+                  >
                     Integrations
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" onClick={scrollToSection("pricing")} className="hover:text-background transition-colors">
+                  <a
+                    href="#pricing"
+                    onClick={scrollToSection("pricing")}
+                    className="hover:text-background transition-colors"
+                  >
                     Pricing
                   </a>
                 </li>

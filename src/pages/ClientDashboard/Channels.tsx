@@ -1277,7 +1277,7 @@ export const Channels = () => {
                   <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent 
+              <DialogContent
                 className="sm:max-w-[500px]"
                 onOpenAutoFocus={(e) => {
                   if (editingChannel) {
@@ -1329,9 +1329,7 @@ export const Channels = () => {
                       className="resize-none max-h-32"
                     />
                     {descriptionExceedsLimit && (
-                      <p className="text-xs text-destructive">
-                        Description cannot exceed 500 characters
-                      </p>
+                      <p className="text-xs text-destructive">Description cannot exceed 500 characters</p>
                     )}
                   </div>
                   <div className="grid gap-2">
@@ -1541,7 +1539,7 @@ export const Channels = () => {
                       </div>
                     );
                   })()}
-                  <div className="min-w-0 flex-1" style={{ maxWidth: 'calc(100% - 200px)' }}>
+                  <div className="min-w-0 flex-1" style={{ maxWidth: "calc(100% - 200px)" }}>
                     <h2 className="font-semibold truncate mb-0.5">{selectedChannel.name}</h2>
                     {selectedChannel.description && (
                       <div className="text-sm text-muted-foreground break-words">

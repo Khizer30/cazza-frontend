@@ -17,9 +17,7 @@ import type {
 } from "@/types/auth";
 
 export const checkLoggedInService = () => {
-  return axiosInstance
-    .get<AuthCheckResponse>(END_POINT.auth.check)
-    .then((res) => res.data);
+  return axiosInstance.get<AuthCheckResponse>(END_POINT.auth.check).then((res) => res.data);
 };
 
 export const signInService = (payload: LOGIN_PAYLOAD) => {

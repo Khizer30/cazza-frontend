@@ -34,9 +34,7 @@ export const useChat = () => {
 
         // Handle validation errors more specifically
         if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
-          const validationMessages = error.response.data.errors
-            .map((err: any) => err.message || err.msg)
-            .join(", ");
+          const validationMessages = error.response.data.errors.map((err: any) => err.message || err.msg).join(", ");
           errorMessage = validationMessages || errorMessage;
         }
 
@@ -103,9 +101,7 @@ export const useChat = () => {
 
         // Handle validation errors more specifically
         if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
-          const validationMessages = error.response.data.errors
-            .map((err: any) => err.message || err.msg)
-            .join(", ");
+          const validationMessages = error.response.data.errors.map((err: any) => err.message || err.msg).join(", ");
           errorMessage = validationMessages || errorMessage;
         }
 

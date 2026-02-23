@@ -255,7 +255,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     };
 
     set((state) => ({
-      conversations: [newConversation, ...state.conversations].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+      conversations: [newConversation, ...state.conversations].sort(
+        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+      )
     }));
   },
 

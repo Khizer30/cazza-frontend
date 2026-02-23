@@ -54,25 +54,15 @@ const TOOL_TO_API: Record<string, string> = {
   Other: "other"
 };
 
-const TOOL_FROM_API: Record<string, string> = Object.fromEntries(
-  Object.entries(TOOL_TO_API).map(([k, v]) => [v, k])
-);
+const TOOL_FROM_API: Record<string, string> = Object.fromEntries(Object.entries(TOOL_TO_API).map(([k, v]) => [v, k]));
 
-function toApiValue(
-  formValue: string,
-  toMap: Record<string, string>,
-  fallback: (v: string) => string
-): string {
+function toApiValue(formValue: string, toMap: Record<string, string>, fallback: (v: string) => string): string {
   const mapped = toMap[formValue];
   if (mapped) return mapped;
   return fallback(formValue);
 }
 
-function fromApiValue(
-  apiValue: string,
-  fromMap: Record<string, string>,
-  fallback: (v: string) => string
-): string {
+function fromApiValue(apiValue: string, fromMap: Record<string, string>, fallback: (v: string) => string): string {
   const mapped = fromMap[apiValue];
   if (mapped) return mapped;
   return fallback(apiValue);
@@ -87,9 +77,7 @@ export function fromApiEntityType(apiValue: string): string {
 }
 
 export function toApiRevenueBand(formValue: string): string {
-  return toApiValue(formValue, REVENUE_BAND_TO_API, (v) =>
-    v.replace(/-/g, "_").replace(/\+/g, "_plus").toLowerCase()
-  );
+  return toApiValue(formValue, REVENUE_BAND_TO_API, (v) => v.replace(/-/g, "_").replace(/\+/g, "_plus").toLowerCase());
 }
 
 export function fromApiRevenueBand(apiValue: string): string {
@@ -97,9 +85,7 @@ export function fromApiRevenueBand(apiValue: string): string {
 }
 
 export function toApiMarketplaces(formValues: string[]): string[] {
-  return formValues.map((v) =>
-    toApiValue(v, MARKETPLACE_TO_API, (x) => x.toLowerCase().replace(/\s+/g, "_"))
-  );
+  return formValues.map((v) => toApiValue(v, MARKETPLACE_TO_API, (x) => x.toLowerCase().replace(/\s+/g, "_")));
 }
 
 export function fromApiMarketplaces(apiValues: string[]): string[] {
@@ -114,9 +100,7 @@ export function fromApiMarketplaces(apiValues: string[]): string[] {
 }
 
 export function toApiTools(formValues: string[]): string[] {
-  return formValues.map((v) =>
-    toApiValue(v, TOOL_TO_API, (x) => x.toLowerCase().replace(/\s+/g, "_"))
-  );
+  return formValues.map((v) => toApiValue(v, TOOL_TO_API, (x) => x.toLowerCase().replace(/\s+/g, "_")));
 }
 
 export function fromApiTools(apiValues: string[]): string[] {
