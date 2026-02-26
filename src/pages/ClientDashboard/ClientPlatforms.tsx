@@ -84,6 +84,12 @@ export const ClientPlatforms = () => {
       return;
     }
 
+    if (platformId === "shopify") {
+      setSelectedPlatform({ id: platform.id, name: platform.name, type: platform.type as "ecommerce" | "accounting" | "marketplace" });
+      setIsModalOpen(true);
+      return;
+    }
+
     try {
       setIsUpdating(true);
       const currentPlatforms = user?.platforms || [];

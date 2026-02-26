@@ -5,7 +5,7 @@ import { useUserStore } from "@/store/userStore";
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: "https://api.cazza.ai/api",
   timeout: 60000,
-  withCredentials: true,
+  withCredentials: true
 });
 
 axiosInstance.interceptors.request.use(

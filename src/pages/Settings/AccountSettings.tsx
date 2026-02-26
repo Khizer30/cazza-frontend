@@ -67,8 +67,16 @@ type BusinessInfoData = z.infer<typeof businessInfoSchema>;
 
 export const AccountSettings = () => {
   const navigate = useNavigate();
-  const { user, fetchUserProfile, updateUser, updateProfileImage, deleteProfileImage, updateBusinessProfile, deleteUser, isLoading } =
-    useUser();
+  const {
+    user,
+    fetchUserProfile,
+    updateUser,
+    updateProfileImage,
+    deleteProfileImage,
+    updateBusinessProfile,
+    deleteUser,
+    isLoading
+  } = useUser();
   const { user: storeUser } = useUserStore();
   const { logout } = useauth();
 
@@ -246,7 +254,7 @@ export const AccountSettings = () => {
 
   const handleRemoveAvatar = useCallback(async () => {
     if (!currentUser?.profileImage && !avatarPreview) return;
-    
+
     setDeletingImage(true);
     try {
       await deleteProfileImage();
@@ -302,7 +310,9 @@ export const AccountSettings = () => {
           businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
           annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
           marketplaces:
-            formData.marketplaces?.length > 0 ? formData.marketplaces : fromApiMarketplaces(currentUser.businessProfile.marketplaces || []),
+            formData.marketplaces?.length > 0
+              ? formData.marketplaces
+              : fromApiMarketplaces(currentUser.businessProfile.marketplaces || []),
           tools:
             formData.accountingStack.integrations?.length > 0
               ? formData.accountingStack.integrations
@@ -357,7 +367,9 @@ export const AccountSettings = () => {
         businessEntityType: formData.entityType || currentUser.businessProfile.businessEntityType,
         annualRevenueBand: formData.revenueBand || currentUser.businessProfile.annualRevenueBand,
         marketplaces:
-          formData.marketplaces?.length > 0 ? formData.marketplaces : fromApiMarketplaces(currentUser.businessProfile.marketplaces || []),
+          formData.marketplaces?.length > 0
+            ? formData.marketplaces
+            : fromApiMarketplaces(currentUser.businessProfile.marketplaces || []),
         tools: formData.accountingStack.integrations || fromApiTools(currentUser.businessProfile.tools || [])
       });
 
@@ -438,11 +450,7 @@ export const AccountSettings = () => {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       disabled={uploadingImage}
                     />
-                    <Button
-                      variant="outline"
-                      className="gap-2"
-                      disabled={uploadingImage}
-                    >
+                    <Button variant="outline" className="gap-2" disabled={uploadingImage}>
                       {uploadingImage ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />

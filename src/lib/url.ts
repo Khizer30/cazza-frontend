@@ -67,5 +67,8 @@ export const END_POINT = {
   notifications: {
     list: "/notifications",
     markRead: "/notifications/mark-read"
+  },
+  shopify: {
+    install: (shop: string) => `/shopify/install?shop=${shop}`
   }
 } as const;

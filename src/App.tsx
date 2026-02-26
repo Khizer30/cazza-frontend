@@ -1,9 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { CanonicalManager } from "./components/CanonicalManager";
 import { ThemeProvider } from "./components/theme-provider";
 import { ToastProvider } from "./components/ToastProvider";
-import { BlogLayout } from "./layouts/BlogLayout";
 import { ClientLayout } from "./layouts/ClientLayout";
 import { GoogleCallback } from "./pages/auth/GoogleCallback";
 import { Onboarding } from "./pages/auth/OnBoarding";
@@ -11,11 +10,7 @@ import { ResetPassword } from "./pages/auth/ResetPassword";
 import { SetNewPassword } from "./pages/auth/SetNewPassword";
 import { SignIn } from "./pages/auth/SignIn";
 import { SignUp } from "./pages/auth/SignUp";
-import { CookiePolicy } from "./pages/auth/Term and Conditions/CookiePolicy";
-import { DataProtection } from "./pages/auth/Term and Conditions/DataProtection";
 import { ClientDashboard } from "./pages/ClientDashboard/ClientDashboard";
-import { AmazonSellers } from "./pages/landingPage/AmazonSellers";
-import { LandingPage } from "./pages/landingPage/LandingPage";
 import NotFound from "./pages/NotFound";
 import { ClientPlatforms } from "./pages/ClientDashboard/ClientPlatforms";
 import { AIChat } from "./pages/ClientDashboard/AIChat";
@@ -24,13 +19,8 @@ import { AccountSettings } from "./pages/Settings/AccountSettings";
 import { BillingSettings } from "./pages/Settings/BillingSettings";
 import { SupportSettings } from "./pages/Settings/SupportSettings";
 import { TeamSettings } from "./pages/Settings/TeamSettings";
-import { PrivacyPolicy } from "./pages/auth/Term and Conditions/PrivacyPolicy";
-import { TermsAndConditions } from "./pages/auth/Term and Conditions/TermsAndConditions";
-import { Disclaimer } from "./pages/auth/Term and Conditions/Disclaimer";
 import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
-import { BlogDashboard } from "./pages/Blog/BlogDashboard";
-import { BlogDetail } from "./pages/Blog/BlogDetail";
 import { BlogManagement } from "./pages/Blog/BlogManagement";
 import { BlogForm } from "./pages/Blog/BlogForm";
 
@@ -43,25 +33,13 @@ const App = () => {
           <Routes>
             {/* Public routes that redirect if authenticated */}
             <Route element={<PublicRoute />}>
-              <Route index element={<LandingPage />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-              <Route path="/cookie-policy" element={<CookiePolicy />} />
-              <Route path="/disclaimer" element={<Disclaimer />} />
-              <Route path="/data-protection" element={<DataProtection />} />
-              <Route path="/amazon-sellers" element={<AmazonSellers />} />
+              <Route index element={<Navigate to="/login" replace />} />
               <Route path="*" element={<NotFound />} />
               <Route path="/login" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/set-new-password" element={<SetNewPassword />} />
               <Route path="/auth/google/callback" element={<GoogleCallback />} />
-            </Route>
-
-            {/* Public blog routes with conditional layout */}
-            <Route path="/blog" element={<BlogLayout />}>
-              <Route index element={<BlogDashboard />} />
-              <Route path=":slug" element={<BlogDetail />} />
             </Route>
 
             {/* Private routes that require authentication */}

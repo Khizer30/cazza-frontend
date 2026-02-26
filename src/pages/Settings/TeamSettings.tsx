@@ -385,11 +385,7 @@ export const TeamSettings = () => {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => handlePayForMember(member)}
-                                    disabled={
-                                      isLoading ||
-                                      isSubscriptionLoading ||
-                                      payingForMemberId === member.id
-                                    }
+                                    disabled={isLoading || isSubscriptionLoading || payingForMemberId === member.id}
                                     className="gap-2"
                                   >
                                     {payingForMemberId === member.id ? (

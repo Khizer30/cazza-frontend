@@ -56,7 +56,7 @@ export const useUser = () => {
           planExpiry: null,
           ownerId: null,
           subscription: null,
-          businessProfile: null,
+          businessProfile: null
         };
         setUser(userData);
         return userData;
@@ -162,7 +162,8 @@ export const useUser = () => {
     } catch (error: unknown) {
       console.error("Update user error:", error);
       if (error instanceof AxiosError) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to update personal information";
+        const errorMessage =
+          error.response?.data?.message || error.response?.data?.error || "Failed to update personal information";
         showToast(errorMessage, "error");
       } else if (error instanceof Error) {
         showToast(error.message, "error");

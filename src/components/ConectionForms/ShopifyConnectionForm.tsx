@@ -1,15 +1,14 @@
 import { ExternalLink, Loader2 } from "lucide-react";
 import { useState } from "react";
 
+import { useToast } from "@/components/ToastProvider";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 export const ShopifyConnectionForm = ({
-  // onSubmit,
   isLoading,
   onClose
-  // onConnectionSuccess,
 }: {
   onSubmit: (data: any) => void;
   isLoading: boolean;
@@ -17,12 +16,29 @@ export const ShopifyConnectionForm = ({
   onConnectionSuccess?: () => void;
 }) => {
   const [shopUrl, setShopUrl] = useState("");
-  const [isConnecting] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    onClose();
+    const normalizedShop = shopUrl.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
+    if (!normalizedShop) return;
+
+    setIsConnecting(true);
+    try {
+      const { getShopifyInstallUrlService } = await import("@/services/shopifyService");
+      const res = await getShopifyInstallUrlService(normalizedShop);
+      if (res?.url) {
+        onClose();
+        window.location.href = res.url;
+      }
+    } catch (error) {
+      console.error("Error connecting Shopify:", error);
+      showToast("Failed to connect Shopify. Please check your shop URL.", "error");
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
   return (
