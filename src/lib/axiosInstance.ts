@@ -3,7 +3,7 @@ import axios, { type AxiosInstance } from "axios";
 import { useUserStore } from "@/store/userStore";
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "https://api.cazza.ai/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 60000,
   withCredentials: true
 });
