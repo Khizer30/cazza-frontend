@@ -1,7 +1,8 @@
 import { AxiosError } from "axios";
 
 import { useToast } from "@/components/ToastProvider";
-import {
+import
+{
   forgotPasswordService,
   getGoogleAuthUrlService,
   googleCallbackService,
@@ -12,7 +13,6 @@ import {
 } from "@/services/authService";
 import { getUserProfileService } from "@/services/userService";
 import { useUserStore } from "@/store/userStore";
-import { removeToken } from "@/utils/localStorage";
 import type {
   FORGOTPASSWORD_PAYLOAD,
   GOOGLE_CALLBACK_PAYLOAD,
@@ -20,207 +20,284 @@ import type {
   SETNEWPASSWORD_PAYLOAD,
   SIGNUP_PAYLOAD
 } from "@/types/auth";
+import { removeToken, setRefreshToken, setToken } from "@/utils/localStorage";
 
-export const useauth = () => {
+export const useauth = () =>
+{
   const { showToast } = useToast();
   const { setUser } = useUserStore();
 
-  const fetchUserProfile = async () => {
-    try {
+  const fetchUserProfile = async () =>
+  {
+    try
+    {
       const res = await getUserProfileService();
-      if (res && res.success && res.data) {
+      if (res && res.success && res.data)
+      {
         setUser(res.data);
         return res.data;
       }
       return null;
-    } catch (error) {
+    } catch (error)
+    {
       console.error("Failed to fetch user profile:", error);
       return null;
     }
   };
 
-  const signIn = async (paylaod: LOGIN_PAYLOAD) => {
-    try {
+  const signIn = async (paylaod: LOGIN_PAYLOAD) =>
+  {
+    try
+    {
       const res = await signInService(paylaod);
 
-      if (res && res.success) {
+      if (res && res.success)
+      {
+        const accessToken =
+          res.data?.accessToken ?? (res as { accessToken?: string; }).accessToken ?? (res as { access_token?: string; }).access_token;
+        const refreshToken = res.data?.refreshToken;
+        if (accessToken) setToken(accessToken);
+        if (refreshToken) setRefreshToken(refreshToken);
+
         const userData = await fetchUserProfile();
 
-        if (!userData && res.data?.user) {
+        if (!userData && res.data?.user)
+        {
           setUser(res.data.user);
         }
 
         showToast(res.message || "Successfully signed in", "success");
         return res;
-      } else if (res && !res.success) {
+      } else if (res && !res.success)
+      {
         // Handle case where API returns success: false with 200 status
         showToast(res.message || "Invalid email or password", "error");
         throw new Error(res.message || "Login failed");
       }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
+    } catch (error: unknown)
+    {
+      if (error instanceof AxiosError)
+      {
         const errorMessage =
           error.response?.data?.message || error.response?.data?.error || "An error occurred during sign in";
         showToast(errorMessage, "error");
-      } else if (error instanceof Error) {
+      } else if (error instanceof Error)
+      {
         showToast(error.message, "error");
-      } else {
+      } else
+      {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
       throw error;
     }
   };
 
-  const signUp = async (paylaod: SIGNUP_PAYLOAD) => {
-    try {
+  const signUp = async (paylaod: SIGNUP_PAYLOAD) =>
+  {
+    try
+    {
       const res = await signUpService(paylaod);
-      if (res && res.success) {
+      if (res && res.success)
+      {
         showToast(res.message || "Verification email has been sent to your email address.", "success");
         return res;
       }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
+    } catch (error: unknown)
+    {
+      if (error instanceof AxiosError)
+      {
         const responseData = error.response?.data;
         let errorMessage = "An error occurred during signup";
 
         // Check if backend returned detailed validation errors
-        if (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
+        if (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0)
+        {
           // Extract all error messages from the errors array
-          const errorMessages = responseData.errors.map((err: { message?: string }) => err.message).filter(Boolean);
+          const errorMessages = responseData.errors.map((err: { message?: string; }) => err.message).filter(Boolean);
 
-          if (errorMessages.length > 0) {
+          if (errorMessages.length > 0)
+          {
             errorMessage = errorMessages.join(". ");
           }
-        } else if (responseData?.message) {
+        } else if (responseData?.message)
+        {
           errorMessage = responseData.message;
-        } else if (responseData?.error) {
+        } else if (responseData?.error)
+        {
           errorMessage = responseData.error;
         }
 
         showToast(errorMessage, "error");
-      } else {
+      } else
+      {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
       throw error;
     }
   };
-  const forgotPassword = async (paylaod: FORGOTPASSWORD_PAYLOAD) => {
-    try {
+  const forgotPassword = async (paylaod: FORGOTPASSWORD_PAYLOAD) =>
+  {
+    try
+    {
       const res = await forgotPasswordService(paylaod);
-      if (res && res.success) {
+      if (res && res.success)
+      {
         showToast(res.message || "Password reset email has been sent.", "success");
         return res;
-      } else if (res && !res.success) {
+      } else if (res && !res.success)
+      {
         showToast(res.message || "Failed to send reset email", "error");
         throw new Error(res.message || "Failed to send reset email");
       }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
+    } catch (error: unknown)
+    {
+      if (error instanceof AxiosError)
+      {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
-      } else if (error instanceof Error) {
+      } else if (error instanceof Error)
+      {
         showToast(error.message, "error");
-      } else {
+      } else
+      {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
       throw error;
     }
   };
-  const setNewPassword = async (paylaod: SETNEWPASSWORD_PAYLOAD) => {
-    try {
+  const setNewPassword = async (paylaod: SETNEWPASSWORD_PAYLOAD) =>
+  {
+    try
+    {
       const res = await setNewPasswordService(paylaod);
-      if (res && res.success) {
+      if (res && res.success)
+      {
         showToast(res.message || "Password has been reset successfully", "success");
         return res;
-      } else if (res && !res.success) {
+      } else if (res && !res.success)
+      {
         showToast(res.message || "Failed to reset password", "error");
         throw new Error(res.message || "Failed to reset password");
       }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
+    } catch (error: unknown)
+    {
+      if (error instanceof AxiosError)
+      {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
-      } else if (error instanceof Error) {
+      } else if (error instanceof Error)
+      {
         showToast(error.message, "error");
-      } else {
+      } else
+      {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
       throw error;
     }
   };
-  const getGoogleAuthUrl = async () => {
-    try {
+  const getGoogleAuthUrl = async () =>
+  {
+    try
+    {
       const res = await getGoogleAuthUrlService();
-      if (res && res.success && res.data?.url) {
+      if (res && res.success && res.data?.url)
+      {
         // Redirect to Google OAuth URL
         window.location.href = res.data.url;
-      } else {
+      } else
+      {
         showToast("Failed to initiate Google authentication", "error");
       }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
+    } catch (error: unknown)
+    {
+      if (error instanceof AxiosError)
+      {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || "An error occurred";
         showToast(errorMessage, "error");
-      } else {
+      } else
+      {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
       throw error;
     }
   };
 
-  const handleGoogleCallback = async (code: string) => {
-    try {
+  const handleGoogleCallback = async (code: string) =>
+  {
+    try
+    {
       const payload: GOOGLE_CALLBACK_PAYLOAD = { token: code };
       const res = await googleCallbackService(payload);
-      if (res && res.success) {
+      if (res && res.success)
+      {
+        const accessToken = res.data?.accessToken;
+        const refreshToken = res.data?.refreshToken;
+        if (accessToken) setToken(accessToken);
+        if (refreshToken) setRefreshToken(refreshToken);
+
         const userData = await fetchUserProfile();
 
-        if (!userData && res.data?.user) {
+        if (!userData && res.data?.user)
+        {
           setUser(res.data.user);
         }
 
         showToast(res.message || "Successfully signed in with Google", "success");
         return res;
-      } else if (res && !res.success) {
+      } else if (res && !res.success)
+      {
         // Display the actual API error message
         const errorMsg = res.message || "Google authentication failed";
         showToast(errorMsg, "error");
         throw new Error(errorMsg);
       }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
+    } catch (error: unknown)
+    {
+      if (error instanceof AxiosError)
+      {
         const responseData = error.response?.data;
         // Display the actual API error message
         const errorMessage =
           responseData?.message || responseData?.error || "An error occurred during Google authentication";
         showToast(errorMessage, "error");
-      } else if (error instanceof Error) {
+      } else if (error instanceof Error)
+      {
         showToast(error.message, "error");
-      } else {
+      } else
+      {
         showToast("An unexpected error occurred. Please try again.", "error");
       }
       return null;
     }
   };
 
-  const logout = async (suppressToast = false) => {
-    try {
+  const logout = async (suppressToast = false) =>
+  {
+    try
+    {
       await logoutService();
-    } catch (error) {
-      if (error instanceof AxiosError) {
+    } catch (error)
+    {
+      if (error instanceof AxiosError)
+      {
         const status = error.response?.status;
-        if (status === 404) {
-        } else {
+        if (status === 404)
+        {
+        } else
+        {
           console.error("Logout error:", error);
         }
-      } else {
+      } else
+      {
         console.error("Logout error:", error);
       }
-    } finally {
+    } finally
+    {
       setUser(null);
       removeToken();
 
-      if (!suppressToast) {
+      if (!suppressToast)
+      {
         showToast("Successfully signed out", "success");
       }
       window.location.href = "/login";
